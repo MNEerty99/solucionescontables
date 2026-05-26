@@ -58,6 +58,12 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <span>Portal Cliente (Demo)</span>
         </a>
 
+        <div class="db-nav-label">Configuración</div>
+        <a href="#/demo/configuracion" class="db-nav-item ${activeRoute === 'configuracion' ? 'active' : ''}" data-route="configuracion">
+          <i data-lucide="settings"></i>
+          <span>Configuración ARCA</span>
+        </a>
+
         <div class="db-nav-label">Salida</div>
         <a href="#/" class="db-nav-item">
           <i data-lucide="arrow-left-circle"></i>

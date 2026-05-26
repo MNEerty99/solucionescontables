@@ -12,6 +12,7 @@ import { renderVentas, initVentas } from './views/ventas.js';
 import { renderImportacion, initImportacion } from './views/importacion.js';
 import { renderIVA, initIVA } from './views/iva.js';
 import { renderPortalCliente, initPortalCliente } from './views/portal_cliente.js';
+import { renderConfiguracion, initConfiguracion } from './views/configuracion.js';
 
 class Application {
   constructor() {
@@ -95,6 +96,12 @@ class Application {
         initDashboardLayout(this);
         initPortalCliente(this);
         this.updateBreadcrumb("Portal del Cliente");
+      }
+      else if (subRoute === '/configuracion') {
+        rootEl.innerHTML = renderDashboardLayout(renderConfiguracion(), 'configuracion');
+        initDashboardLayout(this);
+        initConfiguracion(this);
+        this.updateBreadcrumb("Configuración de Enlace ARCA");
       }
       else {
         // Fallback to demo home
