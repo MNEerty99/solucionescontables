@@ -144,7 +144,18 @@ function renderTransactionsTable(transactions, type) {
               </span>
             </td>
             <td class="font-mono text-sm" style="font-weight: 500;">${t.numero}</td>
-            <td style="font-weight: 600; font-size: 13.5px;">${t.cliente || t.proveedor}</td>
+            <td style="font-weight: 600; font-size: 13.5px;">
+              <div>${t.cliente || t.proveedor}</div>
+              ${type === 'compras' ? (t.es_activo ? `
+                <div style="font-size: 10px; font-weight: 700; color: #818cf8; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                  <i data-lucide="building" style="width: 10px; height: 10px;"></i> Bien de Uso / Activo
+                </div>
+              ` : `
+                <div style="font-size: 10px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                  <i data-lucide="tag" style="width: 10px; height: 10px;"></i> Gasto (${t.categoria || 'General'})
+                </div>
+              `) : ''}
+            </td>
             <td class="font-mono" style="color: var(--text-secondary);">${t.cuit}</td>
             <td class="font-mono text-right">$ ${t.neto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
             <td class="font-mono text-right" style="color: var(--text-secondary);">$ ${t.iva.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>

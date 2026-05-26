@@ -178,7 +178,14 @@ export function renderIVA() {
                   </span>
                 </td>
                 <td class="font-mono text-xs">${item.numero}</td>
-                <td style="font-weight: 600; font-size: 12.5px;">${item.cliente || item.proveedor}</td>
+                <td style="font-weight: 600; font-size: 12.5px;">
+                  <div>${item.cliente || item.proveedor}</div>
+                  ${item.es_activo ? `
+                    <span style="font-size: 8px; font-weight: 700; color: #818cf8; background: rgba(99, 102, 241, 0.08); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(99, 102, 241, 0.2); display: inline-flex; align-items: center; gap: 2px; margin-top: 2px;">
+                      <i data-lucide="building" style="width: 8px; height: 8px;"></i> BIEN DE USO
+                    </span>
+                  ` : ''}
+                </td>
                 <td class="font-mono text-xs" style="color: var(--text-secondary);">${item.cuit}</td>
                 <td class="font-mono text-right text-sm">$ ${item.neto.toLocaleString('es-AR')}</td>
                 <td class="font-mono text-right text-sm text-emerald">${item.df > 0 ? '$ ' + item.df.toLocaleString('es-AR') : '—'}</td>

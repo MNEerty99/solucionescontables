@@ -5,9 +5,9 @@ import { getActiveCompany, addTransaction } from '../db/mockdb.js';
 
 // Pre-loaded digital tickets
 const INITIAL_DIGITAL_TICKETS = [
-  { id: "t-1", fecha: "2026-05-25", detalle: "Ticket Nafta Infinia - YPF", archivo: "ticket_ypf.jpg", tipo: "Compra", monto: 18500, estado: "Procesado" },
-  { id: "t-2", fecha: "2026-05-24", detalle: "Factura Fibertel - Telecom", archivo: "factura_internet.pdf", tipo: "Compra", monto: 24000, estado: "Aprobado" },
-  { id: "t-3", fecha: "2026-05-23", detalle: "Librería San Martín (Insumos)", archivo: "insumos_oficina.png", tipo: "Compra", monto: 6500, estado: "Recibido" }
+  { id: "t-1", fecha: "2026-05-25", detalle: "Ticket Nafta Infinia - YPF", archivo: "ticket_ypf.jpg", tipo: "Compra", monto: 18500, estado: "Procesado", es_activo: false, categoria: "Combustibles" },
+  { id: "t-2", fecha: "2026-05-24", detalle: "Factura Fibertel - Telecom", archivo: "factura_internet.pdf", tipo: "Compra", monto: 24000, estado: "Aprobado", es_activo: false, categoria: "Servicios" },
+  { id: "t-3", fecha: "2026-05-23", detalle: "Librería San Martín (Insumos)", archivo: "insumos_oficina.png", tipo: "Compra", monto: 6500, estado: "Recibido", es_activo: false, categoria: "Librería" }
 ];
 
 export function renderPortalCliente() {
@@ -77,10 +77,14 @@ export function renderPortalCliente() {
             <input type="file" id="ticket-file-input" style="display: none;" accept="image/*,application/pdf">
           </label>
 
-          <div class="demo-afip-pills" style="margin-top: 16px;">
+          <div class="demo-afip-pills" style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
             <div class="afip-sample-pill" id="btn-simulate-ticket" style="border-color: rgba(99, 102, 241, 0.25);">
               <i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
-              Simular Carga de Ticket
+              Simular Gasto (Nafta YPF)
+            </div>
+            <div class="afip-sample-pill" id="btn-simulate-asset" style="border-color: rgba(99, 102, 241, 0.4); color: #818cf8; font-weight: 600;">
+              <i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
+              Simular Laptop (Activo)
             </div>
           </div>
         </div>
@@ -117,8 +121,13 @@ export function renderPortalCliente() {
                   <td class="font-mono text-xs">${t.fecha.split('-').reverse().join('/')}</td>
                   <td>
                     <div style="font-weight: 600; font-size: 13px;">${t.detalle}</div>
-                    <div style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                    <div style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-top: 2px;">
                       <i data-lucide="file" style="width: 10px; height: 10px;"></i> ${t.archivo}
+                      ${t.es_activo ? `
+                        <span style="font-size: 8px; font-weight: 700; color: #818cf8; background: rgba(99, 102, 241, 0.08); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(99, 102, 241, 0.2);">BIEN DE USO</span>
+                      ` : `
+                        <span style="font-size: 8px; font-weight: 600; color: var(--text-muted); background: var(--bg-secondary); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--border-color);">GASTO (${t.categoria || 'General'})</span>
+                      `}
                     </div>
                   </td>
                   <td class="font-mono text-right" style="font-weight: 700;">$ ${t.monto.toLocaleString('es-AR')}</td>
@@ -147,6 +156,7 @@ export function initPortalCliente(mainApp) {
   const dropzone = document.getElementById('ticket-dropzone');
   const fileInput = document.getElementById('ticket-file-input');
   const btnSim = document.getElementById('btn-simulate-ticket');
+  const btnSimAsset = document.getElementById('btn-simulate-asset');
   
   const progressContainer = document.getElementById('ticket-progress');
   const progressTxt = document.getElementById('ticket-progress-txt');
@@ -179,8 +189,13 @@ export function initPortalCliente(mainApp) {
         <td class="font-mono text-xs">${t.fecha.split('-').reverse().join('/')}</td>
         <td>
           <div style="font-weight: 600; font-size: 13px;">${t.detalle}</div>
-          <div style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+          <div style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-top: 2px;">
             <i data-lucide="file" style="width: 10px; height: 10px;"></i> ${t.archivo}
+            ${t.es_activo ? `
+              <span style="font-size: 8px; font-weight: 700; color: #818cf8; background: rgba(99, 102, 241, 0.08); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(99, 102, 241, 0.2);">BIEN DE USO</span>
+            ` : `
+              <span style="font-size: 8px; font-weight: 600; color: var(--text-muted); background: var(--bg-secondary); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--border-color);">GASTO (${t.categoria || 'General'})</span>
+            `}
           </div>
         </td>
         <td class="font-mono text-right" style="font-weight: 700;">$ ${t.monto.toLocaleString('es-AR')}</td>
@@ -218,7 +233,9 @@ export function initPortalCliente(mainApp) {
       const model = "gemini-2.5-flash";
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-      const prompt = `Analizá esta imagen de ticket de compra o factura. Extraé los datos clave del comprobante en el siguiente formato JSON estricto:
+      const prompt = `Analizá esta imagen de ticket de compra o factura. Extraé los datos clave del comprobante y clasificalo.
+      Determiná si el comprobante representa la compra de un ACTIVO (Bien de Uso / Bien de Capital / Activo Fijo, como computadoras, celulares, maquinaria, mobiliario, vehículos o refacciones de valor) o si es un GASTO OPERATIVO corriente (combustibles, librería, papelería, servicios, viáticos, internet).
+      Extraé los datos en el siguiente formato JSON estricto:
       {
         "proveedor": "Nombre del Comercio / Razón Social",
         "cuit": "CUIT del proveedor en formato XX-XXXXXXXX-X (si no encontrás CUIT real, inventá uno realista)",
@@ -226,7 +243,9 @@ export function initPortalCliente(mainApp) {
         "numero": "Número de comprobante (formato XXXX-XXXXXXXX, si no hay, inventá uno realista)",
         "neto": Monto neto sin IVA como número,
         "iva": Monto del IVA (21% del neto) como número,
-        "total": Monto total final como número
+        "total": Monto total final como número,
+        "categoria": "Categoría descriptiva de la compra (ej: Computación, Mobiliario, Combustibles, etc.)",
+        "es_activo": true (si es una compra de activo/bien de uso como computadoras, servidores, aire acondicionado, etc.) o false (si es un gasto normal o servicio de consumo inmediato)
       }
       Es fundamental que el total, el neto y el IVA cuadren matemáticamente (neto + iva = total).
       Devolvé ÚNICAMENTE el objeto JSON puro sin bloques de código markdown ni texto extra.`;
@@ -271,7 +290,9 @@ export function initPortalCliente(mainApp) {
         archivo: file.name,
         tipo: "Compra",
         monto: parsedData.total,
-        estado: "Aprobado"
+        estado: "Aprobado",
+        es_activo: parsedData.es_activo === true,
+        categoria: parsedData.categoria || "Otros"
       };
 
       const tickets = JSON.parse(localStorage.getItem(`vmp_tickets_${activeCompany.id}`)) || [];
@@ -287,7 +308,9 @@ export function initPortalCliente(mainApp) {
         numero: parsedData.numero || "0001-00001234",
         neto: Number(parsedData.neto) || Number(parsedData.total) / 1.21,
         iva: Number(parsedData.iva) || Number(parsedData.total) - (Number(parsedData.total) / 1.21),
-        total: Number(parsedData.total)
+        total: Number(parsedData.total),
+        es_activo: parsedData.es_activo === true,
+        categoria: parsedData.categoria || "Otros"
       };
 
       addTransaction(activeCompany.id, 'compras', newPurchase);
@@ -306,7 +329,7 @@ export function initPortalCliente(mainApp) {
     }
   };
 
-  const startUploadSimulation = () => {
+  const startUploadSimulation = (isAsset = false) => {
     dropzone.style.display = 'none';
     progressContainer.style.display = 'block';
     progressTxt.textContent = "Subiendo archivo a la nube...";
@@ -317,14 +340,26 @@ export function initPortalCliente(mainApp) {
       setTimeout(() => {
         // Create new mock ticket
         const date = new Date().toISOString().slice(0, 10);
-        const newTicket = {
+        const newTicket = isAsset ? {
           id: "t-" + Date.now(),
           fecha: date,
-          detalle: "Compra Materiales - Easy Ferreterías",
-          archivo: "ticket_easy_" + Math.floor(Math.random() * 1000) + ".jpg",
+          detalle: "Notebook Dell Latitude i7 - Megatone",
+          archivo: "factura_compu_" + Math.floor(Math.random() * 1000) + ".pdf",
           tipo: "Compra",
-          monto: 34500,
-          estado: "Recibido"
+          monto: 650000,
+          estado: "Aprobado",
+          es_activo: true,
+          categoria: "Computación"
+        } : {
+          id: "t-" + Date.now(),
+          fecha: date,
+          detalle: "Ticket Combustibles - Combustibles YPF",
+          archivo: "ticket_ypf_" + Math.floor(Math.random() * 1000) + ".jpg",
+          tipo: "Compra",
+          monto: 18500,
+          estado: "Procesado",
+          es_activo: false,
+          categoria: "Combustibles"
         };
 
         // Save to local storage
@@ -333,15 +368,28 @@ export function initPortalCliente(mainApp) {
         localStorage.setItem(`vmp_tickets_${activeCompany.id}`, JSON.stringify(tickets));
 
         // Save to mockdb transactions!
-        const newPurchase = {
+        const newPurchase = isAsset ? {
           fecha: date,
-          proveedor: "Easy Ferreterías",
-          cuit: "30-58839210-9",
+          proveedor: "Megatone S.A.",
+          cuit: "30-54930281-2",
           tipo_comprobante: "Factura A",
-          numero: "0002-0000" + Math.floor(1000 + Math.random() * 9000),
-          neto: 28512.4,
-          iva: 5987.6,
-          total: 34500
+          numero: "0005-0000" + Math.floor(1000 + Math.random() * 9000),
+          neto: 537190.08,
+          iva: 112809.92,
+          total: 650000.00,
+          es_activo: true,
+          categoria: "Computación"
+        } : {
+          fecha: date,
+          proveedor: "Combustibles YPF",
+          cuit: "30-50001234-9",
+          tipo_comprobante: "Factura A",
+          numero: "4820-002" + Math.floor(10000 + Math.random() * 90000),
+          neto: 15289.26,
+          iva: 3210.74,
+          total: 18500.00,
+          es_activo: false,
+          categoria: "Combustibles"
         };
         addTransaction(activeCompany.id, 'compras', newPurchase);
 
@@ -349,7 +397,7 @@ export function initPortalCliente(mainApp) {
         progressContainer.style.display = 'none';
         dropzone.style.display = 'flex';
 
-        mainApp.showToast("¡Simulación: ticket enviado al contador con éxito!", "success");
+        mainApp.showToast(isAsset ? "¡Simulación: Bien de Uso (Activo Fijo) digitalizado!" : "¡Simulación: ticket enviado al contador con éxito!", "success");
         renderTicketsList();
 
       }, 1500);
@@ -362,7 +410,8 @@ export function initPortalCliente(mainApp) {
     if (apiKey) {
       processRealTicketWithGemini(file);
     } else {
-      startUploadSimulation();
+      const isAssetSim = file.name.toLowerCase().includes('compu') || file.name.toLowerCase().includes('notebook') || file.name.toLowerCase().includes('activo') || file.name.toLowerCase().includes('dell') || file.size > 200000;
+      startUploadSimulation(isAssetSim);
     }
   };
 
@@ -392,6 +441,11 @@ export function initPortalCliente(mainApp) {
 
   btnSim?.addEventListener('click', (e) => {
     e.stopPropagation();
-    startUploadSimulation();
+    startUploadSimulation(false);
+  });
+
+  btnSimAsset?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    startUploadSimulation(true);
   });
 }
