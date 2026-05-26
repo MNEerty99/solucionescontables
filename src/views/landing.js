@@ -199,7 +199,7 @@ export function renderLanding() {
                 <div class="cd-icon"><i data-lucide="mail"></i></div>
                 <div class="cd-text">
                   <h4>Email de Consultas</h4>
-                  <p>contacto@vmp.com.ar</p>
+                  <p>administracion@vmp-edtech.com</p>
                 </div>
               </div>
               <div class="cd-item">
