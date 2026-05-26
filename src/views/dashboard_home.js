@@ -38,6 +38,63 @@ export function renderDashboardHome() {
     </div>
   </div>
 
+  <!-- Interactive Onboarding Trial Guide -->
+  <div class="card trial-guide-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%); border-color: rgba(5, 150, 105, 0.12);">
+    <div class="card-body" style="padding: 20px 24px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+        <span class="badge" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); border-color: rgba(5, 150, 105, 0.2); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 11px;">GUÍA DE PRUEBA INTERACTIVA</span>
+        <h4 style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0;">Probá las 4 funciones clave del SaaS haciendo clic en los accesos rápidos:</h4>
+      </div>
+      <div class="trial-actions-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+        
+        <a href="#/demo/importacion" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(16, 185, 129, 0.08); color: #10b981;">
+            <i data-lucide="upload-cloud"></i>
+          </div>
+          <div class="ta-btn-content">
+            <h5>1. Importar AFIP</h5>
+            <p>Subir Excel / Simular carga masiva</p>
+          </div>
+          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
+        </a>
+
+        <a href="#/demo/portal" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(99, 102, 241, 0.08); color: #6366f1;">
+            <i data-lucide="camera"></i>
+          </div>
+          <div class="ta-btn-content">
+            <h5>2. Portal de Clientes</h5>
+            <p>Simular carga de ticket por celular</p>
+          </div>
+          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
+        </a>
+
+        <a href="#/demo/iva" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(245, 158, 11, 0.08); color: #f59e0b;">
+            <i data-lucide="book-open"></i>
+          </div>
+          <div class="ta-btn-content">
+            <h5>3. Libro IVA Digital</h5>
+            <p>Generar TXT y exportar a AFIP</p>
+          </div>
+          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
+        </a>
+
+        <a href="#/demo/empresas" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(14, 165, 233, 0.08); color: #0ea5e9;">
+            <i data-lucide="building-2"></i>
+          </div>
+          <div class="ta-btn-content">
+            <h5>4. Gestionar Empresas</h5>
+            <p>Crear y editar razones sociales</p>
+          </div>
+          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
   <!-- KPI Grid -->
   <div class="kpi-grid">
     <div class="kpi-card sales">

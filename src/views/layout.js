@@ -117,6 +117,26 @@ export function renderDashboardLayout(childHTML, activeRoute) {
       <div class="db-view-container">
         ${childHTML}
       </div>
+
+      <!-- Mobile Bottom Navigation Bar -->
+      <nav class="mobile-bottom-nav">
+        <a href="#/demo" class="mb-nav-item ${activeRoute === 'demo' ? 'active' : ''}">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#/demo/empresas" class="mb-nav-item ${activeRoute === 'empresas' ? 'active' : ''}">
+          <i data-lucide="building-2"></i>
+          <span>Empresas</span>
+        </a>
+        <a href="#/demo/importacion" class="mb-nav-item ${activeRoute === 'importacion' ? 'active' : ''}">
+          <i data-lucide="upload-cloud"></i>
+          <span>AFIP</span>
+        </a>
+        <a href="#/demo/portal" class="mb-nav-item ${activeRoute === 'portal' ? 'active' : ''}">
+          <i data-lucide="smartphone"></i>
+          <span>Portal Cel</span>
+        </a>
+      </nav>
     </div>
   </div>
   `;
