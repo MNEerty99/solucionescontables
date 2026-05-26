@@ -1,0 +1,17 @@
+{
+  "name": "vmp-studio-contable",
+  "version": "1.0.0",
+  "description": "VMP Studio Contable - Sistema de contabilidad multi-empresa para estudios contables",
+  "private": true,
+  "scripts": {
+    "dev": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}

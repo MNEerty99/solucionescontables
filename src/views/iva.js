@@ -1,0 +1,292 @@
+/* -------------------------------------------------------------
+   VMP Studio Contable - Libro IVA Digital View Component
+   ------------------------------------------------------------- */
+import { getActiveCompany, getTransactions } from '../db/mockdb.js';
+
+export function renderIVA() {
+  const activeCompany = getActiveCompany();
+  const txs = getTransactions(activeCompany.id);
+
+  // Calcular totales impositivos
+  const totalNetSales = txs.ventas.reduce((sum, v) => sum + v.neto, 0);
+  const totalIvaSales = txs.ventas.reduce((sum, v) => sum + v.iva, 0);
+  const totalSales = txs.ventas.reduce((sum, v) => sum + v.total, 0);
+
+  const totalNetPurchases = txs.compras.reduce((sum, c) => sum + c.neto, 0);
+  const totalIvaPurchases = txs.compras.reduce((sum, c) => sum + c.iva, 0);
+  const totalPurchases = txs.compras.reduce((sum, c) => sum + c.total, 0);
+
+  const balance = totalIvaSales - totalIvaPurchases;
+
+  return `
+  <div class="view-header">
+    <div>
+      <h1 class="view-title">Libro IVA Digital</h1>
+      <p class="view-subtitle">Liquidación mensual de IVA, débitos y créditos fiscales.</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <button class="btn btn-outline" id="btn-print-iva">
+        <i data-lucide="printer"></i> Imprimir Libro
+      </button>
+      <button class="btn btn-primary" id="btn-show-afip-exports">
+        <i data-lucide="download"></i> Exportar AFIP
+      </button>
+    </div>
+  </div>
+
+  <!-- Exports Panel (Collapsible/Hidden by default) -->
+  <div class="card" id="afip-exports-panel" style="display: none; margin-bottom: 32px; border-color: var(--color-indigo);">
+    <div class="card-header" style="background: rgba(99,102,241,0.02)">
+      <h3 style="color:#818cf8"><i data-lucide="share-2"></i> Generación de Archivos de Importación AFIP (F. 2002)</h3>
+      <button class="btn-icon-sm" id="btn-close-exports" title="Cerrar"><i data-lucide="x"></i></button>
+    </div>
+    <div class="card-body">
+      <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 20px;">
+        Descargá los archivos de texto delimitados oficiales para subirlos directamente en la plataforma de <strong>AFIP (Libro de IVA Digital)</strong> sin tipear una sola factura de forma manual.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <i data-lucide="file-text" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px;"></i>
+          <h4 style="font-size: 14px; margin-bottom: 6px;">RE.CO. Ventas (Comprobantes)</h4>
+          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Contiene las cabeceras de todas tus facturas de venta emitidas.</p>
+          <button class="btn btn-outline btn-sm w-full" id="btn-export-ventas-txt">Descargar TXT</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <i data-lucide="percent" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px;"></i>
+          <h4 style="font-size: 14px; margin-bottom: 6px;">RE.CO. Ventas (Alícuotas)</h4>
+          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Contiene los registros de alícuotas del 21%, 10.5% y exentos.</p>
+          <button class="btn btn-outline btn-sm w-full" id="btn-export-ventas-ali-txt">Descargar TXT</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <i data-lucide="file-check-2" style="width: 32px; height: 32px; color: #818cf8; margin-bottom: 12px;"></i>
+          <h4 style="font-size: 14px; margin-bottom: 6px;">F. 2002 Borrador (PDF)</h4>
+          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Pre-declaración borrador consolidada con totales por actividad.</p>
+          <button class="btn btn-outline btn-sm w-full" id="btn-export-borrador-pdf">Descargar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VAT Consolidated Summary -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+    <!-- Sales (Debit) -->
+    <div class="card" style="border-left: 4px solid var(--color-emerald)">
+      <div class="card-header">
+        <h3><i data-lucide="trending-up" class="text-emerald"></i> Resumen de Ventas (Débito Fiscal)</h3>
+      </div>
+      <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+          <span class="text-secondary">Total Neto Gravado:</span>
+          <span class="font-mono" style="font-weight: 600;">$ ${totalNetSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+          <span class="text-secondary">IVA Débito Fiscal (21%):</span>
+          <span class="font-mono" style="font-weight: 600;">$ ${totalIvaSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+          <span>Total Facturado Ventas:</span>
+          <span class="font-mono text-emerald">$ ${totalSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Purchases (Credit) -->
+    <div class="card" style="border-left: 4px solid #ef4444">
+      <div class="card-header">
+        <h3><i data-lucide="shopping-bag" class="text-red"></i> Resumen de Compras (Crédito Fiscal)</h3>
+      </div>
+      <div class="card-body" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+          <span class="text-secondary">Total Neto Gravado:</span>
+          <span class="font-mono" style="font-weight: 600;">$ ${totalNetPurchases.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px;">
+          <span class="text-secondary">IVA Crédito Fiscal:</span>
+          <span class="font-mono" style="font-weight: 600;">$ ${totalIvaPurchases.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+        <div style="border-top: 1px solid var(--border-color); padding-top: 12px; display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+          <span>Total Facturado Compras:</span>
+          <span class="font-mono">$ ${totalPurchases.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settlement Summary Banner -->
+  <div class="card" style="background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); padding: 24px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fbbf24;">
+        <i data-lucide="calculator" style="width: 24px; height: 24px;"></i>
+      </div>
+      <div>
+        <h4 style="font-size: 16px; font-weight: 700; color: #fbbf24;">
+          Liquidación de IVA - Mayo 2026
+        </h4>
+        <p class="text-secondary" style="font-size: 13px; margin-top: 4px;">
+          ${balance >= 0 
+            ? 'Resultado: Saldo a pagar al fisco por diferencia de débito sobre crédito.' 
+            : 'Resultado: Saldo técnico a favor del contribuyente acumulable para el próximo período.'}
+        </p>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <div class="text-secondary" style="font-size: 11px; font-weight: 600; text-transform: uppercase;">Saldo de IVA Neto</div>
+      <div class="font-mono" style="font-size: 28px; font-weight: 800; color: ${balance >= 0 ? '#fbbf24' : 'var(--color-emerald-light)'}">
+        $ ${Math.abs(balance).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+      </div>
+    </div>
+  </div>
+
+  <!-- VAT Ledger Book Tabs -->
+  <div class="card">
+    <div class="card-header">
+      <h3><i data-lucide="book-open"></i> Subdiario de Comprobantes Consolidados</h3>
+      <span class="badge" style="margin: 0; font-size: 11px;">Período Fiscal Actual</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Número</th>
+              <th>Cliente / Proveedor</th>
+              <th>CUIT</th>
+              <th class="text-right">Neto</th>
+              <th class="text-right">IVA DF</th>
+              <th class="text-right">IVA CF</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${txs.ventas.length === 0 && txs.compras.length === 0 ? `
+              <tr>
+                <td colspan="9" class="text-center text-muted" style="padding: 32px;">No hay transacciones registradas en este período.</td>
+              </tr>
+            ` : [
+              ...txs.ventas.map(v => ({ ...v, type: 'venta', df: v.iva, cf: 0 })),
+              ...txs.compras.map(c => ({ ...c, type: 'compra', df: 0, cf: c.iva }))
+            ].sort((a,b) => new Date(a.fecha) - new Date(b.fecha)).map(item => `
+              <tr>
+                <td class="font-mono text-sm">${item.fecha.split('-').reverse().join('/')}</td>
+                <td>
+                  <span class="badge-status ${item.type === 'venta' ? 'active' : 'pending'}" style="font-size: 10px; padding: 1px 6px;">
+                    ${item.tipo_comprobante}
+                  </span>
+                </td>
+                <td class="font-mono text-xs">${item.numero}</td>
+                <td style="font-weight: 600; font-size: 12.5px;">${item.cliente || item.proveedor}</td>
+                <td class="font-mono text-xs" style="color: var(--text-secondary);">${item.cuit}</td>
+                <td class="font-mono text-right text-sm">$ ${item.neto.toLocaleString('es-AR')}</td>
+                <td class="font-mono text-right text-sm text-emerald">${item.df > 0 ? '$ ' + item.df.toLocaleString('es-AR') : '—'}</td>
+                <td class="font-mono text-right text-sm text-red">${item.cf > 0 ? '$ ' + item.cf.toLocaleString('es-AR') : '—'}</td>
+                <td class="font-mono text-right text-sm" style="font-weight: 700;">$ ${item.total.toLocaleString('es-AR')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+export function initIVA(mainApp) {
+  if (window.lucide) window.lucide.createIcons();
+
+  const activeCompany = getActiveCompany();
+
+  const expPanel = document.getElementById('afip-exports-panel');
+  const btnShowExp = document.getElementById('btn-show-afip-exports');
+  const btnCloseExp = document.getElementById('btn-close-exports');
+
+  const btnPrint = document.getElementById('btn-print-iva');
+
+  // Print function
+  btnPrint?.addEventListener('click', () => {
+    window.print();
+  });
+
+  // Toggle exports
+  btnShowExp?.addEventListener('click', () => {
+    expPanel.style.display = 'block';
+  });
+
+  btnCloseExp?.addEventListener('click', () => {
+    expPanel.style.display = 'none';
+  });
+
+  // Text files downloads helper
+  const downloadTXT = (filename, text) => {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+
+  // RE.CO. Ventas (Comprobantes) TXT structure simulation
+  document.getElementById('btn-export-ventas-txt')?.addEventListener('click', () => {
+    const txs = getTransactions(activeCompany.id).ventas;
+    if (txs.length === 0) {
+      mainApp.showToast('No hay ventas registradas para exportar.', 'error');
+      return;
+    }
+
+    let output = "";
+    txs.forEach(v => {
+      const dateStr = v.fecha.replace(/-/g, ''); // AAAAMMDD
+      const typeCode = v.tipo_comprobante.includes('A') ? '001' : '006';
+      const pv = v.numero.split('-')[0].padStart(5, '0');
+      const num = v.numero.split('-')[1].padStart(8, '0');
+      const docType = v.cuit.startsWith('00') ? '99' : '80'; // CUIT o Sin identificar
+      const cleanCuit = v.cuit.replace(/-/g, '').padEnd(11, '0');
+      const name = v.cliente.padEnd(30, ' ').substring(0, 30);
+      const totalStr = Math.round(v.total * 100).toString().padStart(15, '0');
+      
+      output += `${dateStr}${typeCode}${pv}${num}${num}${docType}${cleanCuit}${name}${totalStr}\r\n`;
+    });
+
+    downloadTXT(`afip-ventas-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}.txt`, output);
+    mainApp.showToast('¡Archivo de Comprobantes descargado con éxito!', 'success');
+  });
+
+  // RE.CO. Ventas (Alícuotas) TXT structure simulation
+  document.getElementById('btn-export-ventas-ali-txt')?.addEventListener('click', () => {
+    const txs = getTransactions(activeCompany.id).ventas;
+    if (txs.length === 0) {
+      mainApp.showToast('No hay ventas registradas para exportar.', 'error');
+      return;
+    }
+
+    let output = "";
+    txs.forEach(v => {
+      const typeCode = v.tipo_comprobante.includes('A') ? '001' : '006';
+      const pv = v.numero.split('-')[0].padStart(5, '0');
+      const num = v.numero.split('-')[1].padStart(8, '0');
+      const netStr = Math.round(v.neto * 100).toString().padStart(15, '0');
+      const ivaCode = '0005'; // Alícuota 21%
+      const ivaStr = Math.round(v.iva * 100).toString().padStart(15, '0');
+      
+      output += `${typeCode}${pv}${num}${netStr}${ivaCode}${ivaStr}\r\n`;
+    });
+
+    downloadTXT(`afip-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}.txt`, output);
+    mainApp.showToast('¡Archivo de Alícuotas descargado con éxito!', 'success');
+  });
+
+  // Mock borrador PDF download
+  document.getElementById('btn-export-borrador-pdf')?.addEventListener('click', () => {
+    mainApp.showToast('Generando formulario F. 2002 interactivo...', 'info');
+    setTimeout(() => {
+      window.print();
+    }, 1000);
+  });
+}

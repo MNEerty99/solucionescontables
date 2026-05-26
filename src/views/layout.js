@@ -1,0 +1,164 @@
+/* -------------------------------------------------------------
+   VMP Studio Contable - Dashboard Layout Component
+   ------------------------------------------------------------- */
+import { getCompanies, getActiveCompany } from '../db/mockdb.js';
+
+export function renderDashboardLayout(childHTML, activeRoute) {
+  const activeCompany = getActiveCompany();
+  const companies = getCompanies();
+
+  return `
+  <div class="db-wrapper" id="db-wrapper-root">
+    <!-- Sidebar -->
+    <aside class="db-sidebar">
+      <div class="db-sidebar-header">
+        <a href="#/demo" class="db-sidebar-logo">
+          <div class="lp-logo-icon">
+            <i data-lucide="calculator"></i>
+          </div>
+          <div class="db-sidebar-logo-text">
+            SOLUCIONES <span>CONTABLES</span>
+          </div>
+        </a>
+        <button class="btn-icon-sm" id="sidebar-collapse-btn" title="Colapsar menú">
+          <i data-lucide="chevrons-left"></i>
+        </button>
+      </div>
+
+      <div class="db-sidebar-nav">
+        <div class="db-nav-label">Estudio</div>
+        <a href="#/demo" class="db-nav-item ${activeRoute === 'demo' ? 'active' : ''}" data-route="demo">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#/demo/empresas" class="db-nav-item ${activeRoute === 'empresas' ? 'active' : ''}" data-route="empresas">
+          <i data-lucide="building-2"></i>
+          <span>Empresas Clientes</span>
+        </a>
+
+        <div class="db-nav-label">Operaciones</div>
+        <a href="#/demo/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
+          <i data-lucide="file-text"></i>
+          <span>Comprobantes</span>
+        </a>
+        <a href="#/demo/importacion" class="db-nav-item ${activeRoute === 'importacion' ? 'active' : ''}" data-route="importacion">
+          <i data-lucide="upload-cloud"></i>
+          <span>Importación AFIP</span>
+        </a>
+
+        <div class="db-nav-label">Fiscal</div>
+        <a href="#/demo/iva" class="db-nav-item ${activeRoute === 'iva' ? 'active' : ''}" data-route="iva">
+          <i data-lucide="book-open"></i>
+          <span>Libro IVA Digital</span>
+        </a>
+
+        <div class="db-nav-label">Portal de Clientes</div>
+        <a href="#/demo/portal" class="db-nav-item ${activeRoute === 'portal' ? 'active' : ''}" data-route="portal">
+          <i data-lucide="smartphone"></i>
+          <span>Portal Cliente (Demo)</span>
+        </a>
+
+        <div class="db-nav-label">Salida</div>
+        <a href="#/" class="db-nav-item">
+          <i data-lucide="arrow-left-circle"></i>
+          <span>Volver a la Web</span>
+        </a>
+      </div>
+
+      <div class="db-sidebar-footer">
+        <div class="user-info">
+          <span class="user-name">Estudio Contable Comahue</span>
+          <span class="user-role">Administrador</span>
+        </div>
+        <button class="btn-icon-sm" id="logout-demo-btn" title="Cerrar sesión">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Section -->
+    <div class="db-main">
+      <header class="db-topbar">
+        <div class="topbar-left">
+          <div class="db-breadcrumb" id="db-breadcrumb-title">Cargando...</div>
+        </div>
+
+        <!-- Dynamic Company Selector Pill -->
+        <div style="position: relative;">
+          <div class="company-selector-container" id="topbar-company-selector">
+            <div class="company-avatar" style="background: ${activeCompany.color}">
+              ${activeCompany.razon_social[0]}
+            </div>
+            <div class="company-select-text">
+              <span class="c-sel-name">${activeCompany.razon_social}</span>
+              <span class="c-sel-cuit">CUIT: ${activeCompany.cuit}</span>
+            </div>
+            <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 8px;"></i>
+          </div>
+
+          <!-- Selector Dropdown -->
+          <div class="company-dropdown" id="company-selector-dropdown">
+            <div style="padding: 6px 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Cambiar Empresa</div>
+            ${companies.map(c => `
+              <div class="dropdown-item ${c.id === activeCompany.id ? 'active' : ''}" data-id="${c.id}">
+                <div class="company-avatar" style="background: ${c.color}; width: 24px; height: 24px; font-size: 11px;">
+                  ${c.razon_social[0]}
+                </div>
+                <div class="company-select-text">
+                  <span class="c-sel-name" style="font-size: 12px; font-weight: 600; max-width: 180px;">${c.razon_social}</span>
+                  <span class="c-sel-cuit" style="font-size: 10px;">${c.cuit}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </header>
+
+      <div class="db-view-container">
+        ${childHTML}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+export function initDashboardLayout(mainApp) {
+  // Toggle sidebar collapse
+  document.getElementById('sidebar-collapse-btn')?.addEventListener('click', () => {
+    document.getElementById('db-wrapper-root').classList.toggle('sidebar-collapsed');
+    const icon = document.querySelector('#sidebar-collapse-btn i');
+    if (icon) {
+      const isCollapsed = document.getElementById('db-wrapper-root').classList.contains('sidebar-collapsed');
+      icon.setAttribute('data-lucide', isCollapsed ? 'chevrons-right' : 'chevrons-left');
+      if (window.lucide) window.lucide.createIcons();
+    }
+  });
+
+  // Toggle company selector dropdown
+  const selector = document.getElementById('topbar-company-selector');
+  const dropdown = document.getElementById('company-selector-dropdown');
+  
+  selector?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('show');
+  });
+
+  document.addEventListener('click', () => {
+    dropdown?.classList.remove('show');
+  });
+
+  // Handle active company change
+  document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const coId = item.dataset.id;
+      mainApp.setActiveCompany(coId);
+      dropdown.classList.remove('show');
+      mainApp.showToast(`Cambiando a: ${item.querySelector('.c-sel-name').textContent}`, 'info');
+    });
+  });
+
+  // Logout demo
+  document.getElementById('logout-demo-btn')?.addEventListener('click', () => {
+    window.location.hash = '#/';
+  });
+}
