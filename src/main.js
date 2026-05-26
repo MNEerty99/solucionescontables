@@ -58,7 +58,7 @@ class Application {
       const activeCompany = getActiveCompany();
       document.title = `Dashboard — ${activeCompany.razon_social} | Soluciones Contables`;
 
-      const subRoute = hash.substring(7); // View route after '#/demo'
+      const subRoute = hash.substring(6); // View route after '#/demo'
 
       if (subRoute === '' || subRoute === '/') {
         rootEl.innerHTML = renderDashboardLayout(renderDashboardHome(), 'demo');
