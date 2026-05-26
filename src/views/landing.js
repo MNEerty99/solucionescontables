@@ -246,12 +246,29 @@ export function renderLanding() {
   `;
 }
 
+import { supabase, isSupabaseConfigured } from '../db/supabase.js';
+
 export function initLanding(mainApp) {
   // Manejo de envío de formulario de lead
   document.getElementById('lead-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('lead-name').value;
+    const studio = document.getElementById('lead-studio').value;
+    const email = document.getElementById('lead-email').value;
+
     mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Demo...`, 'success');
+
+    // Register lead in Supabase asynchronously in background
+    if (isSupabaseConfigured) {
+      console.log("Supabase CRM: Registering B2B sales lead...", name);
+      supabase.from('leads').insert([{ 
+        name, 
+        studio, 
+        email
+      }]).then(({ error }) => {
+        if (error) console.error("Supabase CRM lead error:", error);
+      });
+    }
     
     // Redirigir a la demo después de 1.5s
     setTimeout(() => {

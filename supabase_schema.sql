@@ -1,0 +1,159 @@
+-- =============================================================
+-- VMP Soluciones Contables - Supabase PostgreSQL Database Schema
+-- Execute this script in the Supabase SQL Editor (SQL Query tool)
+-- =============================================================
+
+-- 1. Create Studios Table (linked to Supabase Auth Users)
+CREATE TABLE IF NOT EXISTS public.estudios (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    razon_social TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    arca_model_type TEXT DEFAULT 'hybrid'::text NOT NULL,
+    arca_cert_name TEXT,
+    arca_cert_uploaded BOOLEAN DEFAULT false NOT NULL
+);
+
+-- Enable RLS for Studios
+ALTER TABLE public.estudios ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Estudios can manage their own profile"
+    ON public.estudios
+    FOR ALL
+    USING (auth.uid() = id);
+
+-- 2. Create Companies Table (Razones Sociales)
+CREATE TABLE IF NOT EXISTS public.empresas (
+    id TEXT PRIMARY KEY, -- 'co-' + timestamp
+    estudio_id UUID NOT NULL REFERENCES public.estudios(id) ON DELETE CASCADE,
+    razon_social TEXT NOT NULL,
+    cuit TEXT NOT NULL,
+    tipo TEXT NOT NULL,
+    condicion_iva TEXT NOT NULL,
+    actividad TEXT,
+    inicio_actividades DATE NOT NULL,
+    color TEXT DEFAULT '#0d9488'::text NOT NULL,
+    delegation_active BOOLEAN DEFAULT false NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Companies
+ALTER TABLE public.empresas ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Estudios can manage their own companies"
+    ON public.empresas
+    FOR ALL
+    USING (auth.uid() = estudio_id);
+
+-- 3. Create Transactions Table (Libro IVA Ventas/Compras)
+CREATE TABLE IF NOT EXISTS public.transacciones (
+    id TEXT PRIMARY KEY, -- 'v-' or 'c-' + timestamp
+    empresa_id TEXT NOT NULL REFERENCES public.empresas(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL CHECK (tipo IN ('ventas', 'compras')),
+    fecha DATE NOT NULL,
+    tipo_comprobante TEXT NOT NULL,
+    numero TEXT NOT NULL,
+    proveedor TEXT,
+    cliente TEXT,
+    cuit TEXT NOT NULL,
+    neto NUMERIC(15,2) NOT NULL,
+    iva NUMERIC(15,2) NOT NULL,
+    total NUMERIC(15,2) NOT NULL,
+    es_activo BOOLEAN DEFAULT false NOT NULL,
+    categoria TEXT DEFAULT 'General'::text NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Transactions
+ALTER TABLE public.transacciones ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Estudios can manage transactions of their companies"
+    ON public.transacciones
+    FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.empresas
+            WHERE empresas.id = transacciones.empresa_id
+              AND empresas.estudio_id = auth.uid()
+        )
+    );
+
+-- 4. Create Digitalized Tickets Table (uploaded from mobile client portal)
+CREATE TABLE IF NOT EXISTS public.comprobantes_digitales (
+    id TEXT PRIMARY KEY, -- 't-' + timestamp
+    empresa_id TEXT NOT NULL REFERENCES public.empresas(id) ON DELETE CASCADE,
+    fecha DATE NOT NULL,
+    detalle TEXT NOT NULL,
+    archivo TEXT NOT NULL,
+    tipo TEXT DEFAULT 'Compra'::text NOT NULL,
+    monto NUMERIC(15,2) NOT NULL,
+    estado TEXT DEFAULT 'Procesado'::text NOT NULL,
+    es_activo BOOLEAN DEFAULT false NOT NULL,
+    categoria TEXT DEFAULT 'General'::text NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Tickets
+ALTER TABLE public.comprobantes_digitales ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Estudios can manage tickets of their companies"
+    ON public.comprobantes_digitales
+    FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.empresas
+            WHERE empresas.id = comprobantes_digitales.empresa_id
+              AND empresas.estudio_id = auth.uid()
+        )
+    );
+
+-- =============================================================
+-- AUTO-PROFILE TRIGGER FOR NEW SIGNUPS
+-- =============================================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.estudios (id, razon_social, email, arca_model_type, arca_cert_name, arca_cert_uploaded)
+    VALUES (
+        new.id,
+        coalesce(new.raw_user_meta_data->>'studio_name', 'Estudio Contable Demo'),
+        new.email,
+        'hybrid',
+        'estudio_comahue_arca.crt',
+        false
+    );
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger execution
+CREATE OR REPLACE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =============================================================
+-- 5. Create Leads Table for capturing prospective clients in CRM
+-- =============================================================
+CREATE TABLE IF NOT EXISTS public.leads (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name TEXT NOT NULL,
+    studio TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Leads
+ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous inserts for lead generation
+CREATE POLICY "Anyone can insert leads"
+    ON public.leads
+    FOR INSERT
+    WITH CHECK (true);
+
+-- Allow authenticated users to view leads
+CREATE POLICY "Anyone can view leads"
+    ON public.leads
+    FOR SELECT
+    USING (true);
+
