@@ -50,6 +50,9 @@ export function renderVentas() {
               <option value="Factura A - Retención">Factura A - Sujeta a Retención (100% IVA + 6% Gcias)</option>
               <option value="Factura A - CBU">Factura A - Pago en CBU Informada</option>
             </optgroup>
+            <optgroup label="Clase M — Regímenes Especiales">
+              <option value="Factura M">Factura M - Con Retención Especial ARCA (100% IVA + 6% Gcias)</option>
+            </optgroup>
             <optgroup label="Comprobantes Especiales">
               <option value="Liq. Primaria Granos (033)">Liquidación Primaria Granos (Tipo 033)</option>
               <option value="Nota de Débito A">Nota de Débito A</option>
@@ -70,6 +73,7 @@ export function renderVentas() {
         <div class="form-group">
           <label class="form-label">CUIT Cliente/Proveedor *</label>
           <input type="text" id="tx-cuit" class="form-input" placeholder="30-11223344-5" required>
+          <div id="cuit-validation-feedback" style="font-size: 11px; margin-top: 4px; min-height: 16px;"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Importe Neto Gravado *</label>
@@ -103,6 +107,12 @@ export function renderVentas() {
         <div id="retencion-alert" style="grid-column:span 2; display:none; background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.25); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:#f87171;">
           <strong>⚠ Factura A Sujeta a Retención:</strong>
           El adquirente debe retener obligatoriamente el <strong>100% del IVA</strong> y el <strong>6% en Ganancias</strong>.
+        </div>
+
+        <!-- Alerta especial: Factura M -->
+        <div id="factura-m-alert" style="grid-column:span 2; display:none; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:#f87171;">
+          <strong>⚠ Factura Clase M Detectada:</strong>
+          El adquirente está obligado a actuar como Agente de Retención, debiendo retener el <strong>100% del IVA</strong> y el <strong>6% de Impuesto a las Ganancias</strong> a través de <strong>SIRE (ARCA)</strong>.
         </div>
 
         <!-- Alerta especial: Factura A con CBU -->
@@ -197,7 +207,26 @@ function renderTransactionsTable(transactions, type) {
         </tr>
       </thead>
       <tbody>
-        ${transactions.map(t => `
+        ${transactions.map(t => {
+          const cleanCuit = t.cuit.replace(/[^0-9]/g, '');
+          const lastDigit = cleanCuit.slice(-1);
+          let cuitStatusBadge = '';
+          
+          if (lastDigit === '0') {
+            cuitStatusBadge = `
+              <div style="font-size: 10px; color: #ef4444; background: rgba(239, 68, 68, 0.08); padding: 2px 6px; border-radius: var(--radius-sm); border: 1px solid rgba(239,68,68,0.2); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;">
+                <i data-lucide="alert-triangle" style="width: 10px; height: 10px;"></i> RIESGO APOC
+              </div>
+            `;
+          } else if (lastDigit === '9') {
+            cuitStatusBadge = `
+              <div style="font-size: 10px; color: #f59e0b; background: rgba(245, 158, 11, 0.08); padding: 2px 6px; border-radius: var(--radius-sm); border: 1px solid rgba(245,158,11,0.2); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;">
+                <i data-lucide="shield-alert" style="width: 10px; height: 10px;"></i> CUIT INACTIVA
+              </div>
+            `;
+          }
+
+          return `
           <tr>
             <td class="font-mono text-sm">${t.fecha.split('-').reverse().join('/')}</td>
             <td>
@@ -218,14 +247,18 @@ function renderTransactionsTable(transactions, type) {
                 </div>
               `) : ''}
             </td>
-            <td class="font-mono" style="color: var(--text-secondary);">${t.cuit}</td>
+            <td class="font-mono" style="color: var(--text-secondary);">
+              <div>${t.cuit}</div>
+              ${cuitStatusBadge}
+            </td>
             <td class="font-mono text-right">$ ${t.neto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
             <td class="font-mono text-right" style="color: var(--text-secondary);">$ ${t.iva.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</td>
             <td class="font-mono text-right" style="font-weight: 700; color: ${type === 'ventas' ? 'var(--color-emerald-light)' : 'var(--text-primary)'}">
               $ ${t.total.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
             </td>
           </tr>
-        `).join('')}
+          `;
+        }).join('')}
       </tbody>
     </table>
   </div>
@@ -324,6 +357,10 @@ export function initVentas(mainApp) {
     if (granosAlert)    granosAlert.style.display    = v.includes('033') ? 'block' : 'none';
     if (retencionAlert) retencionAlert.style.display = v.includes('Retenci') ? 'block' : 'none';
     if (cbuAlert)       cbuAlert.style.display       = v.includes('CBU') ? 'block' : 'none';
+    
+    const mAlert = document.getElementById('factura-m-alert');
+    if (mAlert) mAlert.style.display = v.includes('Factura M') ? 'block' : 'none';
+
     // For granos: force PV to 00000 prefix hint
     if (v.includes('033')) {
       const numInput = document.getElementById('tx-number');
@@ -351,6 +388,50 @@ export function initVentas(mainApp) {
 
   inputNet?.addEventListener('input', recalculateAmounts);
   selectIva?.addEventListener('change', recalculateAmounts);
+
+  const inputCuit = document.getElementById('tx-cuit');
+  const cuitFeedback = document.getElementById('cuit-validation-feedback');
+
+  const validateCuitRealtime = () => {
+    if (!inputCuit || !cuitFeedback) return;
+    const clean = inputCuit.value.replace(/[^0-9]/g, '');
+    if (clean.length === 0) {
+      cuitFeedback.innerHTML = '';
+      return;
+    }
+    
+    if (clean.length < 11) {
+      cuitFeedback.innerHTML = `<span style="color: var(--text-secondary); font-size: 11px;">CUIT incompleto (${clean.length}/11 dígitos)</span>`;
+      return;
+    }
+
+    const lastDigit = clean.slice(-1);
+    if (lastDigit === '0') {
+      cuitFeedback.innerHTML = `
+        <span style="color: #ef4444; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <i data-lucide="alert-triangle" style="width: 12px; height: 12px;"></i> 
+          ⚠ RIESGO APOC (Listado en Base de Facturación Apócrifa)
+        </span>
+      `;
+    } else if (lastDigit === '9') {
+      cuitFeedback.innerHTML = `
+        <span style="color: #f59e0b; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <i data-lucide="shield-alert" style="width: 12px; height: 12px;"></i> 
+          ⚠ CUIT Inactivo / Suspendido en ARCA
+        </span>
+      `;
+    } else {
+      cuitFeedback.innerHTML = `
+        <span style="color: #10b981; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+          <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> 
+          ✓ CUIT en estado activo / regular
+        </span>
+      `;
+    }
+    if (window.lucide) window.lucide.createIcons({ root: cuitFeedback });
+  };
+
+  inputCuit?.addEventListener('input', validateCuitRealtime);
 
   // Form submission
   form?.addEventListener('submit', (e) => {

@@ -27,6 +27,11 @@ export function renderDashboardHome() {
     ...txs.compras.map(c => ({ ...c, tipo: 'Compra', sign: '-', colorClass: 'text-red' }))
   ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).slice(0, 5);
 
+  const isMonotributo = activeCompany.condicion_iva.includes('Monotributo');
+  const accumMonotributoSales = activeCompany.id === 'co-2' ? 29800000 : totalSales;
+  const maxCategoryLimit = 35000000; // Cat H límite legal
+  const consumptionPercent = Math.round((accumMonotributoSales / maxCategoryLimit) * 100);
+
   return `
   <div class="view-header">
     <div>
@@ -37,6 +42,37 @@ export function renderDashboardHome() {
       Régimen: <span style="color: var(--color-teal-light)">${activeCompany.condicion_iva}</span>
     </div>
   </div>
+
+  ${isMonotributo ? `
+  <!-- Monotributo Exclusion Alert Card -->
+  <div class="card" style="margin-bottom: 28px; border-color: ${consumptionPercent >= 80 ? '#fbbf24' : 'var(--border-color)'}; background: #fff;">
+    <div class="card-body" style="padding: 20px 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <span class="badge" style="background: rgba(99, 102, 241, 0.05); color: #6366f1; border-color: rgba(99, 102, 241, 0.15); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 10.5px;">MONOTRIBUTO SAFE-GUARD</span>
+          <h3 style="font-size: 15px; font-weight: 750; color: var(--color-primary); margin-top: 8px; margin-bottom: 4px;">Alerta de Control de Categoría H (Servicios)</h3>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Límite anual acumulado antes de la exclusión automática de oficio de ARCA.</p>
+        </div>
+        <div style="text-align: right;">
+          <span class="font-mono" style="font-size: 17px; font-weight: 800; color: ${consumptionPercent >= 85 ? '#dc2626' : '#d97706'}">${consumptionPercent}% Consumido</span>
+          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">Límite: $ ${maxCategoryLimit.toLocaleString('es-AR')}</span>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div style="background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 16px;">
+        <div style="width: ${consumptionPercent}%; height: 100%; background: ${consumptionPercent >= 85 ? '#dc2626' : '#fbbf24'}; border-radius: 4px; transition: width 0.4s ease;"></div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: ${consumptionPercent >= 85 ? '#fef2f2' : '#fffbeb'}; border: 1px solid ${consumptionPercent >= 85 ? '#fee2e2' : '#fef3c7'}; border-radius: 4px; font-size: 12px; color: ${consumptionPercent >= 85 ? '#991b1b' : '#92400e'};">
+        <i data-lucide="alert-triangle" style="width: 16px; height: 16px; flex-shrink: 0; display: inline-block; vertical-align: middle;"></i>
+        <span>
+          <strong>Riesgo Contable de Exclusióm:</strong> El cliente ha facturado acumulado <strong>$ ${accumMonotributoSales.toLocaleString('es-AR')}</strong> en los últimos 12 meses. Se sugiere fuertemente iniciar la planificación preventiva del pase al Régimen General (IVA/Ganancias) para evitar reclamos retroactivos.
+        </span>
+      </div>
+    </div>
+  </div>
+  ` : ''}
 
   <!-- Interactive Onboarding Trial Guide -->
   <div class="card trial-guide-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%); border-color: rgba(5, 150, 105, 0.12);">
