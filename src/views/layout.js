@@ -26,6 +26,22 @@ export function renderDashboardLayout(childHTML, activeRoute) {
       </div>
 
       <div class="db-sidebar-nav">
+        <!-- Active Client Scoping Context Card -->
+        <div class="sidebar-active-client-card" style="background: rgba(13, 148, 136, 0.04); border: 1px solid rgba(13, 148, 136, 0.15); border-radius: var(--radius-md); padding: 12px; margin: 4px 8px 16px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="background: ${activeCompany.color}; width: 8px; height: 8px; border-radius: 50%;"></div>
+            <span style="font-size: 9.5px; font-weight: 700; color: var(--color-teal-light); text-transform: uppercase; letter-spacing: 0.05em;">Cliente Seleccionado</span>
+          </div>
+          <div>
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px;" title="${activeCompany.razon_social}">
+              ${activeCompany.razon_social}
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+              CUIT: ${activeCompany.cuit}
+            </div>
+          </div>
+        </div>
+
         <div class="db-nav-label">Estudio</div>
         <a href="#/demo" class="db-nav-item ${activeRoute === 'demo' ? 'active' : ''}" data-route="demo">
           <i data-lucide="layout-dashboard"></i>

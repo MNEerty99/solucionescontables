@@ -24,11 +24,14 @@ export function renderIVA() {
       <h1 class="view-title">Libro IVA Digital</h1>
       <p class="view-subtitle">Liquidación mensual de IVA, débitos y créditos fiscales.</p>
     </div>
-    <div style="display: flex; gap: 12px;">
-      <button class="btn btn-outline" id="btn-print-iva">
-        <i data-lucide="printer"></i> Imprimir Libro
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button class="btn btn-outline" id="btn-export-excel-iva" style="border-color: #10b981; color: #10b981; display: flex; align-items: center; gap: 6px;">
+        <i data-lucide="file-spreadsheet"></i> Exportar Excel (CSV)
       </button>
-      <button class="btn btn-primary" id="btn-show-afip-exports">
+      <button class="btn btn-outline" id="btn-print-iva" style="display: flex; align-items: center; gap: 6px;">
+        <i data-lucide="printer"></i> Imprimir PDF
+      </button>
+      <button class="btn btn-primary" id="btn-show-afip-exports" style="display: flex; align-items: center; gap: 6px;">
         <i data-lucide="download"></i> Exportar AFIP
       </button>
     </div>
@@ -215,6 +218,41 @@ export function initIVA(mainApp) {
   // Print function
   btnPrint?.addEventListener('click', () => {
     window.print();
+  });
+
+  // Export to Excel (CSV)
+  const btnExcel = document.getElementById('btn-export-excel-iva');
+  btnExcel?.addEventListener('click', () => {
+    const txs = getTransactions(activeCompany.id);
+    const combined = [
+      ...txs.ventas.map(v => ({ ...v, type: 'VENTA', ent: v.cliente, df: v.iva, cf: 0 })),
+      ...txs.compras.map(c => ({ ...c, type: 'COMPRA', ent: c.proveedor, df: 0, cf: c.iva }))
+    ].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+
+    if (combined.length === 0) {
+      mainApp.showToast('No hay transacciones registradas en este período.', 'error');
+      return;
+    }
+
+    // CSV format separated by semicolon with UTF-8 BOM so Excel opens it perfectly in Spanish locale
+    let csvContent = "\uFEFF"; // UTF-8 BOM
+    csvContent += "Fecha;Tipo Operacion;Tipo Comprobante;Numero;Cliente/Proveedor;CUIT;Neto Gravado;IVA Debito;IVA Credito;Total Facturado\r\n";
+
+    combined.forEach(item => {
+      const date = item.fecha.split('-').reverse().join('/');
+      const name = (item.ent || '').replace(/;/g, ',');
+      csvContent += `${date};${item.type};${item.tipo_comprobante};${item.numero};${name};${item.cuit};${item.neto.toFixed(2)};${item.df.toFixed(2)};${item.cf.toFixed(2)};${item.total.toFixed(2)}\r\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `libro_iva_${activeCompany.razon_social.toLowerCase().replace(/ /g, '_')}_${new Date().toISOString().substring(0,7)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    mainApp.showToast('¡Libro de IVA exportado a Excel (CSV) con éxito!', 'success');
   });
 
   // Toggle exports

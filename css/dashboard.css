@@ -166,6 +166,7 @@
 .sidebar-collapsed .db-sidebar-logo-text,
 .sidebar-collapsed .db-nav-label,
 .sidebar-collapsed .db-nav-item span,
+.sidebar-collapsed .sidebar-active-client-card,
 .sidebar-collapsed .user-info {
   display: none;
 }
