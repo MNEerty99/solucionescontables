@@ -6,29 +6,44 @@ import { getActiveCompany, getTransactions } from '../db/mockdb.js';
 export function renderDashboardHome() {
   const activeCompany = getActiveCompany();
   const txs = getTransactions(activeCompany.id);
+  const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+
+  const periodNames = {
+    '2026-05': 'Mayo 2026',
+    '2026-04': 'Abril 2026',
+    '2026-03': 'Marzo 2026',
+    '2026-02': 'Febrero 2026',
+    '2026-01': 'Enero 2026',
+    '2025-12': 'Diciembre 2025'
+  };
+
+  // Filtrar transacciones por período fiscal activo
+  const filteredVentas = txs.ventas.filter(v => v.fecha.startsWith(activePeriod));
+  const filteredCompras = txs.compras.filter(c => c.fecha.startsWith(activePeriod));
 
   // Calcular KPIs
-  const totalNetSales = txs.ventas.reduce((sum, v) => sum + v.neto, 0);
-  const totalIvaSales = txs.ventas.reduce((sum, v) => sum + v.iva, 0);
-  const totalSales = txs.ventas.reduce((sum, v) => sum + v.total, 0);
+  const totalNetSales = filteredVentas.reduce((sum, v) => sum + v.neto, 0);
+  const totalIvaSales = filteredVentas.reduce((sum, v) => sum + v.iva, 0);
+  const totalSales = filteredVentas.reduce((sum, v) => sum + v.total, 0);
 
-  const totalNetPurchases = txs.compras.reduce((sum, c) => sum + c.neto, 0);
-  const totalIvaPurchases = txs.compras.reduce((sum, c) => sum + c.iva, 0);
-  const totalPurchases = txs.compras.reduce((sum, c) => sum + c.total, 0);
+  const totalNetPurchases = filteredCompras.reduce((sum, c) => sum + c.neto, 0);
+  const totalIvaPurchases = filteredCompras.reduce((sum, c) => sum + c.iva, 0);
+  const totalPurchases = filteredCompras.reduce((sum, c) => sum + c.total, 0);
 
   const profit = totalSales - totalPurchases;
   
   // Impuesto estimado (Diferencia de IVA Débito - Crédito)
   const ivaDiferencia = totalIvaSales - totalIvaPurchases;
 
-  // Combinar y ordenar transacciones recientes
+  // Combinar y ordenar transacciones recientes del período
   const allTxs = [
-    ...txs.ventas.map(v => ({ ...v, tipo: 'Venta', sign: '+', colorClass: 'text-emerald' })),
-    ...txs.compras.map(c => ({ ...c, tipo: 'Compra', sign: '-', colorClass: 'text-red' }))
+    ...filteredVentas.map(v => ({ ...v, tipo: 'Venta', sign: '+', colorClass: 'text-emerald' })),
+    ...filteredCompras.map(c => ({ ...c, tipo: 'Compra', sign: '-', colorClass: 'text-red' }))
   ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).slice(0, 5);
 
   const isMonotributo = activeCompany.condicion_iva.includes('Monotributo');
-  const accumMonotributoSales = activeCompany.id === 'co-2' ? 29800000 : totalSales;
+  // Para demostración, si es Monotributista acumulado anual
+  const accumMonotributoSales = activeCompany.id === 'co-2' ? 29800000 + totalSales : totalSales;
   const maxCategoryLimit = 35000000; // Cat H límite legal
   const consumptionPercent = Math.round((accumMonotributoSales / maxCategoryLimit) * 100);
 
@@ -193,7 +208,7 @@ export function renderDashboardHome() {
     <div class="card">
       <div class="card-header">
         <h3><i data-lucide="bar-chart-3"></i> Evolución de Ventas vs Compras</h3>
-        <span class="badge" style="margin: 0; font-size: 11px;">Mayo 2026</span>
+        <span class="badge" style="margin: 0; font-size: 11px;">${periodNames[activePeriod]}</span>
       </div>
       <div class="card-body" style="height: 320px; display: flex; align-items: center; justify-content: center; position: relative;">
         <canvas id="dashboard-main-chart" style="max-height: 100%; max-width: 100%;"></canvas>

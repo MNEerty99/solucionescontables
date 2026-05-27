@@ -6,15 +6,29 @@ import { getActiveCompany, getTransactions } from '../db/mockdb.js';
 export function renderIVA() {
   const activeCompany = getActiveCompany();
   const txs = getTransactions(activeCompany.id);
+  const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+
+  const periodNames = {
+    '2026-05': 'Mayo 2026',
+    '2026-04': 'Abril 2026',
+    '2026-03': 'Marzo 2026',
+    '2026-02': 'Febrero 2026',
+    '2026-01': 'Enero 2026',
+    '2025-12': 'Diciembre 2025'
+  };
+
+  // Filtrar transacciones por período fiscal activo
+  const filteredVentas = txs.ventas.filter(v => v.fecha.startsWith(activePeriod));
+  const filteredCompras = txs.compras.filter(c => c.fecha.startsWith(activePeriod));
 
   // Calcular totales impositivos
-  const totalNetSales = txs.ventas.reduce((sum, v) => sum + v.neto, 0);
-  const totalIvaSales = txs.ventas.reduce((sum, v) => sum + v.iva, 0);
-  const totalSales = txs.ventas.reduce((sum, v) => sum + v.total, 0);
+  const totalNetSales = filteredVentas.reduce((sum, v) => sum + v.neto, 0);
+  const totalIvaSales = filteredVentas.reduce((sum, v) => sum + v.iva, 0);
+  const totalSales = filteredVentas.reduce((sum, v) => sum + v.total, 0);
 
-  const totalNetPurchases = txs.compras.reduce((sum, c) => sum + c.neto, 0);
-  const totalIvaPurchases = txs.compras.reduce((sum, c) => sum + c.iva, 0);
-  const totalPurchases = txs.compras.reduce((sum, c) => sum + c.total, 0);
+  const totalNetPurchases = filteredCompras.reduce((sum, c) => sum + c.neto, 0);
+  const totalIvaPurchases = filteredCompras.reduce((sum, c) => sum + c.iva, 0);
+  const totalPurchases = filteredCompras.reduce((sum, c) => sum + c.total, 0);
 
   const balance = totalIvaSales - totalIvaPurchases;
 
@@ -125,7 +139,7 @@ export function renderIVA() {
       </div>
       <div>
         <h4 style="font-size: 16px; font-weight: 700; color: #fbbf24;">
-          Liquidación de IVA - Mayo 2026
+          Liquidación de IVA - ${periodNames[activePeriod]}
         </h4>
         <p class="text-secondary" style="font-size: 13px; margin-top: 4px;">
           ${balance >= 0 
@@ -146,7 +160,7 @@ export function renderIVA() {
   <div class="card">
     <div class="card-header">
       <h3><i data-lucide="book-open"></i> Subdiario de Comprobantes Consolidados</h3>
-      <span class="badge" style="margin: 0; font-size: 11px;">Período Fiscal Actual</span>
+      <span class="badge" style="margin: 0; font-size: 11px;">Período: ${periodNames[activePeriod]}</span>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
@@ -165,13 +179,13 @@ export function renderIVA() {
             </tr>
           </thead>
           <tbody>
-            ${txs.ventas.length === 0 && txs.compras.length === 0 ? `
+            ${filteredVentas.length === 0 && filteredCompras.length === 0 ? `
               <tr>
                 <td colspan="9" class="text-center text-muted" style="padding: 32px;">No hay transacciones registradas en este período.</td>
               </tr>
             ` : [
-              ...txs.ventas.map(v => ({ ...v, type: 'venta', df: v.iva, cf: 0 })),
-              ...txs.compras.map(c => ({ ...c, type: 'compra', df: 0, cf: c.iva }))
+              ...filteredVentas.map(v => ({ ...v, type: 'venta', df: v.iva, cf: 0 })),
+              ...filteredCompras.map(c => ({ ...c, type: 'compra', df: 0, cf: c.iva }))
             ].sort((a,b) => new Date(a.fecha) - new Date(b.fecha)).map(item => `
               <tr>
                 <td class="font-mono text-sm">${item.fecha.split('-').reverse().join('/')}</td>
@@ -224,9 +238,13 @@ export function initIVA(mainApp) {
   const btnExcel = document.getElementById('btn-export-excel-iva');
   btnExcel?.addEventListener('click', () => {
     const txs = getTransactions(activeCompany.id);
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    const filteredVentas = txs.ventas.filter(v => v.fecha.startsWith(activePeriod));
+    const filteredCompras = txs.compras.filter(c => c.fecha.startsWith(activePeriod));
+
     const combined = [
-      ...txs.ventas.map(v => ({ ...v, type: 'VENTA', ent: v.cliente, df: v.iva, cf: 0 })),
-      ...txs.compras.map(c => ({ ...c, type: 'COMPRA', ent: c.proveedor, df: 0, cf: c.iva }))
+      ...filteredVentas.map(v => ({ ...v, type: 'VENTA', ent: v.cliente, df: v.iva, cf: 0 })),
+      ...filteredCompras.map(c => ({ ...c, type: 'COMPRA', ent: c.proveedor, df: 0, cf: c.iva }))
     ].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
 
     if (combined.length === 0) {
@@ -248,7 +266,7 @@ export function initIVA(mainApp) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `libro_iva_${activeCompany.razon_social.toLowerCase().replace(/ /g, '_')}_${new Date().toISOString().substring(0,7)}.csv`;
+    a.download = `libro_iva_${activeCompany.razon_social.toLowerCase().replace(/ /g, '_')}_${activePeriod}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -280,13 +298,16 @@ export function initIVA(mainApp) {
   // RE.CO. Ventas (Comprobantes) TXT structure simulation
   document.getElementById('btn-export-ventas-txt')?.addEventListener('click', () => {
     const txs = getTransactions(activeCompany.id).ventas;
-    if (txs.length === 0) {
-      mainApp.showToast('No hay ventas registradas para exportar.', 'error');
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    const filteredVentas = txs.filter(v => v.fecha.startsWith(activePeriod));
+
+    if (filteredVentas.length === 0) {
+      mainApp.showToast('No hay ventas registradas en este período para exportar.', 'error');
       return;
     }
 
     let output = "";
-    txs.forEach(v => {
+    filteredVentas.forEach(v => {
       const dateStr = v.fecha.replace(/-/g, ''); // AAAAMMDD
       const typeCode = v.tipo_comprobante.includes('A') ? '001' : '006';
       const pv = v.numero.split('-')[0].padStart(5, '0');
@@ -299,20 +320,23 @@ export function initIVA(mainApp) {
       output += `${dateStr}${typeCode}${pv}${num}${num}${docType}${cleanCuit}${name}${totalStr}\r\n`;
     });
 
-    downloadTXT(`afip-ventas-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}.txt`, output);
+    downloadTXT(`afip-ventas-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
     mainApp.showToast('¡Archivo de Comprobantes descargado con éxito!', 'success');
   });
 
   // RE.CO. Ventas (Alícuotas) TXT structure simulation
   document.getElementById('btn-export-ventas-ali-txt')?.addEventListener('click', () => {
     const txs = getTransactions(activeCompany.id).ventas;
-    if (txs.length === 0) {
-      mainApp.showToast('No hay ventas registradas para exportar.', 'error');
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    const filteredVentas = txs.filter(v => v.fecha.startsWith(activePeriod));
+
+    if (filteredVentas.length === 0) {
+      mainApp.showToast('No hay ventas registradas en este período para exportar.', 'error');
       return;
     }
 
     let output = "";
-    txs.forEach(v => {
+    filteredVentas.forEach(v => {
       const typeCode = v.tipo_comprobante.includes('A') ? '001' : '006';
       const pv = v.numero.split('-')[0].padStart(5, '0');
       const num = v.numero.split('-')[1].padStart(8, '0');
@@ -323,7 +347,7 @@ export function initIVA(mainApp) {
       output += `${typeCode}${pv}${num}${netStr}${ivaCode}${ivaStr}\r\n`;
     });
 
-    downloadTXT(`afip-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}.txt`, output);
+    downloadTXT(`afip-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
     mainApp.showToast('¡Archivo de Alícuotas descargado con éxito!', 'success');
   });
 

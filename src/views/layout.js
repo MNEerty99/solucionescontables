@@ -125,33 +125,49 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <div class="db-breadcrumb" id="db-breadcrumb-title">Cargando...</div>
         </div>
 
-        <!-- Dynamic Company Selector Pill -->
-        <div style="position: relative;">
-          <div class="company-selector-container" id="topbar-company-selector">
-            <div class="company-avatar" style="background: ${activeCompany.color}">
-              ${activeCompany.razon_social[0]}
-            </div>
-            <div class="company-select-text">
-              <span class="c-sel-name">${activeCompany.razon_social}</span>
-              <span class="c-sel-cuit">CUIT: ${activeCompany.cuit}</span>
-            </div>
-            <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 8px;"></i>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <!-- Global Fiscal Period Selector -->
+          <div style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 6px 12px; box-shadow: var(--shadow-sm);">
+            <i data-lucide="calendar" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Período Fiscal:</span>
+            <select id="global-fiscal-period" style="border: none; background: transparent; font-size: 13px; font-weight: 700; color: var(--text-primary); cursor: pointer; outline: none; padding: 0 4px; font-family: inherit;">
+              <option value="2026-05" ${localStorage.getItem('vmp_active_period') === '2026-05' || !localStorage.getItem('vmp_active_period') ? 'selected' : ''}>Mayo 2026</option>
+              <option value="2026-04" ${localStorage.getItem('vmp_active_period') === '2026-04' ? 'selected' : ''}>Abril 2026</option>
+              <option value="2026-03" ${localStorage.getItem('vmp_active_period') === '2026-03' ? 'selected' : ''}>Marzo 2026</option>
+              <option value="2026-02" ${localStorage.getItem('vmp_active_period') === '2026-02' ? 'selected' : ''}>Febrero 2026</option>
+              <option value="2026-01" ${localStorage.getItem('vmp_active_period') === '2026-01' ? 'selected' : ''}>Enero 2026</option>
+              <option value="2025-12" ${localStorage.getItem('vmp_active_period') === '2025-12' ? 'selected' : ''}>Diciembre 2025</option>
+            </select>
           </div>
 
-          <!-- Selector Dropdown -->
-          <div class="company-dropdown" id="company-selector-dropdown">
-            <div style="padding: 6px 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Cambiar Empresa</div>
-            ${companies.map(c => `
-              <div class="dropdown-item ${c.id === activeCompany.id ? 'active' : ''}" data-id="${c.id}">
-                <div class="company-avatar" style="background: ${c.color}; width: 24px; height: 24px; font-size: 11px;">
-                  ${c.razon_social[0]}
-                </div>
-                <div class="company-select-text">
-                  <span class="c-sel-name" style="font-size: 12px; font-weight: 600; max-width: 180px;">${c.razon_social}</span>
-                  <span class="c-sel-cuit" style="font-size: 10px;">${c.cuit}</span>
-                </div>
+          <!-- Dynamic Company Selector Pill -->
+          <div style="position: relative;">
+            <div class="company-selector-container" id="topbar-company-selector">
+              <div class="company-avatar" style="background: ${activeCompany.color}">
+                ${activeCompany.razon_social[0]}
               </div>
-            `).join('')}
+              <div class="company-select-text">
+                <span class="c-sel-name">${activeCompany.razon_social}</span>
+                <span class="c-sel-cuit">CUIT: ${activeCompany.cuit}</span>
+              </div>
+              <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 8px;"></i>
+            </div>
+
+            <!-- Selector Dropdown -->
+            <div class="company-dropdown" id="company-selector-dropdown">
+              <div style="padding: 6px 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Cambiar Empresa</div>
+              ${companies.map(c => `
+                <div class="dropdown-item ${c.id === activeCompany.id ? 'active' : ''}" data-id="${c.id}">
+                  <div class="company-avatar" style="background: ${c.color}; width: 24px; height: 24px; font-size: 11px;">
+                    ${c.razon_social[0]}
+                  </div>
+                  <div class="company-select-text">
+                    <span class="c-sel-name" style="font-size: 12px; font-weight: 600; max-width: 180px;">${c.razon_social}</span>
+                    <span class="c-sel-cuit" style="font-size: 10px;">${c.cuit}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
       </header>
@@ -217,6 +233,25 @@ export function initDashboardLayout(mainApp) {
       dropdown.classList.remove('show');
       mainApp.showToast(`Cambiando a: ${item.querySelector('.c-sel-name').textContent}`, 'info');
     });
+  });
+
+  // Global Fiscal Period Selector listener
+  const periodSelector = document.getElementById('global-fiscal-period');
+  periodSelector?.addEventListener('change', (e) => {
+    const newPeriod = e.target.value;
+    localStorage.setItem('vmp_active_period', newPeriod);
+    
+    const periodNames = {
+      '2026-05': 'Mayo 2026',
+      '2026-04': 'Abril 2026',
+      '2026-03': 'Marzo 2026',
+      '2026-02': 'Febrero 2026',
+      '2026-01': 'Enero 2026',
+      '2025-12': 'Diciembre 2025'
+    };
+    
+    mainApp.showToast(`Cambiando período fiscal a: ${periodNames[newPeriod] || newPeriod}`, 'success');
+    mainApp.router(); // Refresh current page instantly to filter by new period!
   });
 
   // Logout demo

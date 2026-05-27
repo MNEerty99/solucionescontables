@@ -6,6 +6,10 @@ import { getActiveCompany, getTransactions, addTransaction } from '../db/mockdb.
 export function renderVentas() {
   const activeCompany = getActiveCompany();
   const txs = getTransactions(activeCompany.id);
+  const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+
+  const filteredVentas = txs.ventas.filter(v => v.fecha.startsWith(activePeriod));
+  const filteredCompras = txs.compras.filter(c => c.fecha.startsWith(activePeriod));
 
   return `
   <div class="view-header">
@@ -336,7 +340,8 @@ export function initVentas(mainApp) {
   // Renders the active list with filters
   const updateList = () => {
     const txs = getTransactions(activeCompany.id);
-    let list = [...txs[activeTab]];
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    let list = txs[activeTab].filter(t => t.fecha.startsWith(activePeriod));
 
     // Apply date from filter
     if (inputDateFrom && inputDateFrom.value) {
