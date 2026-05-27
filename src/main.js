@@ -16,6 +16,7 @@ import { renderConfiguracion, initConfiguracion } from './views/configuracion.js
 import { renderIVASimple, initIVASimple } from './views/iva_simple.js';
 import { renderRetenciones, initRetenciones } from './views/retenciones.js';
 import { renderRT54, initRT54 } from './views/rt54.js';
+import { renderAyuda, initAyuda } from './views/ayuda.js';
 
 class Application {
   constructor() {
@@ -123,6 +124,12 @@ class Application {
         initDashboardLayout(this);
         initRT54(this);
         this.updateBreadcrumb("RT 54 · Panel Contable");
+      }
+      else if (subRoute === '/ayuda') {
+        rootEl.innerHTML = renderDashboardLayout(renderAyuda(), 'ayuda');
+        initDashboardLayout(this);
+        initAyuda(this);
+        this.updateBreadcrumb("Instructivo & Onboarding");
       }
       else {
         // Fallback to demo home

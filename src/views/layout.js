@@ -77,6 +77,10 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="settings"></i>
           <span>Configuración ARCA</span>
         </a>
+        <a href="#/demo/ayuda" class="db-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}" data-route="ayuda">
+          <i data-lucide="help-circle"></i>
+          <span>Instructivo & Onboarding</span>
+        </a>
 
         <div class="db-nav-label">Salida</div>
         <a href="#/" class="db-nav-item">

@@ -41,9 +41,14 @@ export function renderDashboardHome() {
   <!-- Interactive Onboarding Trial Guide -->
   <div class="card trial-guide-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%); border-color: rgba(5, 150, 105, 0.12);">
     <div class="card-body" style="padding: 20px 24px;">
-      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-        <span class="badge" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); border-color: rgba(5, 150, 105, 0.2); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 11px;">GUÍA DE PRUEBA INTERACTIVA</span>
-        <h4 style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0;">Probá las 4 funciones clave del SaaS haciendo clic en los accesos rápidos:</h4>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span class="badge" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); border-color: rgba(5, 150, 105, 0.2); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 11px;">GUÍA DE PRUEBA INTERACTIVA</span>
+          <h4 style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0;">Probá las 4 funciones clave del SaaS o leé la</h4>
+        </div>
+        <a href="#/demo/ayuda" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 6px 12px; background: #6366f1; border-color: #6366f1; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm); text-decoration: none; color: white;">
+          <i data-lucide="book-open" style="width: 12px; height: 12px;"></i> Guía de Onboarding Completa
+        </a>
       </div>
       <div class="trial-actions-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
         
