@@ -403,7 +403,12 @@ export function initPortalCliente(mainApp) {
     if (apiKey) {
       processRealTicketWithGemini(file);
     } else {
-      const isAssetSim = file.name.toLowerCase().includes('compu') || file.name.toLowerCase().includes('notebook') || file.name.toLowerCase().includes('activo') || file.name.toLowerCase().includes('dell') || file.size > 200000;
+      const isAssetSim = file.name.toLowerCase().includes('compu') || 
+                         file.name.toLowerCase().includes('notebook') || 
+                         file.name.toLowerCase().includes('activo') || 
+                         file.name.toLowerCase().includes('dell') ||
+                         file.name.toLowerCase().includes('laptop') ||
+                         file.name.toLowerCase().includes('pc');
       startUploadSimulation(isAssetSim);
     }
   };
