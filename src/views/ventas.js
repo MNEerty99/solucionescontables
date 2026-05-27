@@ -161,13 +161,51 @@ export function renderVentas() {
   </div>
 
   <!-- Tabs Navigation -->
-  <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+  <div style="display: flex; gap: 8px; margin-bottom: 20px;">
     <button class="btn btn-outline active" id="btn-tab-ventas" style="border-radius: var(--radius-full); padding: 8px 20px; font-size: 13px;">
       Ventas Emitidas (${txs.ventas.length})
     </button>
     <button class="btn btn-outline" id="btn-tab-compras" style="border-radius: var(--radius-full); padding: 8px 20px; font-size: 13px;">
       Compras Recibidas (${txs.compras.length})
     </button>
+  </div>
+
+  <!-- Panel de Filtros Contables (Filtrado por Fecha, Hora y Tipo) -->
+  <div class="card" style="margin-bottom: 24px; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+    <div class="card-body" style="padding: 16px 20px; display: grid; grid-template-columns: repeat(4, 1fr) auto; gap: 16px; align-items: flex-end;">
+      <div class="form-group" style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+        <label class="form-label" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Fecha Desde</label>
+        <input type="date" id="filter-date-from" class="form-input" style="padding: 8px 12px; font-size: 12.5px; border-radius: var(--radius-sm);">
+      </div>
+      <div class="form-group" style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+        <label class="form-label" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Fecha Hasta</label>
+        <input type="date" id="filter-date-to" class="form-input" style="padding: 8px 12px; font-size: 12.5px; border-radius: var(--radius-sm);">
+      </div>
+      <div class="form-group" style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+        <label class="form-label" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Tipo de Comprobante</label>
+        <select id="filter-voucher-type" class="form-select" style="padding: 8px 12px; font-size: 12.5px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <option value="ALL">Todos los tipos</option>
+          <option value="Factura A">Factura A</option>
+          <option value="Factura B">Factura B</option>
+          <option value="Factura C">Factura C</option>
+          <option value="Factura M">Factura M</option>
+          <option value="Factura E">Factura E (Exportación)</option>
+          <option value="033">Liquidación Granos (033)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin: 0; display: flex; flex-direction: column; gap: 6px;">
+        <label class="form-label" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">Orden (Fecha y Hora)</label>
+        <select id="filter-sort-order" class="form-select" style="padding: 8px 12px; font-size: 12.5px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+          <option value="desc">Cronológico Descendente (Más recientes)</option>
+          <option value="asc">Cronológico Ascendente (Más antiguos)</option>
+        </select>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 38px;">
+        <button class="btn btn-outline" id="btn-clear-filters" style="padding: 10px 14px; font-size: 12.5px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; font-weight: 600;" title="Limpiar Filtros">
+          <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i> Reset
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Scoped Data Card -->
@@ -226,9 +264,17 @@ function renderTransactionsTable(transactions, type) {
             `;
           }
 
+          const defaultHours = { 'v-1': '09:15', 'v-2': '11:42', 'v-3': '15:20', 'c-1': '10:30', 'c-2': '16:10', 'v-4': '08:45', 'v-5': '14:22', 'c-3': '11:10', 'v-6': '09:50', 'v-7': '13:15', 'c-4': '12:05' };
+          const hora = t.hora || defaultHours[t.id] || '09:00';
+
           return `
           <tr>
-            <td class="font-mono text-sm">${t.fecha.split('-').reverse().join('/')}</td>
+            <td class="font-mono text-sm">
+              <div style="font-weight: 600;">${t.fecha.split('-').reverse().join('/')}</div>
+              <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                <i data-lucide="clock" style="width: 10px; height: 10px; opacity: 0.7;"></i> ${hora} hs
+              </div>
+            </td>
             <td>
               <span class="badge-status ${type === 'ventas' ? 'active' : 'pending'}" style="font-size: 11.5px; font-weight: 600; padding: 2px 10px;">
                 ${t.tipo_comprobante}
@@ -281,10 +327,44 @@ export function initVentas(mainApp) {
   const tabVentas = document.getElementById('btn-tab-ventas');
   const tabCompras = document.getElementById('btn-tab-compras');
 
-  // Renders the active list
+  const inputDateFrom = document.getElementById('filter-date-from');
+  const inputDateTo = document.getElementById('filter-date-to');
+  const selectVoucherFilter = document.getElementById('filter-voucher-type');
+  const selectSortOrder = document.getElementById('filter-sort-order');
+  const btnClearFilters = document.getElementById('btn-clear-filters');
+
+  // Renders the active list with filters
   const updateList = () => {
     const txs = getTransactions(activeCompany.id);
-    container.innerHTML = renderTransactionsTable(txs[activeTab], activeTab);
+    let list = [...txs[activeTab]];
+
+    // Apply date from filter
+    if (inputDateFrom && inputDateFrom.value) {
+      list = list.filter(t => t.fecha >= inputDateFrom.value);
+    }
+
+    // Apply date to filter
+    if (inputDateTo && inputDateTo.value) {
+      list = list.filter(t => t.fecha <= inputDateTo.value);
+    }
+
+    // Apply voucher type filter
+    if (selectVoucherFilter && selectVoucherFilter.value !== 'ALL') {
+      list = list.filter(t => t.tipo_comprobante.toLowerCase().includes(selectVoucherFilter.value.toLowerCase()));
+    }
+
+    // Apply sorting (by Date and Time)
+    const order = selectSortOrder?.value || 'desc';
+    list.sort((a, b) => {
+      const defaultHours = { 'v-1': '09:15', 'v-2': '11:42', 'v-3': '15:20', 'c-1': '10:30', 'c-2': '16:10', 'v-4': '08:45', 'v-5': '14:22', 'c-3': '11:10', 'v-6': '09:50', 'v-7': '13:15', 'c-4': '12:05' };
+      const timeA = a.hora || defaultHours[a.id] || '09:00';
+      const timeB = b.hora || defaultHours[b.id] || '09:00';
+      const dateTimeA = new Date(`${a.fecha}T${timeA}:00`);
+      const dateTimeB = new Date(`${b.fecha}T${timeB}:00`);
+      return order === 'asc' ? dateTimeA - dateTimeB : dateTimeB - dateTimeA;
+    });
+
+    container.innerHTML = renderTransactionsTable(list, activeTab);
     if (window.lucide) window.lucide.createIcons({ root: container });
   };
 
@@ -303,6 +383,21 @@ export function initVentas(mainApp) {
     tabCompras.classList.add('active');
     tabVentas.classList.remove('active');
     updateList();
+  });
+
+  // Listeners for real-time filtering
+  inputDateFrom?.addEventListener('input', updateList);
+  inputDateTo?.addEventListener('input', updateList);
+  selectVoucherFilter?.addEventListener('change', updateList);
+  selectSortOrder?.addEventListener('change', updateList);
+
+  btnClearFilters?.addEventListener('click', () => {
+    if (inputDateFrom) inputDateFrom.value = '';
+    if (inputDateTo) inputDateTo.value = '';
+    if (selectVoucherFilter) selectVoucherFilter.value = 'ALL';
+    if (selectSortOrder) selectSortOrder.value = 'desc';
+    updateList();
+    mainApp.showToast('Filtros contables restablecidos.', 'success');
   });
 
   // Show/Hide Form
@@ -456,6 +551,7 @@ export function initVentas(mainApp) {
 
     const transaction = {
       fecha: date,
+      hora: new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
       tipo_comprobante: voucher,
       numero: num,
       cuit,
