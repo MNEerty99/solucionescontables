@@ -5,7 +5,7 @@
 import { getCompanies } from '../db/mockdb.js';
 
 export function renderAyuda() {
-  const companies = getCompanies();
+  const companies = getCompanies() || [];
 
   // Onboarding Tasks Status from localStorage
   const t1 = localStorage.getItem('vmp_task_estudio') === 'true';
@@ -507,7 +507,7 @@ export function initAyuda(mainApp) {
     localStorage.setItem('vmp_task_estudio', e.target.checked ? 'true' : 'false');
     
     // Refresh calculations and update progress bar live
-    const companies = getCompanies();
+    const companies = getCompanies() || [];
     const t1 = localStorage.getItem('vmp_task_estudio') === 'true';
     const t2 = localStorage.getItem('vmp_arca_cert_uploaded') === 'true';
     const t3 = companies.length > 2;
