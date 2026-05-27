@@ -126,10 +126,17 @@ class Application {
         this.updateBreadcrumb("RT 54 · Panel Contable");
       }
       else if (subRoute === '/ayuda') {
-        rootEl.innerHTML = renderDashboardLayout(renderAyuda(), 'ayuda');
-        initDashboardLayout(this);
-        initAyuda(this);
-        this.updateBreadcrumb("Instructivo & Onboarding");
+        try {
+          rootEl.innerHTML = renderDashboardLayout(renderAyuda(), 'ayuda');
+          initDashboardLayout(this);
+          initAyuda(this);
+          this.updateBreadcrumb("Instructivo & Onboarding");
+        } catch (err) {
+          console.error("Error loading Ayuda view:", err);
+          if (this.showToast) {
+            this.showToast("Error al cargar la sección de ayuda: " + err.message, "error");
+          }
+        }
       }
       else {
         // Fallback to demo home

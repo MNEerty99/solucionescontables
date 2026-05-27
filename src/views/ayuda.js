@@ -432,25 +432,33 @@ const TabContents = {
 };
 
 export function initAyuda(mainApp) {
-  // Initialize Lucide Icons
-  if (window.lucide) window.lucide.createIcons();
+  try {
+    // Initialize Lucide Icons
+    if (window.lucide) window.lucide.createIcons();
 
-  const container = document.getElementById('help-content-container');
-  const cardTitle = document.getElementById('help-card-title');
-  const searchInput = document.getElementById('help-search-input');
+    const container = document.getElementById('help-content-container');
+    const cardTitle = document.getElementById('help-card-title');
+    const searchInput = document.getElementById('help-search-input');
 
-  // Set default tab content
-  let activeTab = 'general';
-  
-  const updateTabContent = () => {
-    container.innerHTML = TabContents[activeTab];
-    if (window.lucide) window.lucide.createIcons({ root: container });
+    if (!container) {
+      console.warn("Element '#help-content-container' not found in DOM.");
+      return;
+    }
+
+    // Set default tab content
+    let activeTab = 'general';
     
-    // Bind template copy buttons inside tabs if they exist
-    if (activeTab === 'arca') {
-      const copyBtn = document.getElementById('btn-copy-template');
-      copyBtn?.addEventListener('click', () => {
-        const textToCopy = `Hola! Para poder importar tus facturas y retenciones de forma automática a nuestra nueva plataforma contable, te pido que nos delegues el acceso de lectura en ARCA. Es muy fácil, seguro y se hace por única vez:
+    const updateTabContent = () => {
+      if (container) {
+        container.innerHTML = TabContents[activeTab] || '';
+        if (window.lucide) window.lucide.createIcons({ root: container });
+      }
+      
+      // Bind template copy buttons inside tabs if they exist
+      if (activeTab === 'arca') {
+        const copyBtn = document.getElementById('btn-copy-template');
+        copyBtn?.addEventListener('click', () => {
+          const textToCopy = `Hola! Para poder importar tus facturas y retenciones de forma automática a nuestra nueva plataforma contable, te pido que nos delegues el acceso de lectura en ARCA. Es muy fácil, seguro y se hace por única vez:
 
 1. Entrá con tu CUIT y Clave Fiscal a la web de ARCA.
 2. Buscá el servicio "Administrador de Relaciones de Clave Fiscal".
@@ -459,137 +467,149 @@ export function initAyuda(mainApp) {
 5. Buscá el servicio: "Libro de IVA Digital".
 6. En "Representante", poné nuestro CUIT del Estudio: 30-71938495-2.
 7. Confirmá la relación y ¡listo! No hace falta que nos pases tu clave fiscal.`;
-        
-        navigator.clipboard.writeText(textToCopy).then(() => {
-          mainApp.showToast("¡Plantilla copiada al portapapeles!", "success");
-        }).catch(err => {
-          mainApp.showToast("Error al copiar texto", "error");
+          
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            mainApp.showToast("¡Plantilla copiada al portapapeles!", "success");
+          }).catch(err => {
+            mainApp.showToast("Error al copiar texto", "error");
+          });
         });
+      }
+    };
+
+    updateTabContent();
+
+    // Handle Tab Switching
+    document.querySelectorAll('.help-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.help-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        activeTab = btn.dataset.tab;
+        
+        const tabIcons = {
+          general: 'book-open',
+          arca: 'shield-check',
+          modulos: 'cpu',
+          portal: 'smartphone',
+          faq: 'help-circle'
+        };
+
+        const tabTitles = {
+          general: 'Guía General del Sistema',
+          arca: 'Configuración & Enlace ARCA',
+          modulos: 'Módulos Normativos 2026',
+          portal: 'Portal & Whatsapp Contable',
+          faq: 'Preguntas Frecuentes'
+        };
+
+        if (cardTitle) {
+          cardTitle.innerHTML = `<i data-lucide="${tabIcons[activeTab]}" style="color: #6366f1;"></i> ${tabTitles[activeTab]}`;
+        }
+        updateTabContent();
       });
-    }
-  };
-
-  updateTabContent();
-
-  // Handle Tab Switching
-  document.querySelectorAll('.help-tab-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.querySelectorAll('.help-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      activeTab = btn.dataset.tab;
-      
-      const tabIcons = {
-        general: 'book-open',
-        arca: 'shield-check',
-        modulos: 'cpu',
-        portal: 'smartphone',
-        faq: 'help-circle'
-      };
-
-      const tabTitles = {
-        general: 'Guía General del Sistema',
-        arca: 'Configuración & Enlace ARCA',
-        modulos: 'Módulos Normativos 2026',
-        portal: 'Portal & Whatsapp Contable',
-        faq: 'Preguntas Frecuentes'
-      };
-
-      cardTitle.innerHTML = `<i data-lucide="${tabIcons[activeTab]}" style="color: #6366f1;"></i> ${tabTitles[activeTab]}`;
-      updateTabContent();
     });
-  });
 
-  // Checklist updates in localStorage & reactive progress
-  const chkEstudio = document.getElementById('chk-task-estudio');
-  chkEstudio?.addEventListener('change', (e) => {
-    localStorage.setItem('vmp_task_estudio', e.target.checked ? 'true' : 'false');
-    
-    // Refresh calculations and update progress bar live
-    const companies = getCompanies() || [];
-    const t1 = localStorage.getItem('vmp_task_estudio') === 'true';
-    const t2 = localStorage.getItem('vmp_arca_cert_uploaded') === 'true';
-    const t3 = companies.length > 2;
-    const t4 = localStorage.getItem('vmp_delegation_active_1') === 'true' || localStorage.getItem('vmp_delegation_active_2') === 'true';
-    const t5 = localStorage.getItem('vmp_import_simulated') === 'true';
-    const t6 = localStorage.getItem('vmp_iva_validated_Logistica') === 'true' || localStorage.getItem('vmp_iva_validated_Software') === 'true';
+    // Checklist updates in localStorage & reactive progress
+    const chkEstudio = document.getElementById('chk-task-estudio');
+    chkEstudio?.addEventListener('change', (e) => {
+      localStorage.setItem('vmp_task_estudio', e.target.checked ? 'true' : 'false');
+      
+      // Refresh calculations and update progress bar live
+      const companies = getCompanies() || [];
+      const t1 = localStorage.getItem('vmp_task_estudio') === 'true';
+      const t2 = localStorage.getItem('vmp_arca_cert_uploaded') === 'true';
+      const t3 = companies.length > 2;
+      const t4 = localStorage.getItem('vmp_delegation_active_1') === 'true' || localStorage.getItem('vmp_delegation_active_2') === 'true';
+      const t5 = localStorage.getItem('vmp_import_simulated') === 'true';
+      const t6 = localStorage.getItem('vmp_iva_validated_Logistica') === 'true' || localStorage.getItem('vmp_iva_validated_Software') === 'true';
 
-    const completed = [t1, t2, t3, t4, t5, t6].filter(Boolean).length;
-    const percent = Math.round((completed / 6) * 100);
+      const completed = [t1, t2, t3, t4, t5, t6].filter(Boolean).length;
+      const percent = Math.round((completed / 6) * 100);
 
-    const progressBar = document.getElementById('onboarding-progress-bar');
-    if (progressBar) {
-      progressBar.style.width = `${percent}%`;
-    }
-    
-    // Update number texts
-    const textPercent = document.querySelector("span[style*='font-size: 18px']");
-    if (textPercent) textPercent.textContent = `${percent}%`;
-    
-    const textCount = document.querySelector("span[style*='font-size: 11px']");
-    if (textCount) textCount.textContent = `${completed} de 6 tareas`;
+      const progressBar = document.getElementById('onboarding-progress-bar');
+      if (progressBar) {
+        progressBar.style.width = `${percent}%`;
+      }
+      
+      // Update number texts
+      const textPercent = document.querySelector("span[style*='font-size: 18px']");
+      if (textPercent) textPercent.textContent = `${percent}%`;
+      
+      const textCount = document.querySelector("span[style*='font-size: 11px']");
+      if (textCount) textCount.textContent = `${completed} de 6 tareas`;
 
-    // Dynamic style update for the checkbox item borders
-    const parentBtn = chkEstudio.closest('.trial-action-btn');
-    if (parentBtn) {
-      parentBtn.style.borderColor = t1 ? 'var(--color-accent)' : 'var(--border-color)';
-      const h5 = parentBtn.querySelector('h5');
-      if (h5) h5.style.color = t1 ? 'var(--color-accent)' : 'var(--color-primary)';
-    }
+      // Dynamic style update for the checkbox item borders
+      const parentBtn = chkEstudio.closest('.trial-action-btn');
+      if (parentBtn) {
+        parentBtn.style.borderColor = t1 ? 'var(--color-accent)' : 'var(--border-color)';
+        const h5 = parentBtn.querySelector('h5');
+        if (h5) h5.style.color = t1 ? 'var(--color-accent)' : 'var(--color-primary)';
+      }
 
-    mainApp.showToast(t1 ? "¡Paso 1 completado!" : "Paso 1 desmarcado.", "info");
-  });
+      mainApp.showToast(t1 ? "¡Paso 1 completado!" : "Paso 1 desmarcado.", "info");
+    });
 
-  // Dynamic search filtering
-  searchInput?.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    if (!query) {
-      // Restore active tab
-      updateTabContent();
-      return;
-    }
+    // Dynamic search filtering
+    searchInput?.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      if (!query) {
+        // Restore active tab
+        updateTabContent();
+        return;
+      }
 
-    // Filter in all sections for matches
-    let resultsHTML = '<div style="display: flex; flex-direction: column; gap: 16px;">';
-    let matchCount = 0;
+      // Filter in all sections for matches
+      let resultsHTML = '<div style="display: flex; flex-direction: column; gap: 16px;">';
+      let matchCount = 0;
 
-    // Search inside the FAQ and Modules texts
-    const allSearchable = [
-      { q: "cuit clave fiscal contador estudio", title: "¿Necesito la clave de todos mis clientes?", desc: "No, la delegación impositiva permite que uses únicamente tu clave fiscal de contador." },
-      { q: "delegacion arca relacion", title: "¿Cómo funciona la delegación en ARCA?", desc: "El cliente final entra por única vez a ARCA y delega servicios como Libro de IVA Digital a tu CUIT de estudio." },
-      { q: "iva simple f2051 formula", title: "IVA Simple Formulario 2051", desc: "Modulo normativo adaptado al nuevo régimen simplificado. Cruza las actividades declaradas y bloquea liquidación si hay desvíos mayores a $1." },
-      { q: "retenciones percepciones sircreb sire", title: "Retenciones y Percepciones - Conciliación 3 fuentes", desc: "Cruza libro diario, SIRE y extracto bancario (SIRCREB) para no perder crédito impositivo." },
-      { q: "rt 54 contable balance existencia", title: "Norma Técnica RT 54 Contable", desc: "Panel de balance exprés para micro y pequeñas entidades. Existencia inicial = Inventario × factor de 1.2x. Fórmula: CV = EI + C - EF." },
-      { q: "whatsapp celular portal foto ocr", title: "Portal de Clientes & Whatsapp Contable", desc: "El cliente saca foto al ticket de compra, el motor OCR inteligente extrae los datos y lo importa sin intervención manual." }
-    ];
+      // Search inside the FAQ and Modules texts
+      const allSearchable = [
+        { q: "cuit clave fiscal contador estudio", title: "¿Necesito la clave de todos mis clientes?", desc: "No, la delegación impositiva permite que uses únicamente tu clave fiscal de contador." },
+        { q: "delegacion arca relacion", title: "¿Cómo funciona la delegación en ARCA?", desc: "El cliente final entra por única vez a ARCA y delega servicios como Libro de IVA Digital a tu CUIT de estudio." },
+        { q: "iva simple f2051 formula", title: "IVA Simple Formulario 2051", desc: "Modulo normativo adaptado al nuevo régimen simplificado. Cruza las actividades declaradas y bloquea liquidación si hay desvíos mayores a $1." },
+        { q: "retenciones percepciones sircreb sire", title: "Retenciones y Percepciones - Conciliación 3 fuentes", desc: "Cruza libro diario, SIRE y extracto bancario (SIRCREB) para no perder crédito impositivo." },
+        { q: "rt 54 contable balance existencia", title: "Norma Técnica RT 54 Contable", desc: "Panel de balance exprés para micro y pequeñas entidades. Existencia inicial = Inventario × factor de 1.2x. Fórmula: CV = EI + C - EF." },
+        { q: "whatsapp celular portal foto ocr", title: "Portal de Clientes & Whatsapp Contable", desc: "El cliente saca foto al ticket de compra, el motor OCR inteligente extrae los datos y lo importa sin intervención manual." }
+      ];
 
-    allSearchable.forEach(item => {
-      if (item.q.includes(query) || item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)) {
-        matchCount++;
-        resultsHTML += `
-          <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; background: #fff; cursor: pointer; transition: all 0.2s;" onclick="window.location.hash='#/demo/ayuda'">
-            <h4 style="font-size: 13.5px; font-weight: 700; color: #4f46e5; margin-bottom: 6px;">${item.title}</h4>
-            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin: 0;">${item.desc}</p>
-          </div>
-        `;
+      allSearchable.forEach(item => {
+        if (item.q.includes(query) || item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)) {
+          matchCount++;
+          resultsHTML += `
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; background: #fff; cursor: pointer; transition: all 0.2s;" onclick="window.location.hash='#/demo/ayuda'">
+              <h4 style="font-size: 13.5px; font-weight: 700; color: #4f46e5; margin-bottom: 6px;">${item.title}</h4>
+              <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin: 0;">${item.desc}</p>
+            </div>
+          `;
+        }
+      });
+
+      resultsHTML += '</div>';
+
+      if (matchCount === 0) {
+        if (container) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 48px 0; color: var(--text-secondary);">
+              <i data-lucide="alert-circle" style="width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 12px;"></i>
+              <h4 style="font-size: 14px; font-weight: 750;">No se encontraron resultados</h4>
+              <p style="font-size: 12px; margin-top: 4px;">Probá con otros términos como "cuit", "delegación", "iva", "rt 54" o "whatsapp".</p>
+            </div>
+          `;
+          if (window.lucide) window.lucide.createIcons({ root: container });
+        }
+      } else {
+        if (cardTitle) {
+          cardTitle.innerHTML = `<i data-lucide="search" style="color: #6366f1;"></i> Resultados de la búsqueda (${matchCount})`;
+        }
+        if (container) {
+          container.innerHTML = resultsHTML;
+        }
       }
     });
-
-    resultsHTML += '</div>';
-
-    if (matchCount === 0) {
-      container.innerHTML = `
-        <div style="text-align: center; padding: 48px 0; color: var(--text-secondary);">
-          <i data-lucide="alert-circle" style="width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 12px;"></i>
-          <h4 style="font-size: 14px; font-weight: 750;">No se encontraron resultados</h4>
-          <p style="font-size: 12px; margin-top: 4px;">Probá con otros términos como "cuit", "delegación", "iva", "rt 54" o "whatsapp".</p>
-        </div>
-      `;
-      if (window.lucide) window.lucide.createIcons({ root: container });
-    } else {
-      cardTitle.innerHTML = `<i data-lucide="search" style="color: #6366f1;"></i> Resultados de la búsqueda (${matchCount})`;
-      container.innerHTML = resultsHTML;
-    }
-  });
+  } catch (error) {
+    console.error("Error in initAyuda:", error);
+    mainApp.showToast("Error al inicializar la sección de ayuda: " + error.message, "error");
+  }
 }
