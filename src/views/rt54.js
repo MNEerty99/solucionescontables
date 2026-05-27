@@ -107,7 +107,7 @@ export function renderRT54() {
 
         <!-- Umbrales de referencia -->
         <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;">
-          <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">UMBRALES 2026 (Base oct/22 × ${COEF_ACTUALIZACION}×)</p>
+          <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">UMBRALES 2026 (Base oct/22 × ${RT54_COEF}×)</p>
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;font-size:11.5px;">
               <span style="color:#4ade80;font-weight:600;">Pequeña (hasta)</span>
