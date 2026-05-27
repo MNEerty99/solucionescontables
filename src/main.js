@@ -13,6 +13,9 @@ import { renderImportacion, initImportacion } from './views/importacion.js';
 import { renderIVA, initIVA } from './views/iva.js';
 import { renderPortalCliente, initPortalCliente } from './views/portal_cliente.js';
 import { renderConfiguracion, initConfiguracion } from './views/configuracion.js';
+import { renderIVASimple, initIVASimple } from './views/iva_simple.js';
+import { renderRetenciones, initRetenciones } from './views/retenciones.js';
+import { renderRT54, initRT54 } from './views/rt54.js';
 
 class Application {
   constructor() {
@@ -83,7 +86,7 @@ class Application {
         rootEl.innerHTML = renderDashboardLayout(renderImportacion(), 'importacion');
         initDashboardLayout(this);
         initImportacion(this);
-        this.updateBreadcrumb("Importador de Facturas AFIP");
+        this.updateBreadcrumb("Importación ARCA");
       }
       else if (subRoute === '/iva') {
         rootEl.innerHTML = renderDashboardLayout(renderIVA(), 'iva');
@@ -102,6 +105,24 @@ class Application {
         initDashboardLayout(this);
         initConfiguracion(this);
         this.updateBreadcrumb("Configuración de Enlace ARCA");
+      }
+      else if (subRoute === '/iva-simple') {
+        rootEl.innerHTML = renderDashboardLayout(renderIVASimple(), 'iva-simple');
+        initDashboardLayout(this);
+        initIVASimple(this);
+        this.updateBreadcrumb("IVA Simple — F.2051");
+      }
+      else if (subRoute === '/retenciones') {
+        rootEl.innerHTML = renderDashboardLayout(renderRetenciones(), 'retenciones');
+        initDashboardLayout(this);
+        initRetenciones(this);
+        this.updateBreadcrumb("Retenciones y Percepciones");
+      }
+      else if (subRoute === '/rt54') {
+        rootEl.innerHTML = renderDashboardLayout(renderRT54(), 'rt54');
+        initDashboardLayout(this);
+        initRT54(this);
+        this.updateBreadcrumb("RT 54 · Panel Contable");
       }
       else {
         // Fallback to demo home

@@ -40,10 +40,23 @@ export function renderVentas() {
         <div class="form-group">
           <label class="form-label">Tipo de Comprobante *</label>
           <select id="tx-voucher-type" class="form-select">
-            <option value="Factura A">Factura A</option>
-            <option value="Factura B">Factura B</option>
-            <option value="Factura C">Factura C</option>
-            <option value="Factura E (Export.)">Factura E (Exportación)</option>
+            <optgroup label="Facturas Estándar">
+              <option value="Factura A">Factura A</option>
+              <option value="Factura B">Factura B</option>
+              <option value="Factura C">Factura C</option>
+              <option value="Factura E (Export.)">Factura E (Exportación)</option>
+            </optgroup>
+            <optgroup label="Clase A — Regímenes Especiales 2026">
+              <option value="Factura A - Retención">Factura A - Sujeta a Retención (100% IVA + 6% Gcias)</option>
+              <option value="Factura A - CBU">Factura A - Pago en CBU Informada</option>
+            </optgroup>
+            <optgroup label="Comprobantes Especiales">
+              <option value="Liq. Primaria Granos (033)">Liquidación Primaria Granos (Tipo 033)</option>
+              <option value="Nota de Débito A">Nota de Débito A</option>
+              <option value="Nota de Débito B">Nota de Débito B</option>
+              <option value="Nota de Crédito A">Nota de Crédito A</option>
+              <option value="Nota de Crédito B">Nota de Crédito B</option>
+            </optgroup>
           </select>
         </div>
         <div class="form-group">
@@ -78,6 +91,55 @@ export function renderVentas() {
         <div class="form-group">
           <label class="form-label">Total Facturado</label>
           <input type="number" id="tx-total" class="form-input" style="background: rgba(255,255,255,0.02); color: var(--color-teal-light); font-weight: 700;" placeholder="0.00" readonly>
+        </div>
+
+        <!-- Alerta especial: Granos 033 -->
+        <div id="granos-alert" style="grid-column:span 2; display:none; background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.25); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:#fbbf24;">
+          <strong>⚠ Liquidación Primaria de Granos (Tipo 033):</strong>
+          Punto de venta debe ser <strong>00000</strong>. El número de comprobante debe contener los últimos <strong>8 dígitos del COE</strong>.
+        </div>
+
+        <!-- Alerta especial: Factura A con Retención -->
+        <div id="retencion-alert" style="grid-column:span 2; display:none; background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.25); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:#f87171;">
+          <strong>⚠ Factura A Sujeta a Retención:</strong>
+          El adquirente debe retener obligatoriamente el <strong>100% del IVA</strong> y el <strong>6% en Ganancias</strong>.
+        </div>
+
+        <!-- Alerta especial: Factura A con CBU -->
+        <div id="cbu-alert" style="grid-column:span 2; display:none; background:rgba(6,182,212,0.05); border:1px solid rgba(6,182,212,0.25); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:#22d3ee;">
+          <strong>ⓘ Factura A - Pago CBU:</strong>
+          El pago debe realizarse por transferencia bancaria a la CBU declarada ante ARCA, neta de retenciones de ley.
+        </div>
+
+        <div style="grid-column: span 2; border-top: 1px solid var(--border-color); padding-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <!-- Clasificación RT 54 -->
+          <div class="form-group" id="fg-es-activo" style="margin:0; display: flex; flex-direction: column; gap: 8px;">
+            <label class="form-label" style="margin:0;">Clasificación RT 54 (Compras)</label>
+            <div style="display:flex; gap:10px;">
+              <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); flex:1; justify-content:center;" id="lbl-gasto">
+                <input type="radio" name="tx-es-activo" value="false" checked style="accent-color:#6366f1;"> Gasto
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; padding:8px 12px; border:1px solid rgba(99,102,241,0.3); border-radius:var(--radius-sm); flex:1; justify-content:center; background:rgba(99,102,241,0.02);" id="lbl-activo">
+                <input type="radio" name="tx-es-activo" value="true" style="accent-color:#6366f1;"> Bien de Uso
+              </label>
+            </div>
+          </div>
+          <div class="form-group" id="fg-categoria" style="margin:0;">
+            <label class="form-label">Categoría / Rubro</label>
+            <select id="tx-categoria" class="form-select">
+              <option value="General">General</option>
+              <option value="Combustibles">Combustibles</option>
+              <option value="Materias Primas">Materias Primas</option>
+              <option value="Servicios">Servicios (internet, telefonía)</option>
+              <option value="Mantenimiento">Mantenimiento y Reparaciones</option>
+              <option value="Librería">Librería e Insumos de Oficina</option>
+              <option value="Computación">Computación y Tecnología</option>
+              <option value="Mobiliario">Mobiliario y Equipamiento</option>
+              <option value="Vehículos">Vehículos y Transporte</option>
+              <option value="Inmuebles">Inmuebles y Construcción</option>
+              <option value="Maquinaria">Maquinaria e Instalaciones</option>
+            </select>
+          </div>
         </div>
 
         <div style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
@@ -241,10 +303,41 @@ export function initVentas(mainApp) {
   });
 
   // Auto-calculator on net amount change or iva rate change
-  const inputNet = document.getElementById('tx-net');
+  const inputNet  = document.getElementById('tx-net');
   const selectIva = document.getElementById('tx-iva-rate');
-  const inputIva = document.getElementById('tx-iva');
+  const inputIva  = document.getElementById('tx-iva');
   const inputTotal = document.getElementById('tx-total');
+  const selectVoucher = document.getElementById('tx-voucher-type');
+
+  // Show/hide RT54 classification section (only relevant for compras)
+  const fgActivo   = document.getElementById('fg-es-activo');
+  const fgCategoria = document.getElementById('fg-categoria');
+  const granosAlert   = document.getElementById('granos-alert');
+  const retencionAlert = document.getElementById('retencion-alert');
+  const cbuAlert      = document.getElementById('cbu-alert');
+
+  const updateVoucherAlerts = () => {
+    const v = selectVoucher?.value || '';
+    const isCompra = (document.getElementById('tx-operation-type')?.value === 'compras');
+    if (fgActivo) fgActivo.style.display = isCompra ? 'flex' : 'none';
+    if (fgCategoria) fgCategoria.style.display = isCompra ? 'block' : 'none';
+    if (granosAlert)    granosAlert.style.display    = v.includes('033') ? 'block' : 'none';
+    if (retencionAlert) retencionAlert.style.display = v.includes('Retenci') ? 'block' : 'none';
+    if (cbuAlert)       cbuAlert.style.display       = v.includes('CBU') ? 'block' : 'none';
+    // For granos: force PV to 00000 prefix hint
+    if (v.includes('033')) {
+      const numInput = document.getElementById('tx-number');
+      if (numInput && !numInput.value) numInput.placeholder = '00000-XXXXXXXX (últimos 8 dígitos COE)';
+    } else {
+      const numInput = document.getElementById('tx-number');
+      if (numInput) numInput.placeholder = '0001-00001234';
+    }
+  };
+
+  updateVoucherAlerts();
+  selectVoucher?.addEventListener('change', updateVoucherAlerts);
+  document.getElementById('tx-operation-type')?.addEventListener('change', updateVoucherAlerts);
+
 
   const recalculateAmounts = () => {
     const net = parseFloat(inputNet.value) || 0;
@@ -272,6 +365,13 @@ export function initVentas(mainApp) {
     const net = parseFloat(inputNet.value);
     const iva = parseFloat(inputIva.value);
     const total = parseFloat(inputTotal.value);
+    const esActivoVal = document.querySelector('input[name="tx-es-activo"]:checked')?.value === 'true';
+    const categoriaVal = document.getElementById('tx-categoria')?.value || 'General';
+
+    if (!date || !num || !entityName || !cuit || isNaN(net)) {
+      mainApp.showToast('Completá todos los campos obligatorios.', 'error');
+      return;
+    }
 
     const transaction = {
       fecha: date,
@@ -280,7 +380,9 @@ export function initVentas(mainApp) {
       cuit,
       neto: net,
       iva,
-      total
+      total,
+      es_activo: op === 'compras' ? esActivoVal : false,
+      categoria: op === 'compras' ? categoriaVal : 'Venta',
     };
 
     if (op === 'ventas') {

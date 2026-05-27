@@ -51,6 +51,20 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="book-open"></i>
           <span>Libro IVA Digital</span>
         </a>
+        <a href="#/demo/iva-simple" class="db-nav-item ${activeRoute === 'iva-simple' ? 'active' : ''}" data-route="iva-simple">
+          <i data-lucide="file-check-2"></i>
+          <span>IVA Simple F.2051</span>
+        </a>
+        <a href="#/demo/retenciones" class="db-nav-item ${activeRoute === 'retenciones' ? 'active' : ''}" data-route="retenciones">
+          <i data-lucide="percent"></i>
+          <span>Retenciones y Percepciones</span>
+        </a>
+
+        <div class="db-nav-label">Contabilidad</div>
+        <a href="#/demo/rt54" class="db-nav-item ${activeRoute === 'rt54' ? 'active' : ''}" data-route="rt54">
+          <i data-lucide="layers"></i>
+          <span>RT 54 · Panel Contable</span>
+        </a>
 
         <div class="db-nav-label">Portal de Clientes</div>
         <a href="#/demo/portal" class="db-nav-item ${activeRoute === 'portal' ? 'active' : ''}" data-route="portal">

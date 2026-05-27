@@ -37,12 +37,12 @@ export function renderIVA() {
   <!-- Exports Panel (Collapsible/Hidden by default) -->
   <div class="card" id="afip-exports-panel" style="display: none; margin-bottom: 32px; border-color: var(--color-indigo);">
     <div class="card-header" style="background: rgba(99,102,241,0.02)">
-      <h3 style="color:#818cf8"><i data-lucide="share-2"></i> Generación de Archivos de Importación AFIP (F. 2002)</h3>
+      <h3 style="color:#818cf8"><i data-lucide="share-2"></i> Generación de Archivos de Importación ARCA (Libro IVA Digital)</h3>
       <button class="btn-icon-sm" id="btn-close-exports" title="Cerrar"><i data-lucide="x"></i></button>
     </div>
     <div class="card-body">
       <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 20px;">
-        Descargá los archivos de texto delimitados oficiales para subirlos directamente en la plataforma de <strong>AFIP (Libro de IVA Digital)</strong> sin tipear una sola factura de forma manual.
+        Descargá los archivos de texto delimitados oficiales para subirlos directamente al portal de <strong>ARCA (Libro IVA Digital / IVA Simple F.2051)</strong> sin tipear una sola factura manualmente.
       </p>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
         <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
@@ -61,8 +61,8 @@ export function renderIVA() {
 
         <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
           <i data-lucide="file-check-2" style="width: 32px; height: 32px; color: #818cf8; margin-bottom: 12px;"></i>
-          <h4 style="font-size: 14px; margin-bottom: 6px;">F. 2002 Borrador (PDF)</h4>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Pre-declaración borrador consolidada con totales por actividad.</p>
+          <h4 style="font-size: 14px; margin-bottom: 6px;">F. 2051 Borrador (PDF)</h4>
+          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Pre-declaración borrador consolidada con totales por actividad económica.</p>
           <button class="btn btn-outline btn-sm w-full" id="btn-export-borrador-pdf">Descargar PDF</button>
         </div>
       </div>

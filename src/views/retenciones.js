@@ -1,0 +1,261 @@
+/* -------------------------------------------------------------
+   VMP Studio Contable — Retenciones y Percepciones
+   Conciliación impositiva, cuenta puente y generador CSV ARCA
+   ------------------------------------------------------------- */
+import { getActiveCompany, getTransactions } from '../db/mockdb.js';
+
+function fmt(n) {
+  return n.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+}
+
+function getRetenciones(companyId) {
+  const stored = localStorage.getItem(`vmp_retenciones_${companyId}`);
+  if (stored) return JSON.parse(stored);
+  // Demo data
+  return [
+    { id: 'r1', fecha: '2026-05-05', agente: 'Coto S.A.', cuit: '30-50790918-7', tipo: 'PERCEPCIÓN IVA', monto: 1850.20, fuente: 'factura', conciliado: true, certDisponible: true },
+    { id: 'r2', fecha: '2026-05-12', agente: 'Banco Nación Argentina', cuit: '30-55745039-6', tipo: 'RETENCIÓN SIRCREB', monto: 3200.00, fuente: 'banco', conciliado: false, certDisponible: false },
+    { id: 'r3', fecha: '2026-05-18', agente: 'La Rural S.A.', cuit: '30-67890123-5', tipo: 'PERCEPCIÓN IIBB', monto: 940.50, fuente: 'factura', conciliado: true, certDisponible: true },
+    { id: 'r4', fecha: '2026-05-20', agente: 'Carrefour Argentina', cuit: '30-60410619-5', tipo: 'PERCEPCIÓN IVA', monto: 2100.75, fuente: 'factura', conciliado: false, certDisponible: false },
+    { id: 'r5', fecha: '2026-05-22', agente: 'ARBA (Prov. Bs As)', cuit: '33-70523373-9', tipo: 'PERCEPCIÓN IIBB', monto: 780.00, fuente: 'banco', conciliado: false, certDisponible: false },
+  ];
+}
+
+export function renderRetenciones() {
+  const company = getActiveCompany();
+  const rets = getRetenciones(company.id);
+
+  const totalRet = rets.reduce((s, r) => s + r.monto, 0);
+  const totalConc = rets.filter(r => r.conciliado).reduce((s, r) => s + r.monto, 0);
+  const totalPuente = rets.filter(r => !r.conciliado).reduce((s, r) => s + r.monto, 0);
+  const totalSinCert = rets.filter(r => !r.certDisponible).reduce((s, r) => s + r.monto, 0);
+
+  const fuenteColor = { factura: '#6366f1', banco: '#06b6d4', manual: '#f59e0b' };
+  const fuenteLabel = { factura: 'Libro Compras', banco: 'Extracto Bancario', manual: 'Manual' };
+
+  return `
+  <div class="view-header">
+    <div>
+      <h1 class="view-title">Retenciones y Percepciones</h1>
+      <p class="view-subtitle">Conciliación impositiva mensual y carga en IVA Simple.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" id="btn-export-csv-sire">
+        <i data-lucide="download"></i> Exportar CSV SIRE
+      </button>
+      <button class="btn btn-primary" id="btn-add-ret" style="background:#6366f1;border-color:#6366f1;">
+        <i data-lucide="plus"></i> Agregar Manual
+      </button>
+    </div>
+  </div>
+
+  <!-- Resumen de 3 Fuentes -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+    ${[
+      { label:'Total Período', val: totalRet, icon:'sigma', color:'#6366f1' },
+      { label:'Conciliadas', val: totalConc, icon:'check-circle-2', color:'var(--color-accent)' },
+      { label:'Cuenta Puente', val: totalPuente, icon:'clock', color:'#f59e0b' },
+      { label:'Sin Certificado', val: totalSinCert, icon:'alert-triangle', color:'#f87171' },
+    ].map(s => `
+      <div class="card" style="padding:16px 20px;border-color:rgba(255,255,255,0.05);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <i data-lucide="${s.icon}" style="width:16px;height:16px;color:${s.color};"></i>
+          <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">${s.label}</span>
+        </div>
+        <div class="font-mono" style="font-size:20px;font-weight:800;color:${s.color};">$ ${fmt(s.val)}</div>
+      </div>
+    `).join('')}
+  </div>
+
+  <!-- Explicación Cuenta Puente -->
+  ${totalPuente > 0 ? `
+  <div style="background:rgba(245,158,11,0.03);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:24px;display:flex;gap:14px;align-items:flex-start;">
+    <i data-lucide="info" style="width:20px;height:20px;color:#f59e0b;flex-shrink:0;margin-top:2px;"></i>
+    <div>
+      <h4 style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:4px;">Cuenta Puente "Retenciones a Conciliar" — $ ${fmt(totalPuente)}</h4>
+      <p class="text-secondary" style="font-size:12px;line-height:1.5;">
+        Existen agentes de recaudación que aún no subieron sus comprobantes a ARCA. Estos importes están suspendidos en la cuenta puente
+        para no distorsionar los saldos contables de tesorería hasta que se acrediten o se reciba el certificado físico.
+      </p>
+    </div>
+  </div>
+  ` : ''}
+
+  <div style="display:grid;grid-template-columns:1.4fr 0.6fr;gap:24px;align-items:start;">
+
+    <!-- Tabla principal de conciliación -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i data-lucide="git-merge" style="color:#6366f1;"></i> Conciliación de 3 Fuentes</h3>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(99,102,241,0.08);color:#818cf8;border:1px solid rgba(99,102,241,0.2);">Libro Compras</span>
+          <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(6,182,212,0.08);color:#22d3ee;border:1px solid rgba(6,182,212,0.2);">Extracto Bancario</span>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Agente de Retención</th>
+                <th>Tipo</th>
+                <th>Fuente</th>
+                <th class="text-right">Monto</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rets.map(r => `
+              <tr id="row-ret-${r.id}">
+                <td class="font-mono text-xs">${r.fecha.split('-').reverse().join('/')}</td>
+                <td>
+                  <div style="font-size:12.5px;font-weight:600;">${r.agente}</div>
+                  <div class="font-mono" style="font-size:10px;color:var(--text-secondary);">${r.cuit}</div>
+                </td>
+                <td style="font-size:11.5px;">${r.tipo}</td>
+                <td>
+                  <span style="font-size:10px;font-weight:700;color:${fuenteColor[r.fuente]};background:rgba(255,255,255,0.03);border:1px solid var(--border-color);padding:2px 6px;border-radius:4px;">
+                    ${fuenteLabel[r.fuente]}
+                  </span>
+                </td>
+                <td class="font-mono text-right" style="font-weight:700;">$ ${fmt(r.monto)}</td>
+                <td>
+                  ${r.conciliado ? `
+                    <span style="font-size:10px;font-weight:700;color:var(--color-accent);display:flex;align-items:center;gap:3px;">
+                      <i data-lucide="check-circle-2" style="width:12px;height:12px;"></i> Conciliada
+                    </span>
+                  ` : r.certDisponible ? `
+                    <span style="font-size:10px;font-weight:700;color:#f59e0b;display:flex;align-items:center;gap:3px;">
+                      <i data-lucide="clock" style="width:12px;height:12px;"></i> Pendiente
+                    </span>
+                  ` : `
+                    <span style="font-size:10px;font-weight:700;color:#f87171;display:flex;align-items:center;gap:3px;">
+                      <i data-lucide="alert-circle" style="width:12px;height:12px;"></i> Sin Cert.
+                    </span>
+                  `}
+                </td>
+                <td>
+                  ${!r.conciliado ? `
+                    <button class="btn-conciliar btn-outline" data-id="${r.id}" style="font-size:10px;padding:3px 10px;border-radius:4px;">
+                      Conciliar
+                    </button>
+                  ` : ''}
+                </td>
+              </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel lateral: instrucciones CSV -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card" style="border-color:rgba(99,102,241,0.15);background:rgba(99,102,241,0.01);">
+        <div class="card-header" style="background:rgba(99,102,241,0.02);">
+          <h3 style="font-size:13px;color:#818cf8;"><i data-lucide="file-code-2"></i> Formato CSV para ARCA</h3>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          ${[
+            { label:'Orden de Pago', chars:'Exactamente 16', color:'#6366f1' },
+            { label:'Factura de Compra', chars:'Entre 5 y 8', color:'var(--color-accent)' },
+            { label:'Otro Comprobante', chars:'Exactamente 16', color:'#f59e0b' },
+          ].map(r => `
+            <div style="border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:10px 12px;">
+              <div style="font-size:11.5px;font-weight:700;color:var(--color-primary);margin-bottom:3px;">${r.label}</div>
+              <div style="font-size:11px;color:${r.color};font-weight:700;">${r.chars} caracteres</div>
+            </div>
+          `).join('')}
+          <div style="background:rgba(239,68,68,0.03);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius-sm);padding:10px 12px;">
+            <p style="font-size:11px;color:#f87171;line-height:1.5;">
+              <strong>⚠ NO volver a abrir con Excel</strong> tras exportar como CSV UTF-8. El SO puede reformatear fechas y CUITs.
+            </p>
+          </div>
+          <button class="btn btn-outline btn-sm" id="btn-export-csv-sire-lateral" style="width:100%;font-size:12px;">
+            <i data-lucide="download"></i> Descargar CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size:13px;"><i data-lucide="database" style="color:#06b6d4;"></i> Mis Retenciones ARCA</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary" style="font-size:12px;line-height:1.5;margin-bottom:12px;">
+            Las retenciones electrónicas importadas por ARCA quedan <strong>bloqueadas</strong> para edición manual. Solo las cargadas por CSV o manualmente son editables.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;padding:8px;background:rgba(255,255,255,0.02);border-radius:var(--radius-sm);">
+              <span class="text-secondary">Importadas por ARCA</span>
+              <span style="font-weight:700;color:var(--color-accent);">${rets.filter(r=>r.conciliado).length} registros</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;padding:8px;background:rgba(255,255,255,0.02);border-radius:var(--radius-sm);">
+              <span class="text-secondary">Cargadas manualmente/CSV</span>
+              <span style="font-weight:700;color:#f59e0b;">${rets.filter(r=>!r.conciliado).length} registros</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+export function initRetenciones(mainApp) {
+  if (window.lucide) window.lucide.createIcons();
+
+  const company = getActiveCompany();
+
+  // Conciliar una retención
+  document.querySelectorAll('.btn-conciliar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const rId = btn.dataset.id;
+      const rets = getRetenciones(company.id);
+      const updated = rets.map(r => r.id === rId ? { ...r, conciliado: true, certDisponible: true } : r);
+      localStorage.setItem(`vmp_retenciones_${company.id}`, JSON.stringify(updated));
+      mainApp.showToast('Retención conciliada y certificado registrado.', 'success');
+      mainApp.router();
+    });
+  });
+
+  // Exportar CSV SIRE (ambos botones)
+  const exportarCSV = () => {
+    const rets = getRetenciones(company.id);
+    const bom = '\uFEFF';
+    let csv = 'Fecha;CUIT Agente;Tipo;Numero Comprobante;Monto;Estado\n';
+
+    rets.forEach(r => {
+      const cuit = r.cuit.replace(/-/g, '');
+      // Número de comprobante: factura 7 chars (5-8), orden de pago 16 chars
+      const tipo = r.tipo.includes('FACTURA') ? 'F' : 'O';
+      const numDoc = tipo === 'F'
+        ? r.id.replace('r', '').padStart(7, '0')               // 7 chars (entre 5 y 8)
+        : r.id.replace('r', '').padStart(16, '0');              // 16 chars exactos
+      const fechaArr = r.fecha.split('-');
+      const fechaFmt = `${fechaArr[2]}/${fechaArr[1]}/${fechaArr[0]}`;
+      csv += `${fechaFmt};${cuit};${r.tipo};${numDoc};${r.monto.toFixed(2).replace('.',',')};${r.conciliado ? 'CONCILIADA' : 'PENDIENTE'}\n`;
+    });
+
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sire-retenciones-${company.cuit.replace(/-/g,'')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    mainApp.showToast('CSV SIRE exportado en UTF-8. ¡No abrir con Excel!', 'success');
+  };
+
+  document.getElementById('btn-export-csv-sire')?.addEventListener('click', exportarCSV);
+  document.getElementById('btn-export-csv-sire-lateral')?.addEventListener('click', exportarCSV);
+
+  // Agregar manual
+  document.getElementById('btn-add-ret')?.addEventListener('click', () => {
+    mainApp.showToast('Funcionalidad de carga manual próximamente disponible.', 'info');
+  });
+}
