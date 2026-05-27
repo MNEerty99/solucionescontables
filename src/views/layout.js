@@ -59,7 +59,7 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         </a>
         <a href="#/demo/importacion" class="db-nav-item ${activeRoute === 'importacion' ? 'active' : ''}" data-route="importacion">
           <i data-lucide="upload-cloud"></i>
-          <span>Importación AFIP</span>
+          <span>Importación ARCA</span>
         </a>
 
         <div class="db-nav-label">Fiscal</div>
@@ -188,7 +188,7 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         </a>
         <a href="#/demo/importacion" class="mb-nav-item ${activeRoute === 'importacion' ? 'active' : ''}">
           <i data-lucide="upload-cloud"></i>
-          <span>AFIP</span>
+          <span>ARCA</span>
         </a>
         <a href="#/demo/portal" class="mb-nav-item ${activeRoute === 'portal' ? 'active' : ''}">
           <i data-lucide="smartphone"></i>

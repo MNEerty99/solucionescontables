@@ -1,9 +1,9 @@
 /* -------------------------------------------------------------
-   VMP Studio Contable - Importación AFIP View Component
+   VMP Studio Contable - Importación ARCA View Component
    ------------------------------------------------------------- */
 import { getActiveCompany, addTransaction } from '../db/mockdb.js';
 
-const AFIP_MOCK_EMITIDAS = [
+const ARCA_MOCK_EMITIDAS = [
   { fecha: "2026-05-24", tipo_comprobante: "Factura A", numero: "0003-00000850", cliente: "Comercio Mayorista Patagonia", cuit: "30-58930219-4", neto: 150000, iva: 31500, total: 181500, es_activo: false, categoria: "Venta" },
   { fecha: "2026-05-24", tipo_comprobante: "Factura A", numero: "0003-00000851", cliente: "Estación de Servicio Comahue", cuit: "30-50001234-9", neto: 320000, iva: 67200, total: 387200, es_activo: false, categoria: "Venta" },
   { fecha: "2026-05-23", tipo_comprobante: "Factura B", numero: "0003-00000105", cliente: "Gómez Carlos Alberto", cuit: "20-18493021-9", neto: 85000, iva: 17850, total: 102850, es_activo: false, categoria: "Venta" },
@@ -11,7 +11,7 @@ const AFIP_MOCK_EMITIDAS = [
   { fecha: "2026-05-21", tipo_comprobante: "Factura B", numero: "0003-00000106", cliente: "Fernández Mariana", cuit: "27-24958302-3", neto: 25000, iva: 5250, total: 30250, es_activo: false, categoria: "Venta" }
 ];
 
-const AFIP_MOCK_RECIBIDAS = [
+const ARCA_MOCK_RECIBIDAS = [
   { fecha: "2026-05-25", tipo_comprobante: "Factura A", numero: "1284-00019482", proveedor: "Telecomunicaciones SRL", cuit: "30-99889988-1", neto: 45000, iva: 9450, total: 54450, es_activo: false, categoria: "Servicios" },
   { fecha: "2026-05-23", tipo_comprobante: "Factura A", numero: "0094-00293812", proveedor: "Papelera del Valle", cuit: "30-66442299-5", neto: 38000, iva: 7980, total: 45980, es_activo: false, categoria: "Librería" },
   { fecha: "2026-05-20", tipo_comprobante: "Factura B", numero: "8391-09283746", proveedor: "Librería La Favorita", cuit: "30-11221122-3", neto: 12000, iva: 2520, total: 14520, es_activo: false, categoria: "Librería" },
@@ -38,8 +38,8 @@ export function renderImportacion() {
         <div class="import-icon">
           <i data-lucide="file-text"></i>
         </div>
-        <h4>Arrastrá aquí tus comprobantes AFIP</h4>
-        <p>Soportamos formatos oficiales de AFIP (Excel .xls / .xlsx, TXT o CSV de "Mis Comprobantes Emitidos/Recibidos").</p>
+        <h4>Arrastrá aquí tus comprobantes ARCA</h4>
+        <p>Soportamos formatos oficiales de ARCA (Excel .xls / .xlsx, TXT o CSV de "Mis Comprobantes Emitidos/Recibidos").</p>
         
         <label class="btn btn-outline btn-sm" style="cursor: pointer;">
           Examinar Archivo
@@ -61,7 +61,7 @@ export function renderImportacion() {
       <!-- Live simulation progress -->
       <div id="sim-progress-container" style="display: none; padding: 24px; border-top: 1px solid var(--border-color); text-align: center;">
         <div class="spinner" style="margin: 0 auto 16px;"></div>
-        <h4 id="sim-progress-title">Procesando y validando firmas fiscales AFIP...</h4>
+        <h4 id="sim-progress-title">Procesando y validando firmas fiscales ARCA...</h4>
         <div style="width: 100%; max-width: 400px; height: 6px; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); margin: 12px auto; overflow: hidden; position: relative;">
           <div id="sim-progress-bar" style="width: 0%; height: 100%; background: var(--gradient-brand); transition: width 0.1s linear;"></div>
         </div>
@@ -139,7 +139,7 @@ export function initImportacion(mainApp) {
     let percent = 0;
     progBar.style.width = '0%';
     progPercent.textContent = '0%';
-    progTitle.textContent = 'Leyendo estructura del archivo AFIP...';
+    progTitle.textContent = 'Leyendo estructura del archivo ARCA...';
 
     const interval = setInterval(() => {
       percent += 5;
@@ -226,23 +226,23 @@ export function initImportacion(mainApp) {
     dropzone.classList.remove('dragover');
     
     // Simular emitidas por defecto al arrastrar cualquier archivo
-    startSimulation(AFIP_MOCK_EMITIDAS, 'ventas');
+    startSimulation(ARCA_MOCK_EMITIDAS, 'ventas');
   });
 
   fileInput?.addEventListener('change', () => {
     if (fileInput.files.length > 0) {
-      startSimulation(AFIP_MOCK_EMITIDAS, 'ventas');
+      startSimulation(ARCA_MOCK_EMITIDAS, 'ventas');
     }
   });
 
   // Buttons simulation
   btnSimEmitidas?.addEventListener('click', (e) => {
     e.stopPropagation();
-    startSimulation(AFIP_MOCK_EMITIDAS, 'ventas');
+    startSimulation(ARCA_MOCK_EMITIDAS, 'ventas');
   });
 
   btnSimRecibidas?.addEventListener('click', (e) => {
     e.stopPropagation();
-    startSimulation(AFIP_MOCK_RECIBIDAS, 'compras');
+    startSimulation(ARCA_MOCK_RECIBIDAS, 'compras');
   });
 }

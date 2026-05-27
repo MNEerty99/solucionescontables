@@ -228,7 +228,7 @@ function renderTransactionsTable(transactions, type) {
     <div style="text-align: center; padding: 48px; color: var(--text-secondary);">
       <i data-lucide="info" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 12px;"></i>
       <h4>No hay comprobantes cargados en esta sección</h4>
-      <p style="font-size: 13px; margin-top: 6px;">Cargá uno manualmente o importá un archivo de AFIP en la sección "Importación AFIP".</p>
+      <p style="font-size: 13px; margin-top: 6px;">Cargá uno manualmente o importá un archivo de ARCA en la sección "Importación ARCA".</p>
     </div>
     `;
   }

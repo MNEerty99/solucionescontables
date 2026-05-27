@@ -108,7 +108,7 @@ export function renderDashboardHome() {
             <i data-lucide="upload-cloud"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>1. Importar AFIP</h5>
+            <h5>1. Importar ARCA</h5>
             <p>Subir Excel / Simular carga masiva</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
@@ -131,7 +131,7 @@ export function renderDashboardHome() {
           </div>
           <div class="ta-btn-content">
             <h5>3. Libro IVA Digital</h5>
-            <p>Generar TXT y exportar a AFIP</p>
+            <p>Generar TXT y exportar a ARCA</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>

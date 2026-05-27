@@ -35,7 +35,7 @@ export function renderConfiguracion() {
         </div>
         <div class="card-body">
           <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 20px;">
-            Seleccioná cómo querés gestionar los certificados de firma digital (delegación de servicios) para operar con la AFIP/ARCA.
+            Seleccioná cómo querés gestionar los certificados de firma digital (delegación de servicios) para operar con ARCA.
           </p>
 
           <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -80,7 +80,7 @@ export function renderConfiguracion() {
                 </div>
                 <div>
                   <h4 style="font-size: 13.5px; font-weight: 700; color: var(--color-primary);">${certName}</h4>
-                  <p style="font-size: 10.5px; color: var(--text-secondary); margin-top: 2px;">Válido hasta: <span style="font-weight: 600; color: var(--color-accent);">24 Mayo 2028</span> (Emisor: AC ARCA - AFIP)</p>
+                  <p style="font-size: 10.5px; color: var(--text-secondary); margin-top: 2px;">Válido hasta: <span style="font-weight: 600; color: var(--color-accent);">24 Mayo 2028</span> (Emisor: AC ARCA)</p>
                 </div>
               </div>
               <button class="btn btn-outline btn-sm" id="btn-delete-cert" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.2); padding: 6px 12px; font-size: 12px;">Eliminar</button>
@@ -203,7 +203,7 @@ export function renderConfiguracion() {
         </div>
         <div class="card-body">
           <p class="text-secondary" style="font-size: 12px; line-height: 1.4; margin-bottom: 14px;">
-            Para que funcione el modelo híbrido delegado, tu cliente debe realizar este trámite por única vez en la web de la AFIP/ARCA:
+            Para que funcione el modelo híbrido delegado, tu cliente debe realizar este trámite por única vez en la web de ARCA:
           </p>
           <ul style="list-style-type: decimal; padding-left: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px;">
             <li>Ingresa con su Clave Fiscal a la web de ARCA.</li>

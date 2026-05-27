@@ -45,14 +45,14 @@ export function renderIVA() {
       <button class="btn btn-outline" id="btn-print-iva" style="display: flex; align-items: center; gap: 6px;">
         <i data-lucide="printer"></i> Imprimir PDF
       </button>
-      <button class="btn btn-primary" id="btn-show-afip-exports" style="display: flex; align-items: center; gap: 6px;">
-        <i data-lucide="download"></i> Exportar AFIP
+      <button class="btn btn-primary" id="btn-show-arca-exports" style="display: flex; align-items: center; gap: 6px;">
+        <i data-lucide="download"></i> Exportar ARCA
       </button>
     </div>
   </div>
 
   <!-- Exports Panel (Collapsible/Hidden by default) -->
-  <div class="card" id="afip-exports-panel" style="display: none; margin-bottom: 32px; border-color: var(--color-indigo);">
+  <div class="card" id="arca-exports-panel" style="display: none; margin-bottom: 32px; border-color: var(--color-indigo);">
     <div class="card-header" style="background: rgba(99,102,241,0.02)">
       <h3 style="color:#818cf8"><i data-lucide="share-2"></i> Generación de Archivos de Importación ARCA (Libro IVA Digital)</h3>
       <button class="btn-icon-sm" id="btn-close-exports" title="Cerrar"><i data-lucide="x"></i></button>
@@ -223,8 +223,8 @@ export function initIVA(mainApp) {
 
   const activeCompany = getActiveCompany();
 
-  const expPanel = document.getElementById('afip-exports-panel');
-  const btnShowExp = document.getElementById('btn-show-afip-exports');
+  const expPanel = document.getElementById('arca-exports-panel');
+  const btnShowExp = document.getElementById('btn-show-arca-exports');
   const btnCloseExp = document.getElementById('btn-close-exports');
 
   const btnPrint = document.getElementById('btn-print-iva');
@@ -320,7 +320,7 @@ export function initIVA(mainApp) {
       output += `${dateStr}${typeCode}${pv}${num}${num}${docType}${cleanCuit}${name}${totalStr}\r\n`;
     });
 
-    downloadTXT(`afip-ventas-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
+    downloadTXT(`arca-ventas-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
     mainApp.showToast('¡Archivo de Comprobantes descargado con éxito!', 'success');
   });
 
@@ -347,7 +347,7 @@ export function initIVA(mainApp) {
       output += `${typeCode}${pv}${num}${netStr}${ivaCode}${ivaStr}\r\n`;
     });
 
-    downloadTXT(`afip-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
+    downloadTXT(`arca-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
     mainApp.showToast('¡Archivo de Alícuotas descargado con éxito!', 'success');
   });
 

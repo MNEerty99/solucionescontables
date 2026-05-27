@@ -100,7 +100,7 @@ export function renderAyuda() {
           </div>
           <div>
             <h5 style="font-size: 12.5px; font-weight: 700; color: ${t5 ? 'var(--color-accent)' : 'var(--color-primary)'}; margin-bottom: 2px;">5. Primera Importación</h5>
-            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Probar la carga de comprobantes vía AFIP.</p>
+            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Probar la carga de comprobantes vía ARCA.</p>
           </div>
         </a>
 
@@ -226,7 +226,7 @@ const TabContents = {
         <ol style="padding-left: 18px; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; line-height: 1.4;">
           <li>Andá a <strong>Configuración ARCA</strong> y hacé clic en el botón <em>"Simular Alta de Firma Digital"</em> para activar el certificado del estudio.</li>
           <li>En la tabla de la derecha, dale clic a <em>"Verificar"</em> sobre una empresa para simular que el cliente ya te delegó sus permisos.</li>
-          <li>Ingresá a <strong>Importación ARCA</strong>, arrastrá uno de los archivos modelo de compras para simular la descarga desde AFIP.</li>
+          <li>Ingresá a <strong>Importación ARCA</strong>, arrastrá uno de los archivos modelo de compras para simular la descarga desde ARCA.</li>
           <li>Entrá a <strong>IVA Simple F.2051</strong>, analizá el cuadrante de consistencia en tiempo real y dale a <em>"Validar Consistencia"</em> para cerrar el mes impositivo.</li>
         </ol>
       </div>
@@ -236,7 +236,7 @@ const TabContents = {
   arca: `
     <div class="help-section-flow" style="display: flex; flex-direction: column; gap: 20px;">
       <p class="text-primary" style="font-size: 13.5px; line-height: 1.5; font-weight: 500;">
-        La automatización segura se basa en delegar servicios de ARCA (AFIP) al CUIT del estudio. Esto evita compartir claves fiscales y mantiene el 100% de cumplimiento legal.
+        La automatización segura se basa en delegar servicios de ARCA al CUIT del estudio. Esto evita compartir claves fiscales y mantiene el 100% de cumplimiento legal.
       </p>
 
       <!-- Steps for Accountant -->
@@ -303,7 +303,7 @@ const TabContents = {
         <div style="padding: 16px; font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
           Diseñado para el nuevo régimen unificado de liquidación de IVA.
           <ul style="margin-top: 8px; padding-left: 16px; display: flex; flex-direction: column; gap: 6px;">
-            <li><strong>Cuadrante de Consistencia:</strong> El sistema cruza automáticamente los comprobantes del Libro de IVA Digital con las actividades económicas declaradas bajo códigos CLAE en la AFIP.</li>
+            <li><strong>Cuadrante de Consistencia:</strong> El sistema cruza automáticamente los comprobantes del Libro de IVA Digital con las actividades económicas declaradas bajo códigos CLAE en ARCA.</li>
             <li><strong>Validación Preventiva:</strong> Si hay una diferencia contable mayor a $1 entre los débitos calculados y los registrados, el botón <em>"Validar Consistencia"</em> te dará un error detallando la diferencia, evitando fiscalizaciones electrónicas inmediatas.</li>
             <li><strong>Vencimientos Inteligentes:</strong> Se muestran en pantalla de forma dinámica, calculados según el último dígito del CUIT de la empresa activa.</li>
           </ul>
@@ -557,7 +557,7 @@ export function initAyuda(mainApp) {
     // Search inside the FAQ and Modules texts
     const allSearchable = [
       { q: "cuit clave fiscal contador estudio", title: "¿Necesito la clave de todos mis clientes?", desc: "No, la delegación impositiva permite que uses únicamente tu clave fiscal de contador." },
-      { q: "delegacion afip arca relacion", title: "¿Cómo funciona la delegación en ARCA?", desc: "El cliente final entra por única vez a ARCA y delega servicios como Libro de IVA Digital a tu CUIT de estudio." },
+      { q: "delegacion arca relacion", title: "¿Cómo funciona la delegación en ARCA?", desc: "El cliente final entra por única vez a ARCA y delega servicios como Libro de IVA Digital a tu CUIT de estudio." },
       { q: "iva simple f2051 formula", title: "IVA Simple Formulario 2051", desc: "Modulo normativo adaptado al nuevo régimen simplificado. Cruza las actividades declaradas y bloquea liquidación si hay desvíos mayores a $1." },
       { q: "retenciones percepciones sircreb sire", title: "Retenciones y Percepciones - Conciliación 3 fuentes", desc: "Cruza libro diario, SIRE y extracto bancario (SIRCREB) para no perder crédito impositivo." },
       { q: "rt 54 contable balance existencia", title: "Norma Técnica RT 54 Contable", desc: "Panel de balance exprés para micro y pequeñas entidades. Existencia inicial = Inventario × factor de 1.2x. Fórmula: CV = EI + C - EF." },

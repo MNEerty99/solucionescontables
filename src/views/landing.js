@@ -31,7 +31,7 @@ export function renderLanding() {
         <div class="hero-content">
           <span class="badge">SaaS Multi-Empresa &middot; Desarrollado por VMP S.A.S.</span>
           <h1 class="hero-title">El puente definitivo entre <span class="gradient-text">tu estudio y tus clientes</span>.</h1>
-          <p class="hero-subtitle">Dejá de perseguir carpetas físicas o recibir fotos borrosas. Soluciones Contables centraliza tus empresas cliente, automatiza la carga de facturas de AFIP y brinda un portal móvil para que tus clientes suban comprobantes al instante.</p>
+          <p class="hero-subtitle">Dejá de perseguir carpetas físicas o recibir fotos borrosas. Soluciones Contables centraliza tus empresas cliente, automatiza la carga de facturas de ARCA y brinda un portal móvil para que tus clientes suban comprobantes al instante.</p>
           <div class="hero-actions">
             <a href="#/demo" class="btn btn-primary">
               Probar Demo de la Plataforma <i data-lucide="arrow-right"></i>
@@ -50,7 +50,7 @@ export function renderLanding() {
             </div>
             <div class="stat-item">
               <span class="stat-val">0%</span>
-              <span class="stat-label">Complicaciones de AFIP</span>
+              <span class="stat-label">Complicaciones de ARCA</span>
             </div>
           </div>
         </div>
@@ -120,15 +120,15 @@ export function renderLanding() {
             <div class="feature-icon">
               <i data-lucide="upload-cloud"></i>
             </div>
-            <h3>Importación Rápida AFIP</h3>
-            <p>Subí archivos Excel/TXT de AFIP (Mis Comprobantes). El parser inteligente procesa cientos de facturas y calcula alícuotas en menos de 10 segundos.</p>
+            <h3>Importación Rápida ARCA</h3>
+            <p>Subí archivos Excel/TXT de ARCA (Mis Comprobantes). El parser inteligente procesa cientos de facturas y calcula alícuotas en menos de 10 segundos.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i data-lucide="file-spreadsheet"></i>
             </div>
             <h3>Libro IVA Digital Automático</h3>
-            <p>Visualizá tu Libro de IVA Compras y Ventas consolidado mes a mes. Generá los archivos de texto delimitados oficiales listos para importar a AFIP.</p>
+            <p>Visualizá tu Libro de IVA Compras y Ventas consolidado mes a mes. Generá los archivos de texto delimitados oficiales listos para importar a ARCA.</p>
           </div>
         </div>
       </div>
@@ -178,7 +178,7 @@ export function renderLanding() {
               <li><i data-lucide="check"></i> Soporte prioritario vía WhatsApp</li>
               <li><i data-lucide="check"></i> Copias de seguridad automáticas diarias</li>
               <li><i data-lucide="check"></i> Portal de Clientes móvil ilimitado</li>
-              <li><i data-lucide="check"></i> Actualización legal AFIP bonificada</li>
+              <li><i data-lucide="check"></i> Actualización legal ARCA bonificada</li>
             </ul>
             <a href="#contact" class="btn btn-outline w-full">Comenzar Implementación</a>
           </div>
