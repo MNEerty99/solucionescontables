@@ -122,6 +122,32 @@ export function renderConfiguracion() {
         </div>
       </div>
 
+      <!-- Gemini API Key configuration card for the Studio -->
+      <div class="card" style="border-color: rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.01);">
+        <div class="card-header" style="border-bottom-color: rgba(99, 102, 241, 0.1);">
+          <h3><i data-lucide="key" style="color: #6366f1;"></i> Motor IA del Estudio (Gemini OCR Centralizado)</h3>
+          <span class="badge" style="margin: 0; font-size: 10px; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.2);">Estudio Contable</span>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary" style="font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+            Ingresá tu clave API de Gemini. Tus clientes **no tendrán que configurar nada**; heredarán automáticamente tu credencial para digitalizar tickets y facturas desde su celular.
+          </p>
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <div style="flex: 1;">
+              <label style="font-size: 11.5px; font-weight: 600; display: block; margin-bottom: 6px;">Gemini API Key del Estudio</label>
+              <input type="password" id="gemini-api-key-input" class="form-input" style="width: 100%; padding: 8px 12px; font-size: 12.5px; background: #fff;" placeholder="Pega tu API Key de Google Gemini..." value="${localStorage.getItem('vmp_gemini_api_key') || ''}">
+            </div>
+            <button id="btn-save-gemini-key" class="btn btn-primary" style="background: #6366f1; border-color: #6366f1; height: 38px;">
+              Guardar Clave
+            </button>
+          </div>
+          <div style="margin-top: 12px; display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary);">
+            <i data-lucide="info" style="width: 13px; height: 13px; color: #818cf8;"></i>
+            <span>¿No tenés una clave? Podés obtener una gratis en <a href="https://aistudio.google.com/" target="_blank" style="color: #818cf8; text-decoration: underline; font-weight: 600;">Google AI Studio</a>.</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Right Column: Delegated CUITs status & instructions -->
@@ -276,5 +302,19 @@ export function initConfiguracion(mainApp) {
   
   keyDrop?.addEventListener('click', () => {
     simulateFileDrop("estudio_comahue.key");
+  });
+
+  // Save Gemini Key from Studio Configuration
+  const btnSaveGeminiKey = document.getElementById('btn-save-gemini-key');
+  const geminiInput = document.getElementById('gemini-api-key-input');
+  btnSaveGeminiKey?.addEventListener('click', () => {
+    const key = geminiInput?.value.trim();
+    if (key) {
+      localStorage.setItem('vmp_gemini_api_key', key);
+      mainApp.showToast("¡Clave de Gemini guardada! Agente IA activo para todos tus clientes.", "success");
+    } else {
+      localStorage.removeItem('vmp_gemini_api_key');
+      mainApp.showToast("Clave de Gemini eliminada. Tus clientes operarán en modo de simulación.", "info");
+    }
   });
 }

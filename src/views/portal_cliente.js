@@ -12,6 +12,7 @@ const INITIAL_DIGITAL_TICKETS = [
 
 export function renderPortalCliente() {
   const activeCompany = getActiveCompany();
+  const hasApiKey = localStorage.getItem('vmp_gemini_api_key') ? true : false;
 
   // Load from local storage if exists
   if (!localStorage.getItem(`vmp_tickets_${activeCompany.id}`)) {
@@ -35,21 +36,30 @@ export function renderPortalCliente() {
     <!-- Left column -->
     <div style="display: flex; flex-direction: column; gap: 24px;">
       
-      <!-- Gemini API Key configuration card -->
+      <!-- Gemini API Status Card (Inherited from the Studio) -->
       <div class="card" style="border-color: rgba(99, 102, 241, 0.2); background: rgba(99, 102, 241, 0.01);">
         <div class="card-body" style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 12px; min-width: 250px;">
             <div style="background: rgba(99, 102, 241, 0.08); color: #818cf8; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink:0;">
-              <i data-lucide="key"></i>
+              <i data-lucide="sparkles"></i>
             </div>
             <div>
-              <h4 style="font-size: 13.5px; font-weight: 700; margin-bottom: 2px;">Agente IA Activo (Gemini OCR)</h4>
-              <p style="font-size: 11px; color: var(--text-secondary); margin: 0;">Ingresá tu clave API de Google para digitalizar comprobantes reales.</p>
+              <h4 style="font-size: 13.5px; font-weight: 700; margin-bottom: 2px;">Agente IA Activo (OCR Centralizado)</h4>
+              <p style="font-size: 11px; color: var(--text-secondary); margin: 0;">Sincronizado con el motor del estudio. Las imágenes se procesarán automáticamente.</p>
             </div>
           </div>
-          <div style="display: flex; gap: 8px; align-items: center; flex-grow: 1; justify-content: flex-end;">
-            <input type="password" id="gemini-api-key-input" class="form-input" style="max-width: 240px; font-size: 12.5px; padding: 6px 12px; height: 34px; background: #ffffff;" placeholder="API Key de Gemini...">
-            <button id="btn-save-gemini-key" class="btn btn-primary" style="padding: 6px 14px; font-size: 12.5px; height: 34px; background: #6366f1; border-color: #6366f1;">Guardar</button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            ${hasApiKey ? `
+              <span style="font-size: 11.5px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.08); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 4px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                Conectado (Estudio)
+              </span>
+            ` : `
+              <span style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary); background: var(--bg-secondary); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted);"></span>
+                Modo Simulado
+              </span>
+            `}
           </div>
         </div>
       </div>
@@ -162,24 +172,7 @@ export function initPortalCliente(mainApp) {
   const progressTxt = document.getElementById('ticket-progress-txt');
   const tableBody = document.getElementById('ticket-table-body');
 
-  const apiKeyInput = document.getElementById('gemini-api-key-input');
-  const btnSaveKey = document.getElementById('btn-save-gemini-key');
-  
-  if (apiKeyInput) {
-    apiKeyInput.value = localStorage.getItem('vmp_gemini_api_key') || '';
-  }
-
-  btnSaveKey?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const key = apiKeyInput.value.trim();
-    if (key) {
-      localStorage.setItem('vmp_gemini_api_key', key);
-      mainApp.showToast("¡Clave de Gemini guardada! Agente IA activo.", "success");
-    } else {
-      localStorage.removeItem('vmp_gemini_api_key');
-      mainApp.showToast("Clave de Gemini eliminada. Modo simulación activo.", "info");
-    }
-  });
+  // El cliente no ingresa Clave API, hereda la del Estudio Contable
 
   // Render tickets table list helper
   const renderTicketsList = () => {
