@@ -24,6 +24,7 @@ export function renderLanding() {
         <nav class="lp-menu" id="lp-menu-nav">
           <a href="#features" class="lp-menu-link">Beneficios</a>
           <a href="#pricing" class="lp-menu-link">Inversión</a>
+          <a href="#partners" class="lp-menu-link">Partners</a>
           <a href="#contact" class="lp-menu-link">Contacto</a>
           <a href="#/demo" class="btn btn-outline btn-sm">Demo Interactiva</a>
         </nav>
@@ -203,6 +204,71 @@ export function renderLanding() {
       </div>
     </section>
 
+    <!-- Partners / Affiliate Program Section -->
+    <section id="partners" class="partners-section" style="padding: 80px 0; border-top: 1px solid var(--border-color); background: #ffffff;">
+      <div class="container">
+        <div class="partners-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(5, 150, 105, 0.03) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 48px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center;">
+          <div class="partners-info">
+            <span class="badge" style="background: rgba(99,102,241,0.08); color: #6366f1; border-color: rgba(99,102,241,0.15); font-weight: 700;">PLAN DE AFILIADOS / SOCIOS COMERCIALES</span>
+            <h2 style="font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 12px;">Ganá <span class="gradient-text">USD 80</span> por cada licencia recomendada</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 14.5px; line-height: 1.6;">
+              ¿Tenés contactos en el sector contable? ¿Sos contador o estudiante y querés generar un ingreso extra? Te invitamos a sumarte a nuestro **Programa de Partners Asociados**. 
+              <br><br>
+              Por cada Licencia de Adquisición de Soluciones Contables que se venda bajo tu recomendación directa (valor de oferta de la licencia: USD 380), **te quedás con USD 80 de comisión en el acto**, sin topes ni demoras operativas.
+            </p>
+            
+            <!-- Interactive Earnings Calculator -->
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+              <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="calculator" style="color: #6366f1; width: 18px; height: 18px;"></i>
+                Simulador de Comisiones Proyectadas
+              </h4>
+              
+              <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600;">Licencias vendidas al mes:</span>
+                  <span id="partner-qty-label" style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: var(--color-primary); background: var(--bg-secondary); padding: 2px 10px; border-radius: 12px; border: 1px solid var(--border-color);">5</span>
+                </div>
+                <input type="range" id="partner-slider" min="1" max="30" value="5" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px dashed var(--border-color);">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Tu ganancia en comisiones:</span>
+                <div style="text-align: right;">
+                  <span style="font-family: var(--font-heading); font-size: 26px; font-weight: 800; color: #10b981; display: block; line-height: 1;">
+                    USD <span id="partner-commission-val">400</span>
+                  </span>
+                  <span style="font-size: 10px; color: var(--text-muted); font-weight: 500;">Comisión inmediata pagada al instante</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="partners-form" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-sm);">
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Sumarse como Vendedor</h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 20px;">Registrate y un ejecutivo comercial se contactará para darte de alta como Partner.</p>
+            <form id="partner-form">
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label">Nombre Completo</label>
+                <input type="text" class="form-input" id="partner-name" placeholder="Tu Nombre y Apellido" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label">Teléfono de Contacto (WhatsApp)</label>
+                <input type="tel" class="form-input" id="partner-phone" placeholder="+54 9 299 123-4567" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label">Email de Contacto</label>
+                <input type="email" class="form-input" id="partner-email" placeholder="tuemail@correo.com" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-full" style="background: #6366f1; border-color: #6366f1; color: white;">
+                Postularme y Recibir Kit de Ventas
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Contact & Lead Form -->
     <section id="contact" class="contact-section">
       <div class="container">
@@ -301,6 +367,46 @@ export function initLanding(mainApp) {
       });
     });
   }
+
+  // Partner Calculator slider
+  const slider = document.getElementById('partner-slider');
+  const qtyLabel = document.getElementById('partner-qty-label');
+  const commVal = document.getElementById('partner-commission-val');
+
+  if (slider && qtyLabel && commVal) {
+    slider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      qtyLabel.textContent = val;
+      commVal.textContent = val * 80; // USD 80 commission per sale!
+    });
+  }
+
+  // Partner Lead Form Submission
+  document.getElementById('partner-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('partner-name').value;
+    const phone = document.getElementById('partner-phone').value;
+    const email = document.getElementById('partner-email').value;
+
+    mainApp.showToast(`¡Postulación enviada, ${name}! Nos contactaremos por WhatsApp.`, 'success');
+
+    // Register lead in Supabase in background
+    if (isSupabaseConfigured && supabase) {
+      console.log("Supabase CRM: Registering Sales Partner lead...", name);
+      supabase.from('leads').insert([{ 
+        name, 
+        studio: `PARTNER VENDEDOR: (${phone})`, 
+        email
+      }]).then(({ error }) => {
+        if (error) console.error("Supabase CRM partner lead error:", error);
+      }).catch(err => {
+        console.error("Supabase CRM partner lead exception:", err);
+      });
+    }
+
+    // Reset Form
+    document.getElementById('partner-form').reset();
+  });
 
   // Manejo de envío de formulario de lead
   document.getElementById('lead-form')?.addEventListener('submit', (e) => {
