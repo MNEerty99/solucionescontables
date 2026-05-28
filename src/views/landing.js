@@ -218,6 +218,15 @@ export function renderLanding() {
             <p>Agendá una llamada con nuestro equipo técnico para configurar tus primeras empresas o consultanos tus inquietudes.</p>
             <div class="contact-details">
               <div class="cd-item">
+                <div class="cd-icon" style="color: #25d366; background: rgba(37, 211, 102, 0.05); border: 1px solid rgba(37, 211, 102, 0.15); display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px;"><i data-lucide="phone"></i></div>
+                <div class="cd-text">
+                  <h4>Solicitar Licencia (WhatsApp)</h4>
+                  <a href="https://wa.me/5492996731487?text=Hola!%20Me%20interesa%20solicitar%20la%20licencia%20de%20SolucionesContables" target="_blank" style="font-size: 15px; font-weight: 800; color: #25d366; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-top: 2px;">
+                    +54 299 673-1487 <span style="font-size: 10px; font-weight: 700; background: rgba(37,211,102,0.08); padding: 2px 8px; border-radius: 12px;">Chat Directo</span>
+                  </a>
+                </div>
+              </div>
+              <div class="cd-item">
                 <div class="cd-icon"><i data-lucide="mail"></i></div>
                 <div class="cd-text">
                   <h4>Email de Consultas</h4>
