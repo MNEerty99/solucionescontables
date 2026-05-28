@@ -16,7 +16,12 @@ export function renderLanding() {
             SOLUCIONES <span>CONTABLES</span>
           </div>
         </a>
-        <nav class="lp-menu">
+        <button class="lp-menu-toggle" id="lp-menu-toggle-btn" aria-label="Abrir menú">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+        <nav class="lp-menu" id="lp-menu-nav">
           <a href="#features" class="lp-menu-link">Beneficios</a>
           <a href="#pricing" class="lp-menu-link">Inversión</a>
           <a href="#contact" class="lp-menu-link">Contacto</a>
@@ -141,7 +146,7 @@ export function renderLanding() {
           <h2>Un modelo de licenciamiento transparente y profesional</h2>
           <p>Sin sorpresas mensuales ni cuotas variables por colaboradores del estudio.</p>
         </div>
-        <div class="pricing-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px; margin: 0 auto; gap: 32px;">
+        <div class="pricing-grid">
           
           <!-- Upfront license -->
           <div class="price-card featured" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
@@ -269,6 +274,33 @@ export function renderLanding() {
 import { supabase, isSupabaseConfigured } from '../db/supabase.js';
 
 export function initLanding(mainApp) {
+  // Mobile Menu Toggler
+  const toggleBtn = document.getElementById('lp-menu-toggle-btn');
+  const menuNav = document.getElementById('lp-menu-nav');
+
+  if (toggleBtn && menuNav) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleBtn.classList.toggle('active');
+      menuNav.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!menuNav.contains(e.target) && e.target !== toggleBtn) {
+        toggleBtn.classList.remove('active');
+        menuNav.classList.remove('active');
+      }
+    });
+
+    // Close menu when clicking on a link
+    menuNav.querySelectorAll('.lp-menu-link, .btn').forEach(link => {
+      link.addEventListener('click', () => {
+        toggleBtn.classList.remove('active');
+        menuNav.classList.remove('active');
+      });
+    });
+  }
 
   // Manejo de envío de formulario de lead
   document.getElementById('lead-form')?.addEventListener('submit', (e) => {

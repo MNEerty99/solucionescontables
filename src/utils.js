@@ -127,10 +127,10 @@ export function renderPremiumTeaser(childHTML, title, description) {
           ${description}
         </p>
         <div style="background: rgba(13, 148, 136, 0.03); border: 1px solid rgba(13, 148, 136, 0.12); padding: 12px; border-radius: 6px; width: 100%; text-align: left; font-size: 11px; line-height: 1.4; color: #475569;">
-          💡 <strong>Servicio Exclusivo:</strong> Este módulo es una herramienta de alta fidelidad disponible únicamente para clientes activos que contratan el abono mensual del **Estudio Contable Comahue**.
+          💡 <strong>Módulo Premium:</strong> Esta herramienta avanzada está disponible únicamente para clientes con licencia activa de **Soluciones Contables**.
         </div>
-        <button class="btn btn-primary" onclick="alert('Estudio Contable Comahue\\n\\n📞 Teléfono: +54 299 448-1234\\n✉️ Email: contacto@estudiocomahue.com.ar\\n📍 Ubicación: Neuquén, Argentina')" style="width: 100%; background: #6366f1; border-color: #6366f1; font-weight: 700; margin-top: 4px; padding: 10px; border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <i data-lucide="phone" style="width: 16px; height: 16px;"></i> Contactar al Estudio Contable
+        <button class="btn btn-primary" onclick="alert('Soluciones Contables\\n\\n📞 WhatsApp: +54 299 673-1487\\n✉️ Email: administracion@vmp-edtech.com')" style="width: 100%; background: #6366f1; border-color: #6366f1; font-weight: 700; margin-top: 4px; padding: 10px; border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i data-lucide="phone" style="width: 16px; height: 16px;"></i> Contactar para Activar Licencia
         </button>
       </div>
     </div>
