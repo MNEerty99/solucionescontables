@@ -5,7 +5,7 @@
             Importación de Servicios, RG 5824/2026
    ------------------------------------------------------------- */
 import { getActiveCompany, getTransactions } from '../db/mockdb.js';
-import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE } from '../utils.js';
+import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE, renderPremiumTeaser } from '../utils.js';
 
 // Existencia inicial estimada = stock final + unidades vendidas en el período.
 // En demo, asumimos que las ventas del período representaron ~20% del stock inicial.
@@ -72,7 +72,7 @@ export function renderRT54() {
   // Total ventas = ingresos del período
   const ingresoPeriodo = txs.ventas.reduce((s,v) => s + v.total, 0);
 
-  return `
+  return renderPremiumTeaser(`
   <div class="view-header">
     <div>
       <h1 class="view-title">Panel Contable · RT 54 FACPCE</h1>
@@ -360,7 +360,7 @@ export function renderRT54() {
       </div>
     </div>
   </div>
-  `;
+  `, "Valuación e Impacto Contable RT 54", "Automatizá la categorización y valuación FACPCE de bienes de cambio para micro y pequeñas entidades. Generá el costo de ventas automático y los balances simplificados ajustados por inflación.");
 }
 
 export function initRT54(mainApp) {

@@ -103,3 +103,38 @@ export function downloadFile(filename, content, mimeType = 'text/plain') {
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
+
+/**
+ * Renderiza una capa de previsualización bloqueada para venta/marketing (Sales Teaser).
+ * @param {string} childHTML El contenido HTML original a empañar.
+ * @param {string} title Título del beneficio premium.
+ * @param {string} description Descripción corta del valor del módulo.
+ * @returns {string} HTML con el overlay y desenfoque aplicados.
+ */
+export function renderPremiumTeaser(childHTML, title, description) {
+  return `
+  <div class="locked-container" style="width: 100%; min-height: 520px; display: flex; flex-direction: column;">
+    <div class="locked-blur" style="flex-grow: 1;">
+      ${childHTML}
+    </div>
+    <div class="premium-lock-overlay">
+      <div class="premium-lock-card">
+        <div class="premium-lock-icon">
+          <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
+        </div>
+        <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin: 0;">${title}</h3>
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.5; margin: 0; max-width: 360px;">
+          ${description}
+        </p>
+        <div style="background: rgba(13, 148, 136, 0.03); border: 1px solid rgba(13, 148, 136, 0.12); padding: 12px; border-radius: 6px; width: 100%; text-align: left; font-size: 11px; line-height: 1.4; color: #475569;">
+          💡 <strong>Servicio Exclusivo:</strong> Este módulo es una herramienta de alta fidelidad disponible únicamente para clientes activos que contratan el abono mensual del **Estudio Contable Comahue**.
+        </div>
+        <button class="btn btn-primary" onclick="alert('Estudio Contable Comahue\\n\\n📞 Teléfono: +54 299 448-1234\\n✉️ Email: contacto@estudiocomahue.com.ar\\n📍 Ubicación: Neuquén, Argentina')" style="width: 100%; background: #6366f1; border-color: #6366f1; font-weight: 700; margin-top: 4px; padding: 10px; border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i data-lucide="phone" style="width: 16px; height: 16px;"></i> Contactar al Estudio Contable
+        </button>
+      </div>
+    </div>
+  </div>
+  `;
+}
+

@@ -761,3 +761,74 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* -------------------------------------------------------------
+   PREMIUM FEATURE LOCK LAYER (SALES TEASER)
+   ------------------------------------------------------------- */
+.locked-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.locked-blur {
+  filter: blur(4px) grayscale(10%) contrast(90%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.premium-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 24px;
+  text-align: center;
+  border-radius: var(--radius-md);
+}
+
+.premium-lock-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: lockCardFloat 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lockCardFloat {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.premium-lock-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6366f1;
+  margin-bottom: 4px;
+}
+

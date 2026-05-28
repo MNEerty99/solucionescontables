@@ -3,6 +3,7 @@
    Conciliación impositiva, cuenta puente y generador CSV ARCA
    ------------------------------------------------------------- */
 import { getActiveCompany, getTransactions } from '../db/mockdb.js';
+import { renderPremiumTeaser } from '../utils.js';
 
 function fmt(n) {
   return n.toLocaleString('es-AR', { minimumFractionDigits: 2 });
@@ -33,7 +34,7 @@ export function renderRetenciones() {
   const fuenteColor = { factura: '#6366f1', banco: '#06b6d4', manual: '#f59e0b' };
   const fuenteLabel = { factura: 'Libro Compras', banco: 'Extracto Bancario', manual: 'Manual' };
 
-  return `
+  return renderPremiumTeaser(`
   <div class="view-header">
     <div>
       <h1 class="view-title">Retenciones y Percepciones</h1>
@@ -98,50 +99,50 @@ export function renderRetenciones() {
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Agente de Retención</th>
+                <th>Agente de Recaudación</th>
                 <th>Tipo</th>
-                <th>Fuente</th>
-                <th class="text-right">Monto</th>
-                <th>Estado</th>
-                <th></th>
+                <th style="text-align:right;">Monto</th>
+                <th style="text-align:center;">Origen</th>
+                <th style="text-align:center;">Estado</th>
+                <th style="text-align:center;">Acción</th>
               </tr>
             </thead>
             <tbody>
               ${rets.map(r => `
-              <tr id="row-ret-${r.id}">
-                <td class="font-mono text-xs">${r.fecha.split('-').reverse().join('/')}</td>
+              <tr>
+                <td style="font-size:12px;">${r.fecha.split('-').reverse().join('/')}</td>
                 <td>
-                  <div style="font-size:12.5px;font-weight:600;">${r.agente}</div>
-                  <div class="font-mono" style="font-size:10px;color:var(--text-secondary);">${r.cuit}</div>
+                  <div style="font-size:12.5px;font-weight:700;color:var(--color-primary);">${r.agente}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:2px;">CUIT: ${r.cuit}</div>
                 </td>
-                <td style="font-size:11.5px;">${r.tipo}</td>
-                <td>
-                  <span style="font-size:10px;font-weight:700;color:${fuenteColor[r.fuente]};background:rgba(255,255,255,0.03);border:1px solid var(--border-color);padding:2px 6px;border-radius:4px;">
-                    ${fuenteLabel[r.fuente]}
+                <td style="font-size:11.5px;font-weight:600;color:var(--text-secondary);">${r.tipo}</td>
+                <td class="font-mono font-bold" style="text-align:right;font-size:13px;color:${r.conciliado ? 'var(--color-accent)' : '#f59e0b'};">$ ${fmt(r.monto)}</td>
+                <td style="text-align:center;">
+                  <span style="font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border-color);color:${fuenteColor[r.fuente] || '#fff'};">
+                    ${fuenteLabel[r.fuente] || r.fuente}
                   </span>
                 </td>
-                <td class="font-mono text-right" style="font-weight:700;">$ ${fmt(r.monto)}</td>
-                <td>
+                <td style="text-align:center;">
                   ${r.conciliado ? `
-                    <span style="font-size:10px;font-weight:700;color:var(--color-accent);display:flex;align-items:center;gap:3px;">
-                      <i data-lucide="check-circle-2" style="width:12px;height:12px;"></i> Conciliada
-                    </span>
-                  ` : r.certDisponible ? `
-                    <span style="font-size:10px;font-weight:700;color:#f59e0b;display:flex;align-items:center;gap:3px;">
-                      <i data-lucide="clock" style="width:12px;height:12px;"></i> Pendiente
+                    <span style="font-size:10px;font-weight:700;color:var(--color-accent);display:flex;align-items:center;justify-content:center;gap:4px;">
+                      <i data-lucide="check-circle" style="width:12px;height:12px;"></i> Conciliado
                     </span>
                   ` : `
-                    <span style="font-size:10px;font-weight:700;color:#f87171;display:flex;align-items:center;gap:3px;">
-                      <i data-lucide="alert-circle" style="width:12px;height:12px;"></i> Sin Cert.
+                    <span style="font-size:10px;font-weight:700;color:#f59e0b;display:flex;align-items:center;justify-content:center;gap:4px;">
+                      <i data-lucide="clock" style="width:12px;height:12px;"></i> Pendiente
                     </span>
                   `}
                 </td>
-                <td>
-                  ${!r.conciliado ? `
-                    <button class="btn-conciliar btn-outline" data-id="${r.id}" style="font-size:10px;padding:3px 10px;border-radius:4px;">
+                <td style="text-align:center;">
+                  ${r.conciliado ? `
+                    <button class="btn btn-outline btn-xs" disabled style="opacity:.45;cursor:not-allowed;padding:2px 8px;font-size:10px;">
+                      ✓ Listo
+                    </button>
+                  ` : `
+                    <button class="btn btn-primary btn-xs btn-conciliar" data-id="${r.id}" style="padding:2px 8px;font-size:10px;background:#6366f1;border-color:#6366f1;">
                       Conciliar
                     </button>
-                  ` : ''}
+                  `}
                 </td>
               </tr>
               `).join('')}
@@ -159,13 +160,13 @@ export function renderRetenciones() {
         </div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
           ${[
-            { label:'Orden de Pago', chars:'Exactamente 16', color:'#6366f1' },
-            { label:'Factura de Compra', chars:'Entre 5 y 8', color:'var(--color-accent)' },
-            { label:'Otro Comprobante', chars:'Exactamente 16', color:'#f59e0b' },
-          ].map(r => `
+            { label: 'Orden de Pago', chars: 'Exactamente 16', color: '#6366f1' },
+            { label: 'Factura de Compra', chars: 'Entre 5 y 8', color: 'var(--color-accent)' },
+            { label: 'Otro Comprobante', chars: 'Exactamente 16', color: '#f59e0b' }
+          ].map(i => `
             <div style="border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:10px 12px;">
-              <div style="font-size:11.5px;font-weight:700;color:var(--color-primary);margin-bottom:3px;">${r.label}</div>
-              <div style="font-size:11px;color:${r.color};font-weight:700;">${r.chars} caracteres</div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--color-primary);margin-bottom:3px;">${i.label}</div>
+              <div style="font-size:11px;color:${i.color};font-weight:700;">${i.chars} caracteres</div>
             </div>
           `).join('')}
           <div style="background:rgba(239,68,68,0.03);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius-sm);padding:10px 12px;">
@@ -181,7 +182,7 @@ export function renderRetenciones() {
 
       <div class="card">
         <div class="card-header">
-          <h3 style="font-size:13px;"><i data-lucide="database" style="color:#06b6d4;"></i> Mis Retenciones ARCA</h3>
+          <h3><i data-lucide="database" style="color:#06b6d4;"></i> Mis Retenciones ARCA</h3>
         </div>
         <div class="card-body">
           <p class="text-secondary" style="font-size:12px;line-height:1.5;margin-bottom:12px;">
@@ -201,7 +202,7 @@ export function renderRetenciones() {
       </div>
     </div>
   </div>
-  `;
+  `, "Conciliación de Retenciones & Percepciones", "Evitá pérdidas de saldo fiscal. Cruzá de forma automatizada las retenciones registradas en el Libro Diario, el SIRE (ARCA) y los extractos bancarios (SIRCREB/percepciones).");
 }
 
 export function initRetenciones(mainApp) {

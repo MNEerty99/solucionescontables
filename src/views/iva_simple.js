@@ -3,7 +3,7 @@
    Circuito completo de liquidación IVA según ARCA 2026
    ------------------------------------------------------------- */
 import { getActiveCompany, getTransactions } from '../db/mockdb.js';
-import { fmt, fmtDate, getVencimientos, downloadFile } from '../utils.js';
+import { fmt, fmtDate, getVencimientos, downloadFile, renderPremiumTeaser } from '../utils.js';
 
 // ── Actividades económicas CLAE simplificadas por sector ────────
 function getActividadesPorEmpresa(company) {
@@ -66,7 +66,7 @@ export function renderIVASimple() {
     { n:4, label:'Presentación F.2051',  icon:'send',        done: false },
   ];
 
-  return `
+  return renderPremiumTeaser(`
   <div class="view-header">
     <div>
       <h1 class="view-title">IVA Simple — F.2051</h1>
@@ -336,7 +336,7 @@ export function renderIVASimple() {
 
     </div>
   </div>
-  `;
+  `, "IVA Simple — F.2051", "Gestioná y presentá el formulario F.2051 simplificado para pequeñas y medianas entidades. Automatizá los cálculos de débito y crédito fiscal con cruce de consistencia en tiempo real.");
 }
 
 // ── Init ──────────────────────────────────────────────────────────

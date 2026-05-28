@@ -2,6 +2,7 @@
    VMP Studio Contable - Importación ARCA View Component
    ------------------------------------------------------------- */
 import { getActiveCompany, addTransaction } from '../db/mockdb.js';
+import { renderPremiumTeaser } from '../utils.js';
 
 const ARCA_MOCK_EMITIDAS = [
   { fecha: "2026-05-24", tipo_comprobante: "Factura A", numero: "0003-00000850", cliente: "Comercio Mayorista Patagonia", cuit: "30-58930219-4", neto: 150000, iva: 31500, total: 181500, es_activo: false, categoria: "Venta" },
@@ -23,7 +24,7 @@ const ARCA_MOCK_RECIBIDAS = [
 export function renderImportacion() {
   const activeCompany = getActiveCompany();
 
-  return `
+  return renderPremiumTeaser(`
   <div class="view-header">
     <div>
       <h1 class="view-title">Importación ARCA</h1>
@@ -108,7 +109,7 @@ export function renderImportacion() {
       </div>
     </div>
   </div>
-  `;
+  `, "Importador de Comprobantes ARCA", "Sincronizá el estudio contable directamente con ARCA. Habilitá la descarga y carga automatizada de comprobantes de compras y ventas sin carga manual ni planillas externas.");
 }
 
 export function initImportacion(mainApp) {
