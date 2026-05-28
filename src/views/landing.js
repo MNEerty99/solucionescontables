@@ -153,22 +153,20 @@ export function renderLanding() {
               </div>
 
               <!-- Price displaying original and promo -->
-              <div style="margin: 24px 0 24px;">
-                <div style="font-size: 13px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 4px; opacity: 0.7;">
+              <div class="price-amount" style="margin: 16px 0 24px;">
+                <div style="font-size: 13px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 6px; font-weight: 500; opacity: 0.75;">
                   Original: USD 480
                 </div>
-                <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
-                  <span style="font-size: 16px; font-weight: 700; color: var(--color-accent); font-family: var(--font-mono);">USD</span>
-                  <span style="font-size: 48px; font-weight: 800; color: #fff; line-height: 1; font-family: var(--font-mono);">380</span>
-                  <span style="font-size: 9.5px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.08); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.2); margin-left: 6px; white-space: nowrap;">
-                    ¡Ahorrás USD 100!
-                  </span>
-                </div>
+                <span class="currency">USD</span>
+                <span class="val">380</span>
+                <span style="font-size: 10px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.06); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.15); margin-left: 8px; vertical-align: middle; display: inline-block;">
+                  ¡Ahorrás USD 100!
+                </span>
               </div>
 
               <ul class="price-features" style="text-align: left; margin-bottom: 24px;">
                 <li><i data-lucide="check"></i> Entorno exclusivo en la nube</li>
-                <li><i data-lucide="check"></i> Carga y configuración de hasta <strong style="color: #818cf8;">100</strong> empresas</li>
+                <li><i data-lucide="check"></i> Carga y configuración de hasta 100 empresas</li>
                 <li><i data-lucide="check"></i> Colaboradores del estudio ilimitados</li>
                 <li><i data-lucide="check"></i> Capacitación inicial para el equipo</li>
               </ul>
