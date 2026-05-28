@@ -47,19 +47,11 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="layout-dashboard"></i>
           <span>Dashboard</span>
         </a>
-        <a href="#/demo/empresas" class="db-nav-item ${activeRoute === 'empresas' ? 'active' : ''}" data-route="empresas">
-          <i data-lucide="building-2"></i>
-          <span>Empresas Clientes</span>
-        </a>
 
         <div class="db-nav-label">Operaciones</div>
         <a href="#/demo/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
           <i data-lucide="file-text"></i>
           <span>Comprobantes</span>
-        </a>
-        <a href="#/demo/importacion" class="db-nav-item ${activeRoute === 'importacion' ? 'active' : ''}" data-route="importacion">
-          <i data-lucide="upload-cloud"></i>
-          <span>Importación ARCA</span>
         </a>
 
         <div class="db-nav-label">Fiscal</div>
@@ -67,34 +59,8 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="book-open"></i>
           <span>Libro IVA Digital</span>
         </a>
-        <a href="#/demo/iva-simple" class="db-nav-item ${activeRoute === 'iva-simple' ? 'active' : ''}" data-route="iva-simple">
-          <i data-lucide="file-check-2"></i>
-          <span>IVA Simple F.2051</span>
-        </a>
-        <a href="#/demo/retenciones" class="db-nav-item ${activeRoute === 'retenciones' ? 'active' : ''}" data-route="retenciones">
-          <i data-lucide="percent"></i>
-          <span>Retenciones y Percepciones</span>
-        </a>
 
-        <div class="db-nav-label">Contabilidad</div>
-        <a href="#/demo/rt54" class="db-nav-item ${activeRoute === 'rt54' ? 'active' : ''}" data-route="rt54">
-          <i data-lucide="layers"></i>
-          <span>RT 54 · Panel Contable</span>
-        </a>
-
-        <div class="db-nav-label">Portal de Clientes</div>
-        <a href="#/demo/portal" class="db-nav-item ${activeRoute === 'portal' ? 'active' : ''}" data-route="portal">
-          <i data-lucide="smartphone"></i>
-          <span>Portal Cliente (Demo)</span>
-        </a>
-
-        <div class="db-nav-label">Configuración</div>
-        <a href="#/demo/configuracion" class="db-nav-item ${activeRoute === 'configuracion' ? 'active' : ''}" data-route="configuracion">
-          <i data-lucide="settings"></i>
-          <span>Configuración ARCA</span>
-        </a>
-
-        <div class="db-nav-label">Ayuda & Soporte</div>
+        <div class="db-nav-label">Soporte</div>
         <a href="#/demo/ayuda" class="db-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}" data-route="ayuda">
           <i data-lucide="help-circle"></i>
           <span>Instructivo & Onboarding</span>
@@ -182,17 +148,17 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="layout-dashboard"></i>
           <span>Inicio</span>
         </a>
-        <a href="#/demo/empresas" class="mb-nav-item ${activeRoute === 'empresas' ? 'active' : ''}">
-          <i data-lucide="building-2"></i>
-          <span>Empresas</span>
+        <a href="#/demo/ventas" class="mb-nav-item ${activeRoute === 'ventas' ? 'active' : ''}">
+          <i data-lucide="file-text"></i>
+          <span>Comprobantes</span>
         </a>
-        <a href="#/demo/importacion" class="mb-nav-item ${activeRoute === 'importacion' ? 'active' : ''}">
-          <i data-lucide="upload-cloud"></i>
-          <span>ARCA</span>
+        <a href="#/demo/iva" class="mb-nav-item ${activeRoute === 'iva' ? 'active' : ''}">
+          <i data-lucide="book-open"></i>
+          <span>Libro IVA</span>
         </a>
-        <a href="#/demo/portal" class="mb-nav-item ${activeRoute === 'portal' ? 'active' : ''}">
-          <i data-lucide="smartphone"></i>
-          <span>Portal Cel</span>
+        <a href="#/demo/ayuda" class="mb-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}">
+          <i data-lucide="help-circle"></i>
+          <span>Ayuda</span>
         </a>
       </nav>
     </div>
