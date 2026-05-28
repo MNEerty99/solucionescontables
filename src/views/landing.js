@@ -35,9 +35,9 @@ export function renderLanding() {
     <section class="hero-section">
       <div class="container hero-grid">
         <div class="hero-content">
-          <span class="badge">SaaS Multi-Empresa &middot; Desarrollado por VMP S.A.S.</span>
-          <h1 class="hero-title">El puente definitivo entre <span class="gradient-text">tu estudio y tus clientes</span>.</h1>
-          <p class="hero-subtitle">Dejá de perseguir carpetas físicas o recibir fotos borrosas. Soluciones Contables centraliza tus empresas cliente, automatiza la carga de facturas de ARCA y brinda un portal móvil para que tus clientes suban comprobantes al instante.</p>
+          <span class="badge"><i data-lucide="shield-check" style="width:12px; height:12px;"></i> Infraestructura B2B Multi-Empresa &middot; Desarrollado por VMP</span>
+          <h1 class="hero-title">El puente impositivo y contable definitivo para tu <span class="gradient-text">Estudio Contable</span>.</h1>
+          <p class="hero-subtitle">Dejá de perseguir carpetas físicas, renegar con capturas borrosas o procesar planillas inconexas. Soluciones Contables centraliza tus empresas cliente, automatiza la liquidación mensual de IVA, genera exportaciones oficiales y provee un portal móvil intuitivo para la carga de comprobantes al instante.</p>
           <div class="hero-actions">
             <a href="#/demo" class="btn btn-primary">
               Probar Demo de la Plataforma <i data-lucide="arrow-right"></i>
@@ -111,8 +111,8 @@ export function renderLanding() {
     <section id="features" class="features-section">
       <div class="container">
         <div class="section-header">
-          <h2>Diseñado exclusivamente para el contador moderno</h2>
-          <p>Dejá atrás las planillas manuales y optimizá la relación operativa con tus empresas clientes.</p>
+          <h2>Ingeniería fiscal y contable adaptada a tu Estudio</h2>
+          <p>Optimizá la relación operativa y de recolección de datos con todas tus empresas clientes en un solo canal.</p>
         </div>
         <div class="features-grid">
           <div class="feature-card">
@@ -120,22 +120,74 @@ export function renderLanding() {
               <i data-lucide="smartphone"></i>
             </div>
             <h3>Portal de Clientes Simplificado</h3>
-            <p>Tus clientes entran desde su celular y suben fotos de tickets de compras o arrastran PDFs de facturas. Recibís todo digitalizado de inmediato en tu estudio.</p>
+            <p>Tus clientes ingresan desde su celular y cargan fotos de tickets o arrastran PDFs de facturas. El portal realiza la pre-lectura y clasifica la información de compras al instante para tu revisión.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i data-lucide="upload-cloud"></i>
             </div>
-            <h3>Importación Rápida ARCA</h3>
-            <p>Subí archivos Excel/TXT de ARCA (Mis Comprobantes). El parser inteligente procesa cientos de facturas y calcula alícuotas en menos de 10 segundos.</p>
+            <h3>Sincronización y Parser ARCA</h3>
+            <p>Cargá archivos Excel/TXT de ARCA (Mis Comprobantes). Nuestro motor interpreta alícuotas, neto y percepciones de cientos de facturas en menos de 10 segundos, eliminando errores de tipeo.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">
               <i data-lucide="file-spreadsheet"></i>
             </div>
-            <h3>Libro IVA Digital Automático</h3>
-            <p>Visualizá tu Libro de IVA Compras y Ventas consolidado mes a mes. Generá los archivos de texto delimitados oficiales listos para importar a ARCA.</p>
+            <h3>Consolidación de Libro IVA Digital</h3>
+            <p>Visualizá tus libros mensuales de compras y ventas consolidados. Generá los archivos de texto delimitados oficiales listos para importar directamente en el portal de ARCA de forma regulada.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Institutional Prestige Section -->
+    <section id="prestige" class="prestige-section" style="padding: 100px 0; border-top: 1px solid var(--border-color); background: var(--bg-secondary); position: relative; overflow: hidden;">
+      <div class="container">
+        <div class="prestige-grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
+          
+          <!-- Left side: Premium Image Card -->
+          <div class="prestige-image-container" style="position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.12); border: 1px solid rgba(15, 23, 42, 0.08); transition: var(--transition-normal);">
+            <img src="/accounting_firm.png" alt="Estudio Contable de Elite" style="width: 100%; height: auto; display: block; object-fit: cover;">
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 100%); padding: 32px 24px; color: #ffffff;">
+              <span style="font-family: var(--font-heading); font-size: 11px; font-weight: 750; color: #34d399; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 6px;">Socio Tecnológico Impositivo</span>
+              <h4 style="font-size: 18px; font-weight: 700; color: #ffffff; margin: 0;">Estudio Contable Comahue</h4>
+              <p style="font-size: 12px; color: #94a3b8; margin: 4px 0 0 0;">Neuquén, Argentina — Infraestructura en la Nube</p>
+            </div>
+          </div>
+          
+          <!-- Right side: Elite Corporate Copy -->
+          <div class="prestige-info">
+            <span class="badge" style="background: rgba(5, 150, 105, 0.06); color: #047857; border-color: rgba(5, 150, 105, 0.15); font-weight: 700;">PRESTIGIO Y SEGURIDAD LEGAL</span>
+            <h2 style="font-size: 34px; font-weight: 800; margin-top: 10px; margin-bottom: 16px; line-height: 1.15; color: var(--color-primary);">Un estándar de excelencia institucional para tu firma</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14.5px; line-height: 1.6;">
+              Soluciones Contables no es un simple software de planillas; es una infraestructura diseñada para estudios contables que buscan automatizar la operatividad del día a día impositivo y brindar un asesoramiento de altísimo valor a sus empresas clientes.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; gap: 16px;">
+                <div class="prestige-icon-bullet" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i data-lucide="shield-check" style="width: 20px; height: 20px;"></i></div>
+                <div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: var(--color-primary); margin-bottom: 4px;">Cifrado de Credenciales y Delegación Segura</h4>
+                  <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; margin: 0;">Las claves fiscales y certificados de delegación ARCA (ex-AFIP) se resguardan bajo estrictas normas de encriptación para resguardo confidencial.</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 16px;">
+                <div class="prestige-icon-bullet" style="background: rgba(99, 102, 241, 0.08); color: #6366f1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i data-lucide="check-square" style="width: 20px; height: 20px;"></i></div>
+                <div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: var(--color-primary); margin-bottom: 4px;">Auditoría Contra Facturación Apócrifa (APOC)</h4>
+                  <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; margin: 0;">Validación cruzada de CUITs en bases de datos AFIP APOC, mitigando de forma preventiva riesgos tributarios en los libros de tus clientes.</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 16px;">
+                <div class="prestige-icon-bullet" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i data-lucide="scale" style="width: 20px; height: 20px;"></i></div>
+                <div>
+                  <h4 style="font-size: 15px; font-weight: 700; color: var(--color-primary); margin-bottom: 4px;">Cumplimiento Normativo FACPCE y RT 54</h4>
+                  <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; margin: 0;">Toda la categorización de rubros, costos e IVA se procesa siguiendo estrictamente la normativa vigente para su fácil volcado en balances oficiales.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
     </section>
