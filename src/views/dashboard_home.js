@@ -58,6 +58,24 @@ export function renderDashboardHome() {
     </div>
   </div>
 
+  <!-- Demo Mode Alert Banner -->
+  <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(13, 148, 136, 0.05) 100%); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-md); padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px;">
+      <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #818cf8; flex-shrink: 0;">
+        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+      </div>
+      <div>
+        <h4 style="font-size: 14px; font-weight: 800; color: var(--color-primary); margin: 0 0 3px 0;">Modo Demostración Activo</h4>
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+          Estás navegando en una versión de prueba. Al contratar los servicios de abono del <strong>Estudio Contable Comahue</strong>, accederás al <strong>100% de las funciones completas</strong> de la plataforma.
+        </p>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="alert('Estudio Contable Comahue\\n\\n📞 Teléfono: +54 299 448-1234\\n✉️ Email: contacto@estudiocomahue.com.ar\\n📍 Neuquén, Argentina')" style="background: #6366f1; border-color: #6366f1; font-weight: 700; font-size: 12px; padding: 8px 16px; border-radius: 6px; display: flex; align-items: center; gap: 6px; color: #fff; cursor: pointer;">
+      <i data-lucide="phone" style="width: 14px; height: 14px;"></i> Solicitar Acceso Completo
+    </button>
+  </div>
+
   ${isMonotributo ? `
   <!-- Monotributo Exclusion Alert Card -->
   <div class="card" style="margin-bottom: 28px; border-color: ${consumptionPercent >= 80 ? '#fbbf24' : 'var(--border-color)'}; background: #fff;">
@@ -103,24 +121,13 @@ export function renderDashboardHome() {
       </div>
       <div class="trial-actions-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
         
-        <a href="#/demo/importacion" class="trial-action-btn">
-          <div class="ta-btn-icon" style="background: rgba(16, 185, 129, 0.08); color: #10b981;">
-            <i data-lucide="upload-cloud"></i>
-          </div>
-          <div class="ta-btn-content">
-            <h5>1. Importar ARCA</h5>
-            <p>Subir Excel / Simular carga masiva</p>
-          </div>
-          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
-        </a>
-
-        <a href="#/demo/portal" class="trial-action-btn">
+        <a href="#/demo/ventas" class="trial-action-btn">
           <div class="ta-btn-icon" style="background: rgba(99, 102, 241, 0.08); color: #6366f1;">
-            <i data-lucide="camera"></i>
+            <i data-lucide="file-text"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>2. Portal de Clientes</h5>
-            <p>Simular carga de ticket por celular</p>
+            <h5>1. Carga de Comprobantes</h5>
+            <p>Cargar facturas y validar CUIT APOC</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
@@ -130,19 +137,30 @@ export function renderDashboardHome() {
             <i data-lucide="book-open"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>3. Libro IVA Digital</h5>
-            <p>Generar TXT y exportar a ARCA</p>
+            <h5>2. Libro IVA Digital</h5>
+            <p>Auditoría mensual y exportación Excel</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
 
-        <a href="#/demo/empresas" class="trial-action-btn">
-          <div class="ta-btn-icon" style="background: rgba(14, 165, 233, 0.08); color: #0ea5e9;">
-            <i data-lucide="building-2"></i>
+        <a href="#/demo" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(16, 185, 129, 0.08); color: #10b981;">
+            <i data-lucide="alert-triangle"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>4. Gestionar Empresas</h5>
-            <p>Crear y editar razones sociales</p>
+            <h5>3. Control Monotributo</h5>
+            <p>Alarma Safe-Guard contra exclusión</p>
+          </div>
+          <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
+        </a>
+
+        <a href="#/demo/ayuda" class="trial-action-btn">
+          <div class="ta-btn-icon" style="background: rgba(14, 165, 233, 0.08); color: #0ea5e9;">
+            <i data-lucide="help-circle"></i>
+          </div>
+          <div class="ta-btn-content">
+            <h5>4. Instructivo & Soporte</h5>
+            <p>Guía de onboarding y claves ARCA</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>

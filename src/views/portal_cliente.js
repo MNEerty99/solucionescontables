@@ -2,6 +2,7 @@
    VMP Studio Contable - Portal Cliente View Component
    ------------------------------------------------------------- */
 import { getActiveCompany, addTransaction } from '../db/mockdb.js';
+import { renderPremiumTeaser } from '../utils.js';
 
 // Pre-loaded digital tickets
 const INITIAL_DIGITAL_TICKETS = [
@@ -20,7 +21,7 @@ export function renderPortalCliente() {
   }
   const tickets = JSON.parse(localStorage.getItem(`vmp_tickets_${activeCompany.id}`));
 
-  return `
+  return renderPremiumTeaser(`
   <div class="view-header">
     <div>
       <h1 class="view-title">Portal Cliente (Vista Simplificada)</h1>
@@ -155,7 +156,7 @@ export function renderPortalCliente() {
     </div>
 
   </div>
-  `;
+  `, "Portal de Clientes Móvil", "Habilitá un canal directo y exclusivo en el celular de tus clientes. Olvidate de perseguir papeles o recibir fotos borrosas por WhatsApp: tus clientes cargan sus comprobantes con fotos, y el sistema extrae automáticamente CUIT, neto e IVA.");
 }
 
 export function initPortalCliente(mainApp) {
