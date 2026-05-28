@@ -61,76 +61,40 @@ class Application {
     // Demo Studio Routes
     else if (hash.startsWith('#/demo')) {
       try {
-        const activeCompany = getActiveCompany();
-        document.title = `Dashboard — ${activeCompany.razon_social} | Soluciones Contables`;
-
         const subRoute = hash.substring(6); // View route after '#/demo'
 
         if (subRoute === '' || subRoute === '/') {
-          rootEl.innerHTML = renderDashboardLayout(renderDashboardHome(), 'demo');
-          initDashboardLayout(this);
-          initDashboardHome(this);
-          this.updateBreadcrumb("Dashboard General");
+          this.safeRoute(renderDashboardHome, initDashboardHome, 'demo', "Dashboard General");
         } 
         else if (subRoute === '/empresas') {
-          rootEl.innerHTML = renderDashboardLayout(renderEmpresas(), 'empresas');
-          initDashboardLayout(this);
-          initEmpresas(this);
-          this.updateBreadcrumb("Gestión de Empresas Clientes");
+          this.safeRoute(renderEmpresas, initEmpresas, 'empresas', "Gestión de Empresas Clientes");
         }
         else if (subRoute === '/ventas') {
-          rootEl.innerHTML = renderDashboardLayout(renderVentas(), 'ventas');
-          initDashboardLayout(this);
-          initVentas(this);
-          this.updateBreadcrumb("Libro de Comprobantes");
+          this.safeRoute(renderVentas, initVentas, 'ventas', "Libro de Comprobantes");
         }
         else if (subRoute === '/importacion') {
-          rootEl.innerHTML = renderDashboardLayout(renderImportacion(), 'importacion');
-          initDashboardLayout(this);
-          initImportacion(this);
-          this.updateBreadcrumb("Importación ARCA");
+          this.safeRoute(renderImportacion, initImportacion, 'importacion', "Importación ARCA");
         }
         else if (subRoute === '/iva') {
-          rootEl.innerHTML = renderDashboardLayout(renderIVA(), 'iva');
-          initDashboardLayout(this);
-          initIVA(this);
-          this.updateBreadcrumb("Libro IVA Digital Digitalizado");
+          this.safeRoute(renderIVA, initIVA, 'iva', "Libro IVA Digital Digitalizado");
         }
         else if (subRoute === '/portal') {
-          rootEl.innerHTML = renderDashboardLayout(renderPortalCliente(), 'portal');
-          initDashboardLayout(this);
-          initPortalCliente(this);
-          this.updateBreadcrumb("Portal del Cliente");
+          this.safeRoute(renderPortalCliente, initPortalCliente, 'portal', "Portal del Cliente");
         }
         else if (subRoute === '/configuracion') {
-          rootEl.innerHTML = renderDashboardLayout(renderConfiguracion(), 'configuracion');
-          initDashboardLayout(this);
-          initConfiguracion(this);
-          this.updateBreadcrumb("Configuración de Enlace ARCA");
+          this.safeRoute(renderConfiguracion, initConfiguracion, 'configuracion', "Configuración de Enlace ARCA");
         }
         else if (subRoute === '/iva-simple') {
-          rootEl.innerHTML = renderDashboardLayout(renderIVASimple(), 'iva-simple');
-          initDashboardLayout(this);
-          initIVASimple(this);
-          this.updateBreadcrumb("IVA Simple — F.2051");
+          this.safeRoute(renderIVASimple, initIVASimple, 'iva-simple', "IVA Simple — F.2051");
         }
         else if (subRoute === '/retenciones') {
-          rootEl.innerHTML = renderDashboardLayout(renderRetenciones(), 'retenciones');
-          initDashboardLayout(this);
-          initRetenciones(this);
-          this.updateBreadcrumb("Retenciones y Percepciones");
+          this.safeRoute(renderRetenciones, initRetenciones, 'retenciones', "Retenciones y Percepciones");
         }
         else if (subRoute === '/rt54') {
-          rootEl.innerHTML = renderDashboardLayout(renderRT54(), 'rt54');
-          initDashboardLayout(this);
-          initRT54(this);
-          this.updateBreadcrumb("RT 54 · Panel Contable");
+          this.safeRoute(renderRT54, initRT54, 'rt54', "RT 54 · Panel Contable");
         }
         else if (subRoute === '/ayuda') {
-          rootEl.innerHTML = renderDashboardLayout(renderAyuda(), 'ayuda');
-          initDashboardLayout(this);
-          initAyuda(this);
-          this.updateBreadcrumb("Instructivo & Onboarding");
+          this.safeRoute(renderAyuda, initAyuda, 'ayuda', "Instructivo & Onboarding");
         }
         else {
           // Fallback to demo home
@@ -180,6 +144,111 @@ class Application {
   updateBreadcrumb(title) {
     const el = document.getElementById('db-breadcrumb-title');
     if (el) el.textContent = title;
+  }
+
+  safeRoute(renderViewFn, initViewFn, activeRouteKey, breadcrumbTitle) {
+    const rootEl = document.getElementById('view-root');
+    if (!rootEl) return;
+
+    // 1. Get active company
+    let activeCompany;
+    try {
+      activeCompany = getActiveCompany();
+    } catch (dbErr) {
+      console.error("Database access failed inside router:", dbErr);
+      throw dbErr;
+    }
+
+    document.title = `Dashboard — ${activeCompany.razon_social} | Soluciones Contables`;
+
+    // 2. Render sub-view HTML
+    let viewHTML = '';
+    let viewFailed = false;
+    let renderError = null;
+    try {
+      viewHTML = renderViewFn();
+    } catch (err) {
+      console.error(`Error rendering sub-view for ${activeRouteKey}:`, err);
+      viewFailed = true;
+      renderError = err;
+      viewHTML = `
+        <div class="card" style="padding: 24px; text-align: center; border-left: 4px solid #ef4444; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm); margin: 20px;">
+          <div style="background: #fee2e2; color: #ef4444; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 20px;">⚠️</div>
+          <h3 style="color: #1e293b; font-size: 16px; font-weight: 700; margin-bottom: 8px;">Error al cargar la sección</h3>
+          <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Ocurrió un problema al procesar los datos de esta pantalla. Esto puede deberse a la interferencia de extensiones externas del navegador o problemas de consistencia local.</p>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; text-align: left; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ef4444; white-space: pre-wrap;">${err.stack || err.message || err}</div>
+          <button class="btn btn-primary" onclick="window.location.reload()" style="background: #6366f1; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Recargar Sección</button>
+        </div>
+      `;
+    }
+
+    // 3. Render and inject Layout
+    let layoutHTML = '';
+    try {
+      layoutHTML = renderDashboardLayout(viewHTML, activeRouteKey);
+    } catch (layoutErr) {
+      console.error("Layout rendering failed:", layoutErr);
+      throw layoutErr;
+    }
+
+    // Assign to DOM (safeguarded against synchronous DOM listeners throwing errors)
+    try {
+      rootEl.innerHTML = layoutHTML;
+    } catch (domErr) {
+      console.error("DOM assignment failed, attempting resilient recovery:", domErr);
+      try {
+        rootEl.innerHTML = renderDashboardLayout(`
+          <div class="card" style="padding: 24px; text-align: center; border-left: 4px solid #ef4444; background: #fff; margin: 20px;">
+            <div style="background: #fee2e2; color: #ef4444; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 20px;">⚠️</div>
+            <h3 style="color: #ef4444; margin-bottom: 8px;">Interferencia de Extensión Detectada</h3>
+            <p style="color: #64748b; margin-bottom: 16px;">Una extensión de su navegador (como Autofirma, un gestor de contraseñas o un asistente impositivo) impidió cargar el contenido de forma normal.</p>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; text-align: left; overflow-x: auto; margin-bottom: 16px; white-space: pre-wrap;">
+              ${domErr.stack || domErr.message || domErr}
+            </div>
+            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin-bottom: 16px;">Sugerencia: Intente desactivar temporalmente extensiones impositivas de AFIP/ARCA o firmas digitales en este navegador para esta URL.</p>
+            <button class="btn btn-primary" onclick="window.location.reload()" style="background: #6366f1; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Recargar</button>
+          </div>
+        `, activeRouteKey);
+      } catch (fatalErr) {
+        throw domErr;
+      }
+    }
+
+    // 4. Initialize Layout
+    try {
+      initDashboardLayout(this);
+    } catch (layoutInitErr) {
+      console.error("Layout initialization failed:", layoutInitErr);
+    }
+
+    // 5. Update Breadcrumb
+    try {
+      this.updateBreadcrumb(breadcrumbTitle);
+    } catch (bcErr) {
+      console.error("Failed to update breadcrumb:", bcErr);
+    }
+
+    // 6. Initialize View (only if render didn't fail and layout didn't trigger simplified fallback)
+    if (!viewFailed && initViewFn) {
+      const container = document.querySelector('.db-view-container');
+      if (container) {
+        try {
+          initViewFn(this);
+        } catch (viewInitErr) {
+          console.error(`Error initializing sub-view for ${activeRouteKey}:`, viewInitErr);
+          
+          container.innerHTML = `
+            <div class="card" style="padding: 24px; text-align: center; border-left: 4px solid #ef4444; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm); margin: 20px;">
+              <div style="background: #fee2e2; color: #ef4444; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 20px;">⚠️</div>
+              <h3 style="color: #1e293b; font-size: 16px; font-weight: 700; margin-bottom: 8px;">Error de Inicialización</h3>
+              <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">La sección se cargó visualmente pero falló al inicializar sus controles interactivos.</p>
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #475569; text-align: left; overflow-x: auto; margin-bottom: 16px; border-left: 3px solid #ef4444; white-space: pre-wrap;">${viewInitErr.stack || viewInitErr.message || viewInitErr}</div>
+              <button class="btn btn-primary" onclick="window.location.reload()" style="background: #6366f1; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">Recargar Sección</button>
+            </div>
+          `;
+        }
+      }
+    }
   }
 
   setActiveCompany(companyId) {

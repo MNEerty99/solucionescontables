@@ -61,13 +61,13 @@ export function renderAyuda() {
         </label>
 
         <!-- Task 2 -->
-        <a href="#/demo/configuracion" class="trial-action-btn" style="border-color: ${t2 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+         <a href="#/demo/configuracion" class="trial-action-btn" style="border-color: ${t2 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t2 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t2 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
           <div>
             <h5 style="font-size: 12.5px; font-weight: 700; color: ${t2 ? 'var(--color-accent)' : 'var(--color-primary)'}; margin-bottom: 2px;">2. Firma Digital ARCA</h5>
-            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Subir certificado digital `.crt` y `.key`.</p>
+            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Subir certificado digital <code>.crt</code> y <code>.key</code>.</p>
           </div>
         </a>
 
