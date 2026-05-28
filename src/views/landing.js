@@ -149,7 +149,7 @@ export function renderLanding() {
     </section>
 
     <!-- Institutional Prestige Section -->
-    <section id="prestige" class="prestige-section" style="padding: 100px 0; border-top: 1px solid var(--border-color); background: var(--bg-secondary); position: relative; overflow: hidden;">
+    <section id="prestige" class="prestige-section" style="padding: 100px 0; border-top: 1px solid rgba(226, 232, 240, 0.4); background: transparent; position: relative; overflow: hidden;">
       <div class="container">
         <div class="prestige-grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;">
           

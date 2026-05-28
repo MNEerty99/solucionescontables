@@ -623,8 +623,8 @@ h1, h2, h3, h4, h5, h6 {
    ------------------------------------------------------------- */
 .features-section {
   padding: 100px 0;
-  background: rgba(248, 250, 252, 0.35); /* Blends with fixed corporate background */
-  border-top: 1px solid var(--border-color);
+  background: transparent;
+  border-top: 1px solid rgba(226, 232, 240, 0.4);
   position: relative;
 }
 
@@ -712,8 +712,8 @@ h1, h2, h3, h4, h5, h6 {
    ------------------------------------------------------------- */
 .pricing-section {
   padding: 100px 0;
-  border-top: 1px solid var(--border-color);
-  background: rgba(241, 245, 249, 0.55);
+  border-top: 1px solid rgba(226, 232, 240, 0.4);
+  background: transparent;
 }
 
 .pricing-grid {
@@ -840,8 +840,8 @@ h1, h2, h3, h4, h5, h6 {
    ------------------------------------------------------------- */
 .contact-section {
   padding: 100px 0;
-  border-top: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(226, 232, 240, 0.4);
+  background: transparent;
 }
 
 .partners-card, .contact-card {
