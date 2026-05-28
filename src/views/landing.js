@@ -259,7 +259,7 @@ export function initLanding(mainApp) {
     mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Demo...`, 'success');
 
     // Register lead in Supabase asynchronously in background
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured && supabase) {
       console.log("Supabase CRM: Registering B2B sales lead...", name);
       supabase.from('leads').insert([{ 
         name, 
@@ -267,6 +267,8 @@ export function initLanding(mainApp) {
         email
       }]).then(({ error }) => {
         if (error) console.error("Supabase CRM lead error:", error);
+      }).catch(err => {
+        console.error("Supabase CRM lead exception:", err);
       });
     }
     

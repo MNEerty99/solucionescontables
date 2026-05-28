@@ -60,87 +60,110 @@ class Application {
     } 
     // Demo Studio Routes
     else if (hash.startsWith('#/demo')) {
-      const activeCompany = getActiveCompany();
-      document.title = `Dashboard — ${activeCompany.razon_social} | Soluciones Contables`;
+      try {
+        const activeCompany = getActiveCompany();
+        document.title = `Dashboard — ${activeCompany.razon_social} | Soluciones Contables`;
 
-      const subRoute = hash.substring(6); // View route after '#/demo'
+        const subRoute = hash.substring(6); // View route after '#/demo'
 
-      if (subRoute === '' || subRoute === '/') {
-        rootEl.innerHTML = renderDashboardLayout(renderDashboardHome(), 'demo');
-        initDashboardLayout(this);
-        initDashboardHome(this);
-        this.updateBreadcrumb("Dashboard General");
-      } 
-      else if (subRoute === '/empresas') {
-        rootEl.innerHTML = renderDashboardLayout(renderEmpresas(), 'empresas');
-        initDashboardLayout(this);
-        initEmpresas(this);
-        this.updateBreadcrumb("Gestión de Empresas Clientes");
-      }
-      else if (subRoute === '/ventas') {
-        rootEl.innerHTML = renderDashboardLayout(renderVentas(), 'ventas');
-        initDashboardLayout(this);
-        initVentas(this);
-        this.updateBreadcrumb("Libro de Comprobantes");
-      }
-      else if (subRoute === '/importacion') {
-        rootEl.innerHTML = renderDashboardLayout(renderImportacion(), 'importacion');
-        initDashboardLayout(this);
-        initImportacion(this);
-        this.updateBreadcrumb("Importación ARCA");
-      }
-      else if (subRoute === '/iva') {
-        rootEl.innerHTML = renderDashboardLayout(renderIVA(), 'iva');
-        initDashboardLayout(this);
-        initIVA(this);
-        this.updateBreadcrumb("Libro IVA Digital Digitalizado");
-      }
-      else if (subRoute === '/portal') {
-        rootEl.innerHTML = renderDashboardLayout(renderPortalCliente(), 'portal');
-        initDashboardLayout(this);
-        initPortalCliente(this);
-        this.updateBreadcrumb("Portal del Cliente");
-      }
-      else if (subRoute === '/configuracion') {
-        rootEl.innerHTML = renderDashboardLayout(renderConfiguracion(), 'configuracion');
-        initDashboardLayout(this);
-        initConfiguracion(this);
-        this.updateBreadcrumb("Configuración de Enlace ARCA");
-      }
-      else if (subRoute === '/iva-simple') {
-        rootEl.innerHTML = renderDashboardLayout(renderIVASimple(), 'iva-simple');
-        initDashboardLayout(this);
-        initIVASimple(this);
-        this.updateBreadcrumb("IVA Simple — F.2051");
-      }
-      else if (subRoute === '/retenciones') {
-        rootEl.innerHTML = renderDashboardLayout(renderRetenciones(), 'retenciones');
-        initDashboardLayout(this);
-        initRetenciones(this);
-        this.updateBreadcrumb("Retenciones y Percepciones");
-      }
-      else if (subRoute === '/rt54') {
-        rootEl.innerHTML = renderDashboardLayout(renderRT54(), 'rt54');
-        initDashboardLayout(this);
-        initRT54(this);
-        this.updateBreadcrumb("RT 54 · Panel Contable");
-      }
-      else if (subRoute === '/ayuda') {
-        try {
+        if (subRoute === '' || subRoute === '/') {
+          rootEl.innerHTML = renderDashboardLayout(renderDashboardHome(), 'demo');
+          initDashboardLayout(this);
+          initDashboardHome(this);
+          this.updateBreadcrumb("Dashboard General");
+        } 
+        else if (subRoute === '/empresas') {
+          rootEl.innerHTML = renderDashboardLayout(renderEmpresas(), 'empresas');
+          initDashboardLayout(this);
+          initEmpresas(this);
+          this.updateBreadcrumb("Gestión de Empresas Clientes");
+        }
+        else if (subRoute === '/ventas') {
+          rootEl.innerHTML = renderDashboardLayout(renderVentas(), 'ventas');
+          initDashboardLayout(this);
+          initVentas(this);
+          this.updateBreadcrumb("Libro de Comprobantes");
+        }
+        else if (subRoute === '/importacion') {
+          rootEl.innerHTML = renderDashboardLayout(renderImportacion(), 'importacion');
+          initDashboardLayout(this);
+          initImportacion(this);
+          this.updateBreadcrumb("Importación ARCA");
+        }
+        else if (subRoute === '/iva') {
+          rootEl.innerHTML = renderDashboardLayout(renderIVA(), 'iva');
+          initDashboardLayout(this);
+          initIVA(this);
+          this.updateBreadcrumb("Libro IVA Digital Digitalizado");
+        }
+        else if (subRoute === '/portal') {
+          rootEl.innerHTML = renderDashboardLayout(renderPortalCliente(), 'portal');
+          initDashboardLayout(this);
+          initPortalCliente(this);
+          this.updateBreadcrumb("Portal del Cliente");
+        }
+        else if (subRoute === '/configuracion') {
+          rootEl.innerHTML = renderDashboardLayout(renderConfiguracion(), 'configuracion');
+          initDashboardLayout(this);
+          initConfiguracion(this);
+          this.updateBreadcrumb("Configuración de Enlace ARCA");
+        }
+        else if (subRoute === '/iva-simple') {
+          rootEl.innerHTML = renderDashboardLayout(renderIVASimple(), 'iva-simple');
+          initDashboardLayout(this);
+          initIVASimple(this);
+          this.updateBreadcrumb("IVA Simple — F.2051");
+        }
+        else if (subRoute === '/retenciones') {
+          rootEl.innerHTML = renderDashboardLayout(renderRetenciones(), 'retenciones');
+          initDashboardLayout(this);
+          initRetenciones(this);
+          this.updateBreadcrumb("Retenciones y Percepciones");
+        }
+        else if (subRoute === '/rt54') {
+          rootEl.innerHTML = renderDashboardLayout(renderRT54(), 'rt54');
+          initDashboardLayout(this);
+          initRT54(this);
+          this.updateBreadcrumb("RT 54 · Panel Contable");
+        }
+        else if (subRoute === '/ayuda') {
           rootEl.innerHTML = renderDashboardLayout(renderAyuda(), 'ayuda');
           initDashboardLayout(this);
           initAyuda(this);
           this.updateBreadcrumb("Instructivo & Onboarding");
-        } catch (err) {
-          console.error("Error loading Ayuda view:", err);
-          if (this.showToast) {
-            this.showToast("Error al cargar la sección de ayuda: " + err.message, "error");
-          }
         }
-      }
-      else {
-        // Fallback to demo home
-        window.location.hash = '#/demo';
+        else {
+          // Fallback to demo home
+          window.location.hash = '#/demo';
+        }
+      } catch (err) {
+        console.error("Dashboard error caught in orchestrator:", err);
+        
+        // Render a safe, premium error fallback inside rootEl
+        rootEl.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; padding: 24px; text-align: center;">
+            <div style="background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; padding: 16px; border-radius: 8px; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 32px; font-weight: 700;">
+              ⚠️
+            </div>
+            <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Se detectó una discrepancia de inicio</h1>
+            <p style="font-size: 14px; color: #475569; max-width: 500px; line-height: 1.6; margin-bottom: 24px;">
+              El sistema encontró una inconsistencia al procesar los datos locales. Esto puede suceder por una sesión anterior no finalizada.
+            </p>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #64748b; max-width: 600px; overflow-x: auto; margin-bottom: 24px; border-left: 4px solid #dc2626; text-align: left; white-space: pre-wrap;"><strong>Error técnico:</strong> ${err.message}</div>
+            <div style="display: flex; gap: 16px; justify-content: center;">
+              <button onclick="window.location.reload()" style="background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                Recargar Sistema
+              </button>
+              <button onclick="localStorage.clear(); window.location.hash='#/'; window.location.reload();" style="background: transparent; color: #475569; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                Restablecer Sesión (Limpiar Caché)
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (this.showToast) {
+          this.showToast("Inconsistencia temporal detectada. Intentá restablecer la sesión.", "error");
+        }
       }
     } 
     // Fallback to Landing

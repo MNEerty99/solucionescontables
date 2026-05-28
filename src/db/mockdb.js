@@ -154,11 +154,20 @@ async function pullFromSupabase() {
 // -------------------------------------------------------------
 export function getCompanies() {
   initMockDB();
-  return JSON.parse(localStorage.getItem("vmp_studio_companies"));
+  try {
+    const raw = localStorage.getItem("vmp_studio_companies");
+    const data = JSON.parse(raw);
+    if (Array.isArray(data) && data.length > 0) {
+      return data;
+    }
+  } catch (e) {
+    console.error("Error parsing companies from localStorage, falling back to defaults:", e);
+  }
+  return DEFAULT_COMPANIES;
 }
 
 export function saveCompany(company) {
-  const cos = getCompanies();
+  const cos = getCompanies() || [...DEFAULT_COMPANIES];
   let isNew = false;
   
   if (company.id) {
@@ -170,9 +179,13 @@ export function saveCompany(company) {
     cos.push(company);
     
     // Initialize empty transactions map locally
-    const txs = JSON.parse(localStorage.getItem("vmp_studio_transactions")) || {};
-    txs[company.id] = { ventas: [], compras: [] };
-    localStorage.setItem("vmp_studio_transactions", JSON.stringify(txs));
+    try {
+      const txs = JSON.parse(localStorage.getItem("vmp_studio_transactions")) || {};
+      txs[company.id] = { ventas: [], compras: [] };
+      localStorage.setItem("vmp_studio_transactions", JSON.stringify(txs));
+    } catch (e) {
+      console.error("Error setting empty transactions for new company:", e);
+    }
   }
   
   localStorage.setItem("vmp_studio_companies", JSON.stringify(cos));
@@ -187,6 +200,7 @@ export function saveCompany(company) {
 
 async function pushCompanyToSupabase(company, isNew) {
   try {
+    if (!supabase) return;
     const { data: { user } } = await supabase.auth.getUser();
     const studioId = user ? user.id : '00000000-0000-0000-0000-000000000000'; // Fallback uuid for anonymous sessions
 
@@ -213,13 +227,25 @@ async function pushCompanyToSupabase(company, isNew) {
 
 export function getActiveCompanyId() {
   initMockDB();
-  return localStorage.getItem("vmp_studio_active_co");
+  return localStorage.getItem("vmp_studio_active_co") || 'co-1';
 }
 
 export function getActiveCompany() {
-  const id = getActiveCompanyId();
-  const cos = getCompanies();
-  return cos.find(c => c.id === id) || cos[0];
+  try {
+    const id = getActiveCompanyId();
+    const cos = getCompanies() || DEFAULT_COMPANIES;
+    const found = cos.find(c => c.id === id);
+    if (found) return found;
+    
+    // If active CUIT is not in local storage list, default to first available
+    if (cos.length > 0) {
+      localStorage.setItem("vmp_studio_active_co", cos[0].id);
+      return cos[0];
+    }
+  } catch (e) {
+    console.error("Error getting active company, falling back:", e);
+  }
+  return DEFAULT_COMPANIES[0];
 }
 
 export function setActiveCompanyId(id) {
@@ -228,8 +254,16 @@ export function setActiveCompanyId(id) {
 
 export function getTransactions(companyId) {
   initMockDB();
-  const txs = JSON.parse(localStorage.getItem("vmp_studio_transactions"));
-  return txs[companyId] || { ventas: [], compras: [] };
+  try {
+    const raw = localStorage.getItem("vmp_studio_transactions");
+    const txs = JSON.parse(raw);
+    if (txs && txs[companyId]) {
+      return txs[companyId];
+    }
+  } catch (e) {
+    console.error("Error parsing transactions from localStorage, falling back:", e);
+  }
+  return DEFAULT_TRANSACTIONS[companyId] || { ventas: [], compras: [] };
 }
 
 export function addTransaction(companyId, type, item) {
