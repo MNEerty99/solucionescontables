@@ -169,17 +169,53 @@ h1, h2, h3, h4, h5, h6 {
    LANDING PAGE LAYOUT WITH LEDGER PATTERN
    ------------------------------------------------------------- */
 .lp-wrapper {
-  background: 
-    linear-gradient(rgba(226, 232, 240, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 232, 240, 0.22) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.81) 0%, rgba(248, 250, 252, 0.86) 100%),
-    url('/corporate_bg.png');
-  background-size: 48px 48px, 48px 48px, 100% 100%, cover;
-  background-attachment: scroll, scroll, scroll, fixed;
-  background-position: left top, left top, center center, center center;
-  background-repeat: repeat, repeat, no-repeat, no-repeat;
+  background: transparent;
   min-height: 100vh;
   position: relative;
+  z-index: 2;
+}
+
+/* Dynamic Slide Backgrounds (Parallax Fixed Slideshow) */
+.lp-bg-slideshow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.lp-bg-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.8s ease-in-out;
+  filter: none; /* Absolute clarity: no blur filter */
+}
+
+.lp-bg-slide.active {
+  opacity: 1;
+}
+
+.lp-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(rgba(226, 232, 240, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 232, 240, 0.15) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.38) 0%, rgba(248, 250, 252, 0.44) 100%);
+  background-size: 48px 48px, 48px 48px, 100% 100%;
+  z-index: 1;
 }
 
 /* Navigation bar */
