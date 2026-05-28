@@ -152,24 +152,15 @@ export function renderLanding() {
                 <p>Instalación, configuración y alta de tu estudio.</p>
               </div>
 
-              <!-- Slider for configuring companies -->
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; margin: 16px 0; text-align: left;">
-                <label for="company-slider" style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Empresas a gestionar:</label>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <input type="range" id="company-slider" min="20" max="100" step="10" value="20" style="flex: 1; accent-color: #6366f1; cursor: pointer; height: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none;">
-                  <span id="company-count-display" style="font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: #818cf8; min-width: 35px; text-align: right;">20</span>
-                </div>
-              </div>
-
               <!-- Price displaying original and promo -->
-              <div style="margin: 16px 0 20px;">
-                <div style="font-size: 11.5px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 2px; opacity: 0.7;">
-                  Original: USD <span id="original-price-val">480</span>
+              <div style="margin: 24px 0 24px;">
+                <div style="font-size: 13px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 4px; opacity: 0.7;">
+                  Original: USD 480
                 </div>
                 <div style="display: flex; align-items: baseline; justify-content: center; gap: 4px;">
-                  <span style="font-size: 14px; font-weight: 700; color: var(--color-accent); font-family: var(--font-mono);">USD</span>
-                  <span id="promo-price-val" style="font-size: 42px; font-weight: 800; color: #fff; line-height: 1; font-family: var(--font-mono);">380</span>
-                  <span style="font-size: 9.5px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.08); padding: 2px 6px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.2); margin-left: 6px; white-space: nowrap;">
+                  <span style="font-size: 16px; font-weight: 700; color: var(--color-accent); font-family: var(--font-mono);">USD</span>
+                  <span style="font-size: 48px; font-weight: 800; color: #fff; line-height: 1; font-family: var(--font-mono);">380</span>
+                  <span style="font-size: 9.5px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.08); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.2); margin-left: 6px; white-space: nowrap;">
                     ¡Ahorrás USD 100!
                   </span>
                 </div>
@@ -177,7 +168,7 @@ export function renderLanding() {
 
               <ul class="price-features" style="text-align: left; margin-bottom: 24px;">
                 <li><i data-lucide="check"></i> Entorno exclusivo en la nube</li>
-                <li><i data-lucide="check"></i> Carga y configuración de hasta <strong id="company-bullet-val" style="color: #818cf8;">20</strong> empresas</li>
+                <li><i data-lucide="check"></i> Carga y configuración de hasta <strong style="color: #818cf8;">100</strong> empresas</li>
                 <li><i data-lucide="check"></i> Colaboradores del estudio ilimitados</li>
                 <li><i data-lucide="check"></i> Capacitación inicial para el equipo</li>
               </ul>
@@ -280,30 +271,6 @@ export function renderLanding() {
 import { supabase, isSupabaseConfigured } from '../db/supabase.js';
 
 export function initLanding(mainApp) {
-  // Configuración interactiva del selector de empresas y precios
-  const slider = document.getElementById('company-slider');
-  const countDisplay = document.getElementById('company-count-display');
-  const bulletVal = document.getElementById('company-bullet-val');
-  const origPriceVal = document.getElementById('original-price-val');
-  const promoPriceVal = document.getElementById('promo-price-val');
-
-  if (slider) {
-    slider.addEventListener('input', (e) => {
-      const companies = parseInt(e.target.value);
-      if (countDisplay) countDisplay.textContent = companies;
-      if (bulletVal) bulletVal.textContent = companies;
-
-      // Tarificación dinámica con descuento promocional de USD 100
-      // Base (20 empresas): Original 480, Promo 380
-      // Incremento: +30 Original, +25 Promo por cada 10 empresas adicionales
-      const multiplier = (companies - 20) / 10;
-      const originalPrice = 480 + (multiplier * 30);
-      const promoPrice = 380 + (multiplier * 25);
-
-      if (origPriceVal) origPriceVal.textContent = originalPrice;
-      if (promoPriceVal) promoPriceVal.textContent = promoPrice;
-    });
-  }
 
   // Manejo de envío de formulario de lead
   document.getElementById('lead-form')?.addEventListener('submit', (e) => {
