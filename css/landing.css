@@ -169,16 +169,17 @@ h1, h2, h3, h4, h5, h6 {
    LANDING PAGE LAYOUT WITH LEDGER PATTERN
    ------------------------------------------------------------- */
 .lp-wrapper {
-  background-color: #ffffff;
-  /* Premium 48px ledger grids + ambient backdrops */
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%), 
-    radial-gradient(at 50% 0%, rgba(5, 150, 105, 0.03) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+  background: 
     linear-gradient(rgba(226, 232, 240, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 232, 240, 0.22) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    linear-gradient(90deg, rgba(226, 232, 240, 0.22) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.91) 0%, rgba(248, 250, 252, 0.95) 100%),
+    url('/corporate_bg.png');
+  background-size: 48px 48px, 48px 48px, 100% 100%, cover;
+  background-attachment: scroll, scroll, scroll, fixed;
+  background-position: left top, left top, center center, center center;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
   min-height: 100vh;
+  position: relative;
 }
 
 /* Navigation bar */
@@ -586,7 +587,7 @@ h1, h2, h3, h4, h5, h6 {
    ------------------------------------------------------------- */
 .features-section {
   padding: 100px 0;
-  background: rgba(248, 250, 252, 0.45);
+  background: rgba(248, 250, 252, 0.35); /* Blends with fixed corporate background */
   border-top: 1px solid var(--border-color);
   position: relative;
 }
@@ -676,7 +677,7 @@ h1, h2, h3, h4, h5, h6 {
 .pricing-section {
   padding: 100px 0;
   border-top: 1px solid var(--border-color);
-  background: var(--bg-secondary);
+  background: rgba(241, 245, 249, 0.55);
 }
 
 .pricing-grid {
@@ -804,7 +805,7 @@ h1, h2, h3, h4, h5, h6 {
 .contact-section {
   padding: 100px 0;
   border-top: 1px solid var(--border-color);
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .partners-card, .contact-card {
@@ -1022,7 +1023,8 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .prestige-info h2 {
-    font-size: 28px !text-align: center;
+    font-size: 28px;
+    text-align: center;
   }
   
   .prestige-info p {
