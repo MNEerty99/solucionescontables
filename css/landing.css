@@ -172,7 +172,7 @@ h1, h2, h3, h4, h5, h6 {
   background: 
     linear-gradient(rgba(226, 232, 240, 0.22) 1px, transparent 1px),
     linear-gradient(90deg, rgba(226, 232, 240, 0.22) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.91) 0%, rgba(248, 250, 252, 0.95) 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.81) 0%, rgba(248, 250, 252, 0.86) 100%),
     url('/corporate_bg.png');
   background-size: 48px 48px, 48px 48px, 100% 100%, cover;
   background-attachment: scroll, scroll, scroll, fixed;
