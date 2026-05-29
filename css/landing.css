@@ -635,7 +635,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .mfc-text h4 {
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 700;
   color: var(--color-primary);
 }
 
@@ -643,6 +643,13 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 10px;
   color: var(--text-secondary);
   margin-top: 1px;
+}
+
+/* -------------------------------------------------------------
+   SECTION ANCHOR SCROLL OFFSET (Fix #1 — sticky header overlap)
+   ------------------------------------------------------------- */
+#features, #pricing, #partners, #contact, #prestige {
+  scroll-margin-top: 96px;
 }
 
 /* -------------------------------------------------------------
@@ -659,6 +666,13 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
   max-width: 620px;
   margin: 0 auto 64px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.05);
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .section-header h2 {
@@ -672,6 +686,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
   font-size: 15.5px;
   line-height: 1.6;
+  margin: 0;
 }
 
 .features-grid {
@@ -681,17 +696,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feature-card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.07);
   border-radius: var(--radius-lg);
   padding: 36px 28px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.005);
+  box-shadow: 0 8px 24px -6px rgba(15, 23, 42, 0.07);
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
   z-index: 2;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .feature-card:hover {
@@ -723,7 +740,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .feature-card h3 {
   font-size: 19px;
-  font-weight: 750;
+  font-weight: 700;
   margin-bottom: 12px;
 }
 
@@ -799,7 +816,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .price-header h3 {
   font-size: 22px;
-  font-weight: 750;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
@@ -822,7 +839,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .price-amount .val {
   font-size: 44px;
-  font-weight: 850;
+  font-weight: 800;
   color: var(--color-primary);
   letter-spacing: -0.03em;
 }
@@ -950,7 +967,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .form-title {
   font-size: 19px;
-  font-weight: 750;
+  font-weight: 700;
   margin-bottom: 24px;
 }
 
@@ -987,13 +1004,58 @@ h1, h2, h3, h4, h5, h6 {
   outline: none !important;
 }
 
+/* Fix #3 — Form validation visual feedback states */
+.form-input:user-valid {
+  border-color: #059669 !important;
+  background: rgba(5, 150, 105, 0.02) !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.08) !important;
+}
+
+.form-input:user-invalid {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.02) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
+}
+
+.form-input:user-invalid + .form-error {
+  display: block;
+}
+
+.form-error {
+  display: none;
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 600;
+  margin-top: 4px;
+  padding-left: 2px;
+}
+
 .lp-footer {
-  padding: 36px 0;
+  padding: 48px 0;
   border-top: 1px solid var(--border-color);
   text-align: center;
   color: var(--text-muted);
   font-size: 12.5px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.97);
+}
+
+/* Fix #8 — Active nav link */
+.lp-menu-link.active {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* Fix #9 — Footer links */
+.lp-footer-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.lp-footer-link:hover {
+  color: var(--color-primary);
 }
 
 /* -------------------------------------------------------------
@@ -1243,5 +1305,15 @@ h1, h2, h3, h4, h5, h6 {
   
   .stat-item {
     align-items: center;
+  }
+
+  /* Fix #5 — section-header padding on small screens */
+  .section-header {
+    padding: 28px 20px !important;
+  }
+
+  /* Prestige info card mobile padding */
+  .prestige-info {
+    padding: 28px 20px !important;
   }
 }

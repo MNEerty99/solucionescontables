@@ -24,7 +24,7 @@ export function renderLanding() {
             SOLUCIONES <span>CONTABLES</span>
           </div>
         </a>
-        <button class="lp-menu-toggle" id="lp-menu-toggle-btn" aria-label="Abrir menú">
+        <button class="lp-menu-toggle" id="lp-menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="lp-menu-nav">
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
@@ -155,7 +155,7 @@ export function renderLanding() {
           
           <!-- Left side: Premium Image Card -->
           <div class="prestige-image-container" style="position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.12); border: 1px solid rgba(15, 23, 42, 0.08); transition: var(--transition-normal);">
-            <img src="/accounting_firm.png" alt="Estudio Contable de Elite" style="width: 100%; height: auto; display: block; object-fit: cover;">
+            <img src="/accounting_firm.png" alt="Escritorio de un contador profesional con libros contables y calculadora" width="600" height="450" loading="lazy" style="width: 100%; height: auto; display: block; object-fit: cover;">
             <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 100%); padding: 32px 24px; color: #ffffff;">
               <span style="font-family: var(--font-heading); font-size: 11px; font-weight: 750; color: #34d399; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 6px;">Socio Tecnológico Impositivo</span>
               <h4 style="font-size: 18px; font-weight: 700; color: #ffffff; margin: 0;">Estudio Contable Comahue</h4>
@@ -164,7 +164,7 @@ export function renderLanding() {
           </div>
           
           <!-- Right side: Elite Corporate Copy -->
-          <div class="prestige-info">
+          <div class="prestige-info" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(15, 23, 42, 0.08); border-radius: var(--radius-lg); padding: 44px; box-shadow: 0 12px 32px -10px rgba(15, 23, 42, 0.07); transform: translate3d(0,0,0); backface-visibility: hidden;">
             <span class="badge" style="background: rgba(5, 150, 105, 0.06); color: #047857; border-color: rgba(5, 150, 105, 0.15); font-weight: 700;">COLABORADOR DIGITAL DE ÉLITE</span>
             <h2 style="font-size: 34px; font-weight: 800; margin-top: 10px; margin-bottom: 16px; line-height: 1.15; color: var(--color-primary);">Mucho más que un sistema. Un socio operativo para tu firma.</h2>
             <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14.5px; line-height: 1.6;">
@@ -289,7 +289,7 @@ export function renderLanding() {
                   <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600;">Licencias vendidas al mes:</span>
                   <span id="partner-qty-label" style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: var(--color-primary); background: var(--bg-secondary); padding: 2px 10px; border-radius: 12px; border: 1px solid var(--border-color);">5</span>
                 </div>
-                <input type="range" id="partner-slider" min="1" max="30" value="5" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
+                <input type="range" id="partner-slider" min="1" max="30" value="5" aria-label="Licencias vendidas por mes" aria-valuemin="1" aria-valuemax="30" aria-valuenow="5" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
               </div>
               
               <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px dashed var(--border-color);">
@@ -389,8 +389,22 @@ export function renderLanding() {
 
     <!-- Footer -->
     <footer class="lp-footer">
-      <div class="container">
-        <p>&copy; 2026 Soluciones Contables. Todos los derechos reservados. Desarrollado y administrado por VMP S.A.S.</p>
+      <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+        <div style="display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; align-items: center;">
+          <a href="#features" class="lp-footer-link">Beneficios</a>
+          <a href="#pricing" class="lp-footer-link">Inversión</a>
+          <a href="#partners" class="lp-footer-link">Partners</a>
+          <a href="#contact" class="lp-footer-link">Contacto</a>
+          <a href="#/demo" class="lp-footer-link" style="color: var(--color-accent); font-weight: 700;">Demo Interactiva →</a>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <a href="https://wa.me/5492996731487" target="_blank" rel="noopener" aria-label="WhatsApp" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #25d366; font-weight: 700; text-decoration: none;">
+            <i data-lucide="phone" style="width: 14px; height: 14px;"></i> +54 299 673-1487
+          </a>
+          <span style="color: var(--border-color);">|</span>
+          <a href="mailto:administracion@vmp-edtech.com" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">administracion@vmp-edtech.com</a>
+        </div>
+        <p style="font-size: 11.5px; color: var(--text-muted);">&copy; <span id="footer-year"></span> Soluciones Contables &mdash; Desarrollado por VMP S.A.S. Argentina</p>
       </div>
     </footer>
   </div>
@@ -418,8 +432,11 @@ export function initLanding(mainApp) {
   if (toggleBtn && menuNav) {
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      toggleBtn.classList.toggle('active');
+      const isOpen = toggleBtn.classList.toggle('active');
       menuNav.classList.toggle('active');
+      // Fix #4 — dynamic aria-label and aria-expanded
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggleBtn.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
     });
 
     // Close menu when clicking outside
@@ -427,6 +444,8 @@ export function initLanding(mainApp) {
       if (!menuNav.contains(e.target) && e.target !== toggleBtn) {
         toggleBtn.classList.remove('active');
         menuNav.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
       }
     });
 
@@ -435,9 +454,31 @@ export function initLanding(mainApp) {
       link.addEventListener('click', () => {
         toggleBtn.classList.remove('active');
         menuNav.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
       });
     });
   }
+
+  // Fix #8 — Active nav link highlight via IntersectionObserver
+  const navLinks = document.querySelectorAll('.lp-menu-link[href^="#"]');
+  const sections = document.querySelectorAll('section[id]');
+  if (sections.length > 0 && navLinks.length > 0) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => link.classList.remove('active'));
+          const activeLink = document.querySelector(`.lp-menu-link[href="#${entry.target.id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+    sections.forEach(section => observer.observe(section));
+  }
+
+  // Fix #9 — Dynamic footer year
+  const footerYear = document.getElementById('footer-year');
+  if (footerYear) footerYear.textContent = new Date().getFullYear();
 
   // Partner Calculator slider
   const slider = document.getElementById('partner-slider');
