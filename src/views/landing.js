@@ -5,11 +5,9 @@
 export function renderLanding() {
   return `
   <div class="lp-wrapper">
-    <!-- Dynamic Slide Backgrounds (Parallax Fixed Slideshow) -->
+    <!-- Permanent Fixed Background -->
     <div class="lp-bg-slideshow">
       <div class="lp-bg-slide active" style="background-image: url('/corporate_bg.jpg');"></div>
-      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_2.jpg');"></div>
-      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_3.jpg');"></div>
       <div class="lp-bg-overlay"></div>
     </div>
     
@@ -414,16 +412,9 @@ export function renderLanding() {
 import { supabase, isSupabaseConfigured } from '../db/supabase.js';
 
 export function initLanding(mainApp) {
-  // Dynamic Background Slide Toggler
-  let currentSlide = 0;
-  const slides = document.querySelectorAll('.lp-bg-slide');
-  if (slides.length > 0) {
-    setInterval(() => {
-      slides[currentSlide].classList.remove('active');
-      currentSlide = (currentSlide + 1) % slides.length;
-      slides[currentSlide].classList.add('active');
-    }, 7000); // Changes background slide every 7 seconds!
-  }
+  // Footer dynamic year
+  const footerYear = document.getElementById('footer-year');
+  if (footerYear) footerYear.textContent = new Date().getFullYear();
 
   // Mobile Menu Toggler
   const toggleBtn = document.getElementById('lp-menu-toggle-btn');
