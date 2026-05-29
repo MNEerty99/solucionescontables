@@ -265,7 +265,7 @@ export function renderLanding() {
     </section>
 
     <!-- Partners / Affiliate Program Section -->
-    <section id="partners" class="partners-section" style="padding: 80px 0; border-top: 1px solid var(--border-color); background: #ffffff;">
+    <section id="partners" class="partners-section" style="padding: 80px 0; border-top: 1px solid rgba(226, 232, 240, 0.4); background: transparent;">
       <div class="container">
         <div class="partners-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(5, 150, 105, 0.03) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 48px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center;">
           <div class="partners-info">
