@@ -187,7 +187,7 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  will-change: transform;
+  contain: strict; /* Extreme optimization: prevents layouts propagating outside this container */
 }
 
 .lp-bg-slide {
@@ -221,7 +221,7 @@ h1, h2, h3, h4, h5, h6 {
   background: 
     linear-gradient(rgba(226, 232, 240, 0.15) 1px, transparent 1px),
     linear-gradient(90deg, rgba(226, 232, 240, 0.15) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.38) 0%, rgba(248, 250, 252, 0.44) 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(248, 250, 252, 0.52) 100%);
   background-size: 48px 48px, 48px 48px, 100% 100%;
   z-index: 1;
   pointer-events: none;
@@ -354,6 +354,22 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   position: relative;
   z-index: 2;
+}
+
+.hero-content {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-lg);
+  padding: 44px;
+  box-shadow: 
+    0 10px 30px -10px rgba(15, 23, 42, 0.04), 
+    0 20px 40px -15px rgba(15, 23, 42, 0.06);
+  z-index: 2;
+  position: relative;
+  transform: translate3d(0, 0, 0); /* GPU acceleration */
+  backface-visibility: hidden;
 }
 
 .hero-title {
@@ -1014,6 +1030,12 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: 1fr;
     gap: 48px;
     text-align: center;
+  }
+
+  .hero-content {
+    padding: 32px 20px;
+    background: rgba(255, 255, 255, 0.86) !important;
+    border-radius: var(--radius-lg);
   }
   
   .hero-subtitle {
