@@ -412,10 +412,6 @@ export function renderLanding() {
 import { supabase, isSupabaseConfigured } from '../db/supabase.js';
 
 export function initLanding(mainApp) {
-  // Footer dynamic year
-  const footerYear = document.getElementById('footer-year');
-  if (footerYear) footerYear.textContent = new Date().getFullYear();
-
   // Mobile Menu Toggler
   const toggleBtn = document.getElementById('lp-menu-toggle-btn');
   const menuNav = document.getElementById('lp-menu-nav');
