@@ -15,11 +15,18 @@ export function renderLanding() {
     <header class="lp-header">
       <div class="container lp-nav">
         <a href="#/" class="lp-logo">
-          <div class="lp-logo-icon">
-            <i data-lucide="calculator"></i>
+          <div class="lp-logo-icon" style="background: none; box-shadow: none; padding: 0; width: auto; height: auto;">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="38" height="38" rx="9" fill="#0f172a"/>
+              <rect x="9" y="12" width="16" height="2.5" rx="1.25" fill="white"/>
+              <rect x="9" y="17.75" width="12" height="2.5" rx="1.25" fill="white"/>
+              <!-- Emerald checkmark -->
+              <path d="M21 23.5 L24 26.5 L29 21" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </div>
-          <div class="lp-logo-text">
-            SOLUCIONES <span>CONTABLES</span>
+          <div class="lp-logo-text" style="display: flex; flex-direction: column; line-height: 1.05; font-family: var(--font-heading);">
+            <span style="font-size: 11px; font-weight: 300; color: var(--text-secondary); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1px;">Soluciones</span>
+            <span style="font-size: 14px; font-weight: 800; color: var(--color-primary); letter-spacing: 0.04em; text-transform: uppercase;">Contables</span>
           </div>
         </a>
         <button class="lp-menu-toggle" id="lp-menu-toggle-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="lp-menu-nav">
