@@ -7,9 +7,9 @@ export function renderLanding() {
   <div class="lp-wrapper">
     <!-- Dynamic Slide Backgrounds (Parallax Fixed Slideshow) -->
     <div class="lp-bg-slideshow">
-      <div class="lp-bg-slide active" style="background-image: url('/corporate_bg.png');"></div>
-      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_2.png');"></div>
-      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_3.png');"></div>
+      <div class="lp-bg-slide active" style="background-image: url('/corporate_bg.jpg');"></div>
+      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_2.jpg');"></div>
+      <div class="lp-bg-slide" style="background-image: url('/corporate_bg_3.jpg');"></div>
       <div class="lp-bg-overlay"></div>
     </div>
     
