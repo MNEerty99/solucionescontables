@@ -12,12 +12,10 @@ export function renderDashboardLayout(childHTML, activeRoute) {
     <!-- Sidebar -->
     <aside class="db-sidebar">
       <div class="db-sidebar-header">
-        <a href="#/demo" class="db-sidebar-logo">
-          <div class="lp-logo-icon">
-            <i data-lucide="calculator"></i>
-          </div>
-          <div class="db-sidebar-logo-text">
-            SOLUCIONES <span>CONTABLES</span>
+        <a href="#/demo" class="db-sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
+          <img src="/SolucionesContables_Logo.png" alt="SolucionesContables Logo" style="height: 32px; width: 32px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(15, 23, 42, 0.15);" />
+          <div class="db-sidebar-logo-text" style="font-size: 13.5px; font-weight: 800; letter-spacing: 0.02em; color: var(--color-primary);">
+            SOLUCIONES CONTABLES
           </div>
         </a>
         <button class="btn-icon-sm" id="sidebar-collapse-btn" title="Colapsar menú">
