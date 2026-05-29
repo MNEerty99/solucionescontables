@@ -43,9 +43,9 @@ export function renderLanding() {
     <section class="hero-section">
       <div class="container hero-grid">
         <div class="hero-content">
-          <span class="badge"><i data-lucide="shield-check" style="width:12px; height:12px;"></i> Infraestructura B2B Multi-Empresa &middot; Desarrollado por VMP</span>
-          <h1 class="hero-title">El puente impositivo y contable definitivo para tu <span class="gradient-text">Estudio Contable</span>.</h1>
-          <p class="hero-subtitle">Dejá de perseguir carpetas físicas, renegar con capturas borrosas o procesar planillas inconexas. Soluciones Contables centraliza tus empresas cliente, automatiza la liquidación mensual de IVA, genera exportaciones oficiales y provee un portal móvil intuitivo para la carga de comprobantes al instante.</p>
+          <span class="badge"><i data-lucide="shield-check" style="width:12px; height:12px;"></i> El colaborador digital de tu Estudio Contable &middot; Desarrollado por VMP</span>
+          <h1 class="hero-title">El colaborador que tu <span class="gradient-text">estudio merece</span>.</h1>
+          <p class="hero-subtitle">No es un software más. Es un integrante virtual de tu equipo que automatiza la carga de comprobantes, liquida el IVA en segundos y vigila el límite de tus monotributistas — de forma autónoma, mientras vos te enfocás en el asesoramiento estratégico.</p>
           <div class="hero-actions">
             <a href="#/demo" class="btn btn-primary">
               Probar Demo de la Plataforma <i data-lucide="arrow-right"></i>
@@ -165,10 +165,10 @@ export function renderLanding() {
           
           <!-- Right side: Elite Corporate Copy -->
           <div class="prestige-info">
-            <span class="badge" style="background: rgba(5, 150, 105, 0.06); color: #047857; border-color: rgba(5, 150, 105, 0.15); font-weight: 700;">PRESTIGIO Y SEGURIDAD LEGAL</span>
-            <h2 style="font-size: 34px; font-weight: 800; margin-top: 10px; margin-bottom: 16px; line-height: 1.15; color: var(--color-primary);">Un estándar de excelencia institucional para tu firma</h2>
+            <span class="badge" style="background: rgba(5, 150, 105, 0.06); color: #047857; border-color: rgba(5, 150, 105, 0.15); font-weight: 700;">COLABORADOR DIGITAL DE ÉLITE</span>
+            <h2 style="font-size: 34px; font-weight: 800; margin-top: 10px; margin-bottom: 16px; line-height: 1.15; color: var(--color-primary);">Mucho más que un sistema. Un socio operativo para tu firma.</h2>
             <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14.5px; line-height: 1.6;">
-              Soluciones Contables no es un simple software de planillas; es una infraestructura diseñada para estudios contables que buscan automatizar la operatividad del día a día impositivo y brindar un asesoramiento de altísimo valor a sus empresas clientes.
+              Soluciones Contables funciona como un colaborador de élite: asume las tareas más repetitivas del día a día fiscal, resguarda tus credenciales con estándares bancarios y te permite concentrarte en lo que realmente vale — el asesoramiento estratégico de tus clientes.
             </p>
             
             <div style="display: flex; flex-direction: column; gap: 20px;">
