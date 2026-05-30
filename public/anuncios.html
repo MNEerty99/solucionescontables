@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudio Creativo - Videos Publicitarios SolucionesContables</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Georgia&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --navy-dark: #090d16;
+      --navy-medium: #0f172a;
+      --navy-light: #1e293b;
+      --gold: #d4af37;
+      --gold-hover: #f3e5ab;
+      --emerald: #059669;
+      --slate: #475569;
+      --white: #ffffff;
+      --radius-lg: 16px;
+      --radius-md: 8px;
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+      --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--navy-dark);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ----------------------------------
+       HEADER
+       ---------------------------------- */
+    header {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid var(--gold);
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .brand-title span {
+      color: var(--gold);
+    }
+
+    .header-badge {
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ----------------------------------
+       MAIN LAYOUT
+       ---------------------------------- */
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 32px;
+      padding: 32px 40px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+
+    @media (max-width: 1100px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Side: Cinema / Player */
+    .player-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .concept-selector-bar {
+      background: var(--navy-medium);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-lg);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .selector-label {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    select#concept-select {
+      background: var(--navy-light);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--white);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      min-width: 320px;
+      transition: var(--transition-normal);
+    }
+
+    select#concept-select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Video Theater Frame */
+    .theater-screen {
+      background: #000000;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      aspect-ratio: 1;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+      border: 4px solid var(--navy-light);
+    }
+
+    .theater-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .ad-frame-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.8s ease-in-out;
+      opacity: 0;
+      position: absolute;
+      inset: 0;
+    }
+
+    .ad-frame-image.active {
+      opacity: 1;
+    }
+
+    /* Kinetic Subtitles Overlay */
+    .subtitles-overlay {
+      position: absolute;
+      bottom: 12%;
+      left: 10%;
+      right: 10%;
+      text-align: center;
+      z-index: 20;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .subtitles-overlay.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .subtitles-text {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: var(--white);
+    }
+
+    .subtitles-text span.highlight {
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
+    }
+
+    /* Controller Panel */
+    .control-panel {
+      background: var(--navy-medium);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-lg);
+      padding: 20px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    .time-indicators {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--slate);
+    }
+
+    .control-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: none;
+      color: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      transition: var(--transition-normal);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-circle:hover {
+      background: var(--gold-hover);
+      transform: scale(1.05);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--white);
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-normal);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .voice-settings {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--navy-light);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate);
+    }
+
+    .voice-settings select {
+      background: transparent;
+      border: none;
+      color: var(--white);
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Right Side: Script and Prompts */
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .script-card {
+      background: var(--navy-medium);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      height: 100%;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--gold);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .script-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      max-height: 480px;
+      padding-right: 8px;
+    }
+
+    /* Scrollbar */
+    .script-timeline::-webkit-scrollbar {
+      width: 4px;
+    }
+    .script-timeline::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .script-timeline::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 2px;
+    }
+
+    .timeline-node {
+      border-left: 2px solid rgba(255, 255, 255, 0.1);
+      padding-left: 16px;
+      position: relative;
+      transition: var(--transition-normal);
+      cursor: pointer;
+    }
+
+    .timeline-node.active {
+      border-left-color: var(--gold);
+      background: rgba(212, 175, 55, 0.03);
+    }
+
+    .timeline-node::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--navy-light);
+      border: 2px solid var(--slate);
+      border-radius: 50%;
+      position: absolute;
+      left: -5px;
+      top: 4px;
+      transition: var(--transition-normal);
+    }
+
+    .timeline-node.active::before {
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--slate);
+      margin-bottom: 4px;
+    }
+
+    .timeline-node.active .node-header {
+      color: var(--gold);
+    }
+
+    .node-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #94a3b8;
+    }
+
+    .timeline-node.active .node-text {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* Info Alert Card */
+    .info-card {
+      background: rgba(5, 150, 105, 0.04);
+      border: 1px solid rgba(5, 150, 105, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .info-card i {
+      color: var(--emerald);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .info-card-text {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #a7f3d0;
+    }
+
+    .info-card-text strong {
+      color: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Permanent Header -->
+  <header>
+    <a href="/index.html" class="brand">
+      <img src="/SolucionesContables_Logo.png" alt="Logo">
+      <div class="brand-title">Soluciones<span>Contables</span></div>
+    </a>
+    <div class="header-badge">Estudio Creativo de Marketing</div>
+  </header>
+
+  <!-- App Wrapper -->
+  <main class="app-container">
+    
+    <!-- Player/Visualizer Column -->
+    <section class="player-section">
+      
+      <!-- Selector Bar -->
+      <div class="concept-selector-bar">
+        <div>
+          <div class="selector-label">Campaña Publicitaria</div>
+          <select id="concept-select">
+            <option value="escaner">1. El Escáner Inteligente (OCR - 45s)</option>
+            <option value="semaforo">2. El Semáforo Monotributo (F.2051 - 35s)</option>
+            <option value="apoc">3. Escudo Contable APOC (Seguridad - 40s)</option>
+          </select>
+        </div>
+        <div class="voice-settings">
+          <i data-lucide="mic"></i>
+          <span>Voz:</span>
+          <select id="voice-select">
+            <!-- Populated dynamically via JS -->
+            <option value="system">Cargando voces...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Theater Screen -->
+      <div class="theater-screen">
+        <img id="frame-img-1" class="ad-frame-image active" src="" alt="Frame 1">
+        <img id="frame-img-2" class="ad-frame-image" src="" alt="Frame 2">
+        <img id="frame-img-3" class="ad-frame-image" src="" alt="Frame 3">
+        <img id="frame-img-4" class="ad-frame-image" src="" alt="Frame 4">
+
+        <!-- Kinetic Subtitles -->
+        <div class="subtitles-overlay" id="subtitle-box">
+          <div class="subtitles-text" id="subtitle-content">Cargando guión...</div>
+        </div>
+      </div>
+
+      <!-- Control Panel -->
+      <div class="control-panel">
+        <div class="progress-bar-container" id="timeline-progress">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="time-indicators">
+          <span id="current-time">00:00</span>
+          <span id="total-time">00:45</span>
+        </div>
+        <div class="control-actions">
+          <button class="btn-secondary" id="restart-btn">
+            <i data-lucide="rotate-ccw"></i> Reiniciar
+          </button>
+          <button class="btn-circle" id="play-btn">
+            <i data-lucide="play" id="play-icon"></i>
+          </button>
+          <button class="btn-secondary" id="bg-audio-btn">
+            <i data-lucide="music"></i> Música: ON
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Sidebar Column -->
+    <aside class="sidebar-section">
+      
+      <!-- Story Script Card -->
+      <div class="script-card">
+        <div class="card-title">
+          <i data-lucide="file-text"></i> Guión de Voz (Locución Argentina)
+        </div>
+        <div class="script-timeline" id="script-timeline-content">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Ad Tips Info Card -->
+      <div class="info-card">
+        <i data-lucide="help-circle"></i>
+        <div class="info-card-text">
+          <strong>¿Cómo usar este Estudio Creativo?</strong><br>
+          Este reproductor utiliza la <strong>SpeechSynthesis API</strong> nativa de tu Mac para emitir una voz natural. Elige una voz de hombre o mujer con acento castellano (como Isabela o Diego) para escuchar la entonación exacta. Puedes capturar la pantalla y el sonido interno de tu computadora para crear el archivo de video publicitario final para redes.
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <script>
+    // Lucide Icon Initializer
+    lucide.createIcons();
+
+    // Procedural Audio Engine (Web Audio API)
+    class B2BAmbientSynth {
+      constructor() {
+        this.ctx = null;
+        this.oscillator = null;
+        this.filter = null;
+        this.gainNode = null;
+        this.isPlaying = false;
+      }
+
+      init() {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.filter = this.ctx.createBiquadFilter();
+        this.filter.type = 'lowpass';
+        this.filter.frequency.setValueAtTime(350, this.ctx.currentTime);
+
+        this.gainNode = this.ctx.createGain();
+        this.gainNode.gain.setValueAtTime(0.0, this.ctx.currentTime);
+
+        this.filter.connect(this.gainNode);
+        this.gainNode.connect(this.ctx.destination);
+      }
+
+      start() {
+        if (this.isPlaying) return;
+        if (!this.ctx) this.init();
+
+        this.ctx.resume();
+        this.oscillator = this.ctx.createOscillator();
+        this.oscillator.type = 'sawtooth';
+        this.oscillator.frequency.setValueAtTime(55, this.ctx.currentTime); // Deep A1 base note
+        this.oscillator.connect(this.filter);
+
+        this.gainNode.gain.linearRampToValueAtTime(0.04, this.ctx.currentTime + 1.5);
+        this.oscillator.start();
+        this.isPlaying = true;
+      }
+
+      stop() {
+        if (!this.isPlaying) return;
+        this.gainNode.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.0);
+        setTimeout(() => {
+          if (this.oscillator) {
+            this.oscillator.stop();
+            this.oscillator.disconnect();
+          }
+          this.isPlaying = false;
+        }, 1000);
+      }
+    }
+
+    const synth = new B2BAmbientSynth();
+
+    // B2B Campaigns Data
+    const campaigns = {
+      escaner: {
+        totalTime: 45,
+        frames: [
+          "/SolucionesContables_Promo/Concepto1_Escaner/frame_1.png",
+          "/SolucionesContables_Promo/Concepto1_Escaner/frame_2.png",
+          "/SolucionesContables_Promo/Concepto1_Escaner/frame_3.png",
+          "/SolucionesContables_Promo/Concepto1_Escaner/frame_4.png"
+        ],
+        script: [
+          {
+            start: 0,
+            duration: 10,
+            frame: 0,
+            text: "¿Seguís transcribiendo <span class='highlight'>tickets a mano</span> un domingo a la noche porque tus clientes te mandan fotos borrosas por WhatsApp?",
+            voice: "Che, ¿seguís transcribiendo tickets a mano un domingo a la noche porque tus clientes te mandan fotos re borrosas por WhatsApp? Tus domingos impositivos se terminaron de verdad."
+          },
+          {
+            start: 10,
+            duration: 12,
+            frame: 1,
+            text: "Con el <span class='highlight'>Portal de Clientes con OCR</span>, ellos sacan la foto y la Inteligencia Artificial extrae neto, IVA y CUIT al instante.",
+            voice: "Con el nuevo Portal de Clientes con Agente OCR, ellos simplemente le sacan una foto al comprobante desde el celular y nuestra Inteligencia Artificial te extrae el neto, el IVA y el CUIT al instante. Posta, en segundos."
+          },
+          {
+            start: 22,
+            duration: 11,
+            frame: 2,
+            text: "Los comprobantes entran ordenados y <span class='highlight'>listos para aprobar</span> en un solo clic. Chau chats desorganizados.",
+            voice: "Olvidate del caos de WhatsApp. Todos los comprobantes entran ordenados, auditados y listos para que los apruebes con un solo clic. Ganás control y profesionalismo."
+          },
+          {
+            start: 33,
+            duration: 12,
+            frame: 3,
+            text: "El colaborador digital que tu estudio merece. Cargá hasta <span class='highlight'>100 empresas por USD 380</span>.",
+            voice: "Es el colaborador digital que tu estudio se merece. Llevá hasta cien empresas clientes con carga impositiva automática por solo trescientos ochenta dólares de oferta. Entrá a solucionescontables.com.ar y probalo hoy."
+          }
+        ]
+      },
+      semaforo: {
+        totalTime: 35,
+        frames: [
+          "/SolucionesContables_Promo/Concepto2_Semaforo/frame_1.png",
+          "/SolucionesContables_Promo/Concepto2_Semaforo/frame_2.png",
+          "/SolucionesContables_Promo/Concepto2_Semaforo/frame_3.png",
+          "/SolucionesContables_Promo/Concepto2_Semaforo/frame_4.png"
+        ],
+        script: [
+          {
+            start: 0,
+            duration: 8,
+            frame: 0,
+            text: "¿Vigilás de cerca el límite de facturación de tus <span class='highlight'>monotributistas</span> o te enterás cuando ya los excluyó AFIP?",
+            voice: "¿Vigilás de cerca el límite de facturación de tus monotributistas, o te terminás enterando cuando AFIP ya los excluyó de oficio? Evitá sorpresas desagradables."
+          },
+          {
+            start: 8,
+            duration: 10,
+            frame: 1,
+            text: "El <span class='highlight'>Semáforo Inteligente Safe-Guard F.2051</span> te alerta en tiempo real cuando un cliente se acerca al límite impositivo.",
+            voice: "Con el Semáforo Inteligente de Alerta Automática F.2051 de SolucionesContables, tenés un vigilante las veinticuatro horas. Te avisa en tiempo real si un cliente se acerca a la cornisa."
+          },
+          {
+            start: 18,
+            duration: 9,
+            frame: 2,
+            text: "Brindá un <span class='highlight'>asesoramiento estratégico proactivo</span>. Protegé el patrimonio de tus clientes.",
+            voice: "Llevá tranquilidad total a tus clientes con asesoramiento estratégico proactivo basado en alertas tempranas, resguardando su patrimonio y cuidando tu firma."
+          },
+          {
+            start: 27,
+            duration: 8,
+            frame: 3,
+            text: "Tomá el control de tu Estudio hoy. <span class='highlight'>100 empresas por USD 380</span>.",
+            voice: "Tomá el control absoluto de tu estudio contable hoy mismo. Cien empresas clientes por solo trescientos ochenta dólares. SolucionesContables.com.ar."
+          }
+        ]
+      },
+      apoc: {
+        totalTime: 40,
+        frames: [
+          "/SolucionesContables_Promo/Concepto3_Auditoria/frame_1.png",
+          "/SolucionesContables_Promo/Concepto3_Auditoria/frame_2.png",
+          "/SolucionesContables_Promo/Concepto3_Auditoria/frame_3.png",
+          "/SolucionesContables_Promo/Concepto3_Auditoria/frame_4.png"
+        ],
+        script: [
+          {
+            start: 0,
+            duration: 9,
+            frame: 0,
+            text: "¿Estás auditando a los proveedores de tus clientes contra la base de <span class='highlight'>facturas apócrifas de AFIP</span>?",
+            voice: "¿Estás auditando en serio a los proveedores de tus clientes contra la base de facturas apócrifas de AFIP? Una sola factura trucha puede costar multas millonarias."
+          },
+          {
+            start: 9,
+            duration: 11,
+            frame: 1,
+            text: "Activá el <span class='highlight'>Escudo Contable APOC</span>: cruzamos automáticamente cada factura contra el padrón impositivo.",
+            voice: "Activá el Escudo de Auditoría Contable Preventiva de SolucionesContables. Cruzamos de forma totalmente automática cada factura cargada contra el padrón APOC y detectamos facturas M al instante."
+          },
+          {
+            start: 20,
+            duration: 10,
+            frame: 2,
+            text: "Garantizá una <span class='highlight'>seguridad jurídica absoluta</span> para tu estudio bajo normativas RT 54.",
+            voice: "Evitá cualquier tipo de inspección sorpresa y garantizá una seguridad jurídica total para tu estudio bajo las estrictas normativas vigentes de la R.T. cincuenta y cuatro."
+          },
+          {
+            start: 30,
+            duration: 10,
+            frame: 3,
+            text: "Protegé el prestigio de tu firma contable hoy. <span class='highlight'>Demo interactiva abierta</span>.",
+            voice: "Protegé el prestigio y el futuro de tu firma contable hoy mismo. Entrá a solucionescontables.com.ar y probá la demo interactiva sin costo."
+          }
+        ]
+      }
+    };
+
+    // State Variables
+    let currentCampaign = "escaner";
+    let isPlaying = false;
+    let isBgAudioOn = true;
+    let currentTime = 0;
+    let timerInterval = null;
+    let speechUtterance = null;
+    let currentTimelineIndex = -1;
+
+    // DOM Elements
+    const conceptSelect = document.getElementById('concept-select');
+    const voiceSelect = document.getElementById('voice-select');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const restartBtn = document.getElementById('restart-btn');
+    const bgAudioBtn = document.getElementById('bg-audio-btn');
+    const progressFill = document.getElementById('progress-fill');
+    const currentTimeText = document.getElementById('current-time');
+    const totalTimeText = document.getElementById('total-time');
+    const subtitleBox = document.getElementById('subtitle-box');
+    const subtitleContent = document.getElementById('subtitle-content');
+    const scriptTimeline = document.getElementById('script-timeline-content');
+
+    // Populate Speech Voices
+    function populateVoices() {
+      if (typeof speechSynthesis === 'undefined') return;
+      const voices = speechSynthesis.getVoices();
+      
+      voiceSelect.innerHTML = '';
+      
+      // Filter for Spanish voices, prioritizing es-AR
+      const spanishVoices = voices.filter(v => v.lang.includes('es'));
+      
+      if (spanishVoices.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = 'default';
+        opt.textContent = 'Voz predeterminada del sistema';
+        voiceSelect.appendChild(opt);
+        return;
+      }
+
+      // Sort prioritizing Argentine Spanish
+      spanishVoices.sort((a, b) => {
+        if (a.lang.includes('AR') && !b.lang.includes('AR')) return -1;
+        if (!a.lang.includes('AR') && b.lang.includes('AR')) return 1;
+        return 0;
+      });
+
+      spanishVoices.forEach(voice => {
+        const opt = document.createElement('option');
+        opt.value = voice.name;
+        opt.textContent = `${voice.name} (${voice.lang})${voice.lang.includes('AR') ? ' 🇦🇷 (Recomendada)' : ''}`;
+        voiceSelect.appendChild(opt);
+      });
+    }
+
+    populateVoices();
+    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    // Render Script Timeline Sidebar
+    function renderTimeline() {
+      const data = campaigns[currentCampaign];
+      scriptTimeline.innerHTML = '';
+      
+      data.script.forEach((node, idx) => {
+        const div = document.createElement('div');
+        div.className = `timeline-node ${idx === currentTimelineIndex ? 'active' : ''}`;
+        div.onclick = () => jumpToNode(idx);
+        
+        const durationText = `${node.start}s - ${node.start + node.duration}s`;
+        div.innerHTML = `
+          <div class="node-header">
+            <span>Escena ${idx + 1}</span>
+            <span>${durationText}</span>
+          </div>
+          <div class="node-text">${node.voice}</div>
+        `;
+        scriptTimeline.appendChild(div);
+      });
+    }
+
+    // Update the visual frame on screen
+    function updateFrame(frameIndex) {
+      const data = campaigns[currentCampaign];
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`frame-img-${i}`);
+        el.src = data.frames[i-1];
+        if (i - 1 === frameIndex) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      }
+    }
+
+    // Initialize Campaign Settings
+    function loadCampaign() {
+      stopAd();
+      const data = campaigns[currentCampaign];
+      totalTimeText.textContent = `00:${data.totalTime.toString().padStart(2, '0')}`;
+      currentTimeText.textContent = "00:00";
+      progressFill.style.width = "0%";
+      currentTime = 0;
+      currentTimelineIndex = -1;
+      updateFrame(0);
+      renderTimeline();
+      subtitleBox.classList.remove('active');
+    }
+
+    loadCampaign();
+
+    // Jump to specific timeline block
+    function jumpToNode(index) {
+      const data = campaigns[currentCampaign];
+      const node = data.script[index];
+      currentTime = node.start;
+      
+      const percent = (currentTime / data.totalTime) * 100;
+      progressFill.style.width = `${percent}%`;
+      currentTimeText.textContent = `00:${Math.floor(currentTime).toString().padStart(2, '0')}`;
+      
+      updateFrame(node.frame);
+      currentTimelineIndex = index;
+      renderTimeline();
+
+      if (isPlaying) {
+        playNodeVoice(node);
+      }
+    }
+
+    // Speech Synthesis Executor
+    function playNodeVoice(node) {
+      if (typeof speechSynthesis === 'undefined') return;
+      speechSynthesis.cancel(); // Abort previous speech
+
+      speechUtterance = new SpeechSynthesisUtterance(node.voice);
+      
+      // Select the chosen voice
+      const chosenVoiceName = voiceSelect.value;
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => v.name === chosenVoiceName);
+      if (voice) {
+        speechUtterance.voice = voice;
+      }
+      
+      // Argentine voice adjustments
+      speechUtterance.pitch = 0.95; // Deep, professional
+      speechUtterance.rate = 1.05;  // Energetic speed
+      
+      // Sync Subtitles
+      subtitleContent.innerHTML = node.text;
+      subtitleBox.classList.add('active');
+
+      speechSynthesis.speak(speechUtterance);
+    }
+
+    // Play Ad Loop
+    function startTimer() {
+      const data = campaigns[currentCampaign];
+      
+      timerInterval = setInterval(() => {
+        currentTime += 0.5;
+        
+        if (currentTime >= data.totalTime) {
+          stopAd();
+          return;
+        }
+
+        // Progress visuals
+        const percent = (currentTime / data.totalTime) * 100;
+        progressFill.style.width = `${percent}%`;
+        currentTimeText.textContent = `00:${Math.floor(currentTime).toString().padStart(2, '0')}`;
+
+        // Find active script block
+        const activeIndex = data.script.findIndex(n => currentTime >= n.start && currentTime < (n.start + n.duration));
+        
+        if (activeIndex !== -1 && activeIndex !== currentTimelineIndex) {
+          currentTimelineIndex = activeIndex;
+          updateFrame(data.script[activeIndex].frame);
+          renderTimeline();
+          playNodeVoice(data.script[activeIndex]);
+        }
+      }, 500);
+    }
+
+    function playAd() {
+      if (isPlaying) return;
+      isPlaying = true;
+      playIcon.setAttribute('data-lucide', 'pause');
+      lucide.createIcons({ root: playBtn });
+
+      if (isBgAudioOn) {
+        synth.start();
+      }
+
+      startTimer();
+      // Instantly play first node
+      if (currentTimelineIndex === -1) {
+        jumpToNode(0);
+      } else {
+        playNodeVoice(campaigns[currentCampaign].script[currentTimelineIndex]);
+      }
+    }
+
+    function stopAd() {
+      isPlaying = false;
+      playIcon.setAttribute('data-lucide', 'play');
+      lucide.createIcons({ root: playBtn });
+      
+      clearInterval(timerInterval);
+      if (typeof speechSynthesis !== 'undefined') {
+        speechSynthesis.cancel();
+      }
+      synth.stop();
+      subtitleBox.classList.remove('active');
+    }
+
+    // DOM Event Listeners
+    conceptSelect.addEventListener('change', (e) => {
+      currentCampaign = e.target.value;
+      loadCampaign();
+    });
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        stopAd();
+      } else {
+        playAd();
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      loadCampaign();
+      if (isPlaying) {
+        playAd();
+      }
+    });
+
+    bgAudioBtn.addEventListener('click', () => {
+      isBgAudioOn = !isBgAudioOn;
+      if (isBgAudioOn) {
+        bgAudioBtn.innerHTML = '<i data-lucide="music"></i> Música: ON';
+        if (isPlaying) synth.start();
+      } else {
+        bgAudioBtn.innerHTML = '<i data-lucide="music-2"></i> Música: OFF';
+        synth.stop();
+      }
+      lucide.createIcons({ root: bgAudioBtn });
+    });
+
+    document.getElementById('timeline-progress').addEventListener('click', (e) => {
+      const rect = e.target.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const percent = clickX / width;
+      
+      const data = campaigns[currentCampaign];
+      const targetTime = percent * data.totalTime;
+      
+      // Find script index matching this targetTime
+      const index = data.script.findIndex(n => targetTime >= n.start && targetTime < (n.start + n.duration));
+      if (index !== -1) {
+        jumpToNode(index);
+      }
+    });
+  </script>
+</body>
+</html>
