@@ -218,6 +218,19 @@ export function initDashboardLayout(mainApp) {
     mainApp.router(); // Refresh current page instantly to filter by new period!
   });
 
+  // Explicit handlers for mobile bottom navigation to prevent dead taps or clicks on cell phones
+  document.querySelectorAll('.mb-nav-item').forEach(item => {
+    const handleNavigation = (e) => {
+      e.preventDefault();
+      const href = item.getAttribute('href');
+      if (href) {
+        window.location.hash = href;
+      }
+    };
+    item.addEventListener('click', handleNavigation);
+    item.addEventListener('touchstart', handleNavigation, { passive: false });
+  });
+
   // Logout demo
   document.getElementById('logout-demo-btn')?.addEventListener('click', () => {
     window.location.hash = '#/';
