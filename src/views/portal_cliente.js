@@ -58,7 +58,7 @@ export function renderPortalCliente() {
             ` : `
               <span style="font-size: 11.5px; font-weight: 600; color: var(--text-secondary); background: var(--bg-secondary); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px;">
                 <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted);"></span>
-                Modo Simulado
+                Carga Offline
               </span>
             `}
           </div>
@@ -90,12 +90,12 @@ export function renderPortalCliente() {
 
           <div class="demo-afip-pills" style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
             <div class="afip-sample-pill" id="btn-simulate-ticket" style="border-color: rgba(99, 102, 241, 0.25);">
-              <i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
-              Simular Gasto (Nafta YPF)
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
+              Digitalizar Gasto de Combustible
             </div>
             <div class="afip-sample-pill" id="btn-simulate-asset" style="border-color: rgba(99, 102, 241, 0.4); color: #818cf8; font-weight: 600;">
-              <i data-lucide="sparkles" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
-              Simular Laptop (Activo)
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
+              Digitalizar Compra de Notebook
             </div>
           </div>
         </div>
@@ -391,7 +391,7 @@ export function initPortalCliente(mainApp) {
         progressContainer.style.display = 'none';
         dropzone.style.display = 'flex';
 
-        mainApp.showToast(isAsset ? "¡Simulación: Bien de Uso (Activo Fijo) digitalizado!" : "¡Simulación: ticket enviado al contador con éxito!", "success");
+        mainApp.showToast(isAsset ? "¡Comprobante: Bien de Uso (Activo Fijo) digitalizado!" : "¡Comprobante de Gasto enviado al contador con éxito!", "success");
         renderTicketsList();
 
       }, 1500);

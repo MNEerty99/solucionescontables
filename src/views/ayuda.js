@@ -61,18 +61,18 @@ export function renderAyuda() {
         </label>
 
         <!-- Task 2 -->
-         <a href="#/demo/configuracion" class="trial-action-btn" style="border-color: ${t2 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+         <a href="#/studio/configuracion" class="trial-action-btn" style="border-color: ${t2 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t2 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t2 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
           <div>
             <h5 style="font-size: 12.5px; font-weight: 700; color: ${t2 ? 'var(--color-accent)' : 'var(--color-primary)'}; margin-bottom: 2px;">2. Firma Digital ARCA</h5>
-            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Subir certificado digital <code>.crt</code> y <code>.key</code>.</p>
+            <p style="font-size: 10px; color: var(--text-secondary); line-height: 1.3;">Subir certificado digital <code>.crt</code> and <code>.key</code>.</p>
           </div>
         </a>
 
         <!-- Task 3 -->
-        <a href="#/demo/empresas" class="trial-action-btn" style="border-color: ${t3 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+        <a href="#/studio/empresas" class="trial-action-btn" style="border-color: ${t3 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t3 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t3 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
@@ -83,7 +83,7 @@ export function renderAyuda() {
         </a>
 
         <!-- Task 4 -->
-        <a href="#/demo/configuracion" class="trial-action-btn" style="border-color: ${t4 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+        <a href="#/studio/configuracion" class="trial-action-btn" style="border-color: ${t4 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t4 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t4 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
@@ -94,7 +94,7 @@ export function renderAyuda() {
         </a>
 
         <!-- Task 5 -->
-        <a href="#/demo/importacion" class="trial-action-btn" style="border-color: ${t5 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+        <a href="#/studio/importacion" class="trial-action-btn" style="border-color: ${t5 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t5 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t5 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
@@ -105,7 +105,7 @@ export function renderAyuda() {
         </a>
 
         <!-- Task 6 -->
-        <a href="#/demo/iva-simple" class="trial-action-btn" style="border-color: ${t6 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
+        <a href="#/studio/iva-simple" class="trial-action-btn" style="border-color: ${t6 ? 'var(--color-accent)' : 'var(--border-color)'}; display: flex; align-items: flex-start; gap: 10px; background: #fff; text-align: left; text-decoration: none; color: inherit;">
           <div style="margin-top: 3px;">
             <i data-lucide="${t6 ? 'check-circle-2' : 'circle'}" style="width: 16px; height: 16px; color: ${t6 ? 'var(--color-accent)' : 'var(--text-muted)'};"></i>
           </div>
@@ -219,14 +219,14 @@ const TabContents = {
       </div>
 
       <div style="margin-top: 8px;">
-        <h4 style="font-size: 13.5px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">Primeras Pruebas Recomendadas para Evaluadores:</h4>
+        <h4 style="font-size: 13.5px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">Primeros Pasos Operativos en el Studio:</h4>
         <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
-          Si estás testeando el sistema con un cliente de prueba, te sugerimos hacer este flujo rápido en **5 minutos**:
+          Te sugerimos iniciar el enlace con este flujo rápido en **5 minutos**:
         </p>
         <ol style="padding-left: 18px; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; line-height: 1.4;">
-          <li>Andá a <strong>Configuración ARCA</strong> y hacé clic en el botón <em>"Simular Alta de Firma Digital"</em> para activar el certificado del estudio.</li>
-          <li>En la tabla de la derecha, dale clic a <em>"Verificar"</em> sobre una empresa para simular que el cliente ya te delegó sus permisos.</li>
-          <li>Ingresá a <strong>Importación ARCA</strong>, arrastrá uno de los archivos modelo de compras para simular la descarga desde ARCA.</li>
+          <li>Andá a <strong>Configuración ARCA</strong> y hacé clic en el botón <em>"Enlazar y Homologar Firma Digital"</em> para activar el certificado del estudio.</li>
+          <li>En la tabla de la derecha, dale clic a <em>"Verificar"</em> sobre una empresa para validar que el cliente ya te delegó sus permisos.</li>
+          <li>Ingresá a <strong>Importación ARCA</strong>, arrastrá uno de los archivos de compras para sincronizar e importar los datos de ARCA.</li>
           <li>Entrá a <strong>IVA Simple F.2051</strong>, analizá el cuadrante de consistencia en tiempo real y dale a <em>"Validar Consistencia"</em> para cerrar el mes impositivo.</li>
         </ol>
       </div>
@@ -363,12 +363,12 @@ const TabContents = {
 
         <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.12); border-radius: var(--radius-md); padding: 16px;">
           <h4 style="font-size: 12.5px; font-weight: 700; color: var(--color-accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-            <i data-lucide="smartphone"></i> Simular la experiencia del Cliente
+            <i data-lucide="smartphone"></i> Visualizar la experiencia del Cliente
           </h4>
           <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px;">
-            Podés ver exactamente lo que vería el cliente final en su celular ingresando a la demo del Portal del Cliente.
+            Podés ver exactamente lo que vería el cliente final en su celular ingresando al Portal del Cliente.
           </p>
-          <a href="#/demo/portal" class="btn btn-primary btn-sm" style="font-size: 11px; background: var(--color-accent); border-color: var(--color-accent); padding: 6px 12px; display: inline-block;">
+          <a href="#/studio/portal" class="btn btn-primary btn-sm" style="font-size: 11px; background: var(--color-accent); border-color: var(--color-accent); padding: 6px 12px; display: inline-block;">
             <i data-lucide="eye" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Probar Portal del Cliente
           </a>
         </div>
@@ -578,7 +578,7 @@ export function initAyuda(mainApp) {
         if (item.q.includes(query) || item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query)) {
           matchCount++;
           resultsHTML += `
-            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; background: #fff; cursor: pointer; transition: all 0.2s;" onclick="window.location.hash='#/demo/ayuda'">
+            <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; background: #fff; cursor: pointer; transition: all 0.2s;" onclick="window.location.hash='#/studio/ayuda'">
               <h4 style="font-size: 13.5px; font-weight: 700; color: #4f46e5; margin-bottom: 6px;">${item.title}</h4>
               <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin: 0;">${item.desc}</p>
             </div>

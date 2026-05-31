@@ -30,7 +30,7 @@ export function renderLanding() {
           <a href="#pricing" class="lp-menu-link">Inversión</a>
           <a href="#partners" class="lp-menu-link">Partners</a>
           <a href="#contact" class="lp-menu-link">Contacto</a>
-          <a href="#/demo" class="btn btn-outline btn-sm">Demo Interactiva</a>
+          <a href="#/studio" class="btn btn-outline btn-sm">Ingresar al Studio</a>
         </nav>
       </div>
     </header>
@@ -43,8 +43,8 @@ export function renderLanding() {
           <h1 class="hero-title">El colaborador que tu <span class="gradient-text">estudio merece</span>.</h1>
           <p class="hero-subtitle">No es un software más. Es un integrante virtual de tu equipo que automatiza la carga de comprobantes, liquida el IVA en segundos y vigila el límite de tus monotributistas — de forma autónoma, mientras vos te enfocás en el asesoramiento estratégico.</p>
           <div class="hero-actions">
-            <a href="#/demo" class="btn btn-primary">
-              Probar Demo de la Plataforma <i data-lucide="arrow-right"></i>
+            <a href="#/studio" class="btn btn-primary">
+              Acceder al Studio Profesional <i data-lucide="arrow-right"></i>
             </a>
             <a href="#contact" class="btn btn-outline">Solicitar Asesoramiento</a>
           </div>
@@ -233,7 +233,7 @@ export function renderLanding() {
                 <li><i data-lucide="check"></i> Capacitación inicial para el equipo</li>
               </ul>
             </div>
-            <a href="#/demo" class="btn btn-primary w-full">Ingresar a la Demo</a>
+            <a href="#/studio" class="btn btn-primary w-full">Ingresar al Studio</a>
           </div>
 
           <!-- Monthly maintenance -->
@@ -277,7 +277,7 @@ export function renderLanding() {
             <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
               <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
                 <i data-lucide="calculator" style="color: #6366f1; width: 18px; height: 18px;"></i>
-                Simulador de Comisiones Proyectadas
+                Calculador de Comisiones Proyectadas
               </h4>
               
               <div style="margin-bottom: 16px;">
@@ -358,9 +358,8 @@ export function renderLanding() {
               </div>
             </div>
           </div>
-
           <div class="contact-form">
-            <h3 class="form-title">Solicitar Licencia o Demostración</h3>
+            <h3 class="form-title">Solicitar Alta de Licencia VMP</h3>
             <form id="lead-form">
               <div class="form-group">
                 <label class="form-label">Nombre y Apellido</label>
@@ -375,7 +374,7 @@ export function renderLanding() {
                 <input type="email" class="form-input" id="lead-email" placeholder="juan@estudioperez.com.ar" required>
               </div>
               <button type="submit" class="btn btn-primary w-full">
-                Enviar y Entrar a la Demo
+                Enviar y Acceder al Studio
               </button>
             </form>
           </div>
@@ -391,7 +390,7 @@ export function renderLanding() {
           <a href="#pricing" class="lp-footer-link">Inversión</a>
           <a href="#partners" class="lp-footer-link">Partners</a>
           <a href="#contact" class="lp-footer-link">Contacto</a>
-          <a href="#/demo" class="lp-footer-link" style="color: var(--color-accent); font-weight: 700;">Demo Interactiva →</a>
+          <a href="#/studio" class="lp-footer-link" style="color: var(--color-accent); font-weight: 700;">Ingresar al Studio →</a>
         </div>
         <div style="display: flex; gap: 20px; align-items: center;">
           <a href="https://wa.me/5492996731487" target="_blank" rel="noopener" aria-label="WhatsApp" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #25d366; font-weight: 700; text-decoration: none;">
@@ -512,7 +511,7 @@ export function initLanding(mainApp) {
     const studio = document.getElementById('lead-studio').value;
     const email = document.getElementById('lead-email').value;
 
-    mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Demo...`, 'success');
+    mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Suite...`, 'success');
 
     // Register lead in Supabase asynchronously in background
     if (isSupabaseConfigured && supabase) {
@@ -528,9 +527,9 @@ export function initLanding(mainApp) {
       });
     }
     
-    // Redirigir a la demo después de 1.5s
+    // Redirigir al studio después de 1.5s
     setTimeout(() => {
-      window.location.hash = '#/demo';
+      window.location.hash = '#/studio';
     }, 1500);
   });
 }

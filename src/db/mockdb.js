@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------
-   VMP Studio Contable - Mock Database & Supabase Adapter
+   VMP Studio Contable - Resilient Offline-First Sync Database
    ------------------------------------------------------------- */
 import { supabase, isSupabaseConfigured } from './supabase.js';
 
@@ -68,6 +68,144 @@ const DEFAULT_TRANSACTIONS = {
   }
 };
 
+// -------------------------------------------------------------
+// 1. MOTORES DE AUDITORÍA Y ESTADO DE SINCRONIZACIÓN (OUTBOX ENGINE)
+// -------------------------------------------------------------
+let isSyncingInProgress = false;
+let syncStatusCallbacks = [];
+
+export function subscribeSyncStatus(callback) {
+  syncStatusCallbacks.push(callback);
+  callback(getSyncStatus());
+  return () => {
+    syncStatusCallbacks = syncStatusCallbacks.filter(c => c !== callback);
+  };
+}
+
+function updateSyncStatus(status) {
+  syncStatusCallbacks.forEach(cb => cb(status));
+  window.dispatchEvent(new CustomEvent('vmp_sync_status_change', { detail: status }));
+}
+
+export function getSyncStatus() {
+  if (!navigator.onLine) {
+    return 'offline';
+  }
+  const queue = getSyncQueue();
+  if (queue.length === 0) {
+    return 'synced';
+  }
+  const hasPersistentError = queue.some(item => item.retries >= 5);
+  if (hasPersistentError) {
+    return 'error';
+  }
+  return isSyncingInProgress ? 'syncing' : 'pending';
+}
+
+function getSyncQueue() {
+  try {
+    const raw = localStorage.getItem("vmp_studio_sync_queue");
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSyncQueue(queue) {
+  localStorage.setItem("vmp_studio_sync_queue", JSON.stringify(queue));
+  updateSyncStatus(getSyncStatus());
+}
+
+export function enqueueSyncTask(action, payload) {
+  const queue = getSyncQueue();
+  const task = {
+    id: "task-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5),
+    action,
+    payload,
+    retries: 0,
+    timestamp: Date.now()
+  };
+  queue.push(task);
+  saveSyncQueue(queue);
+  
+  if (isSupabaseConfigured) {
+    processSyncQueue();
+  }
+}
+
+export async function processSyncQueue() {
+  if (isSyncingInProgress) return;
+  if (!isSupabaseConfigured) return;
+  if (!navigator.onLine) {
+    updateSyncStatus('offline');
+    return;
+  }
+
+  const queue = getSyncQueue();
+  if (queue.length === 0) {
+    updateSyncStatus('synced');
+    return;
+  }
+
+  isSyncingInProgress = true;
+  updateSyncStatus('syncing');
+  console.log(`Sync Engine: Procesando Cola Outbox (${queue.length} tareas pendientes)`);
+
+  let currentIndex = 0;
+  while (currentIndex < queue.length) {
+    const task = queue[currentIndex];
+    let success = false;
+
+    if (!navigator.onLine) {
+      updateSyncStatus('offline');
+      break;
+    }
+
+    try {
+      if (task.action === 'save_company') {
+        await pushCompanyToSupabase(task.payload.company, task.payload.isNew);
+        success = true;
+      } else if (task.action === 'insert_transaction') {
+        await pushTransactionToSupabase(task.payload.companyId, task.payload.type, task.payload.item);
+        success = true;
+      } else {
+        console.warn("Sync Engine: Acción de tarea desconocida:", task.action);
+        success = true;
+      }
+    } catch (err) {
+      console.error(`Sync Engine: Falló la tarea ${task.id}:`, err);
+      task.retries += 1;
+      
+      if (task.retries >= 5) {
+        console.error(`Sync Engine: Tarea ${task.id} excedió los reintentos máximos.`);
+        updateSyncStatus('error');
+      }
+      
+      const backoff = Math.min(30000, Math.pow(2, task.retries) * 1000);
+      console.log(`Sync Engine: Reintento programado en ${backoff}ms`);
+      
+      saveSyncQueue(queue);
+      setTimeout(processSyncQueue, backoff);
+      
+      isSyncingInProgress = false;
+      return; 
+    }
+
+    if (success) {
+      queue.splice(currentIndex, 1);
+      saveSyncQueue(queue);
+    } else {
+      currentIndex++;
+    }
+  }
+
+  isSyncingInProgress = false;
+  updateSyncStatus(getSyncStatus());
+}
+
+// -------------------------------------------------------------
+// 2. INICIALIZACIÓN Y SINCRONIZACIÓN DE PULL (DESDE LA NUBE)
+// -------------------------------------------------------------
 export function initMockDB() {
   if (!localStorage.getItem("vmp_studio_companies")) {
     localStorage.setItem("vmp_studio_companies", JSON.stringify(DEFAULT_COMPANIES));
@@ -78,22 +216,33 @@ export function initMockDB() {
   if (!localStorage.getItem("vmp_studio_active_co")) {
     localStorage.setItem("vmp_studio_active_co", "co-1");
   }
+  if (!localStorage.getItem("vmp_studio_sync_queue")) {
+    localStorage.setItem("vmp_studio_sync_queue", "[]");
+  }
 
-  // If Supabase is active, trigger background offline-first pull
+  // Vincular eventos globales de red para sincronización resiliente
+  window.addEventListener('online', () => {
+    console.log("Sync Engine: Dispositivo online. Reanudando sincronización...");
+    processSyncQueue();
+  });
+  window.addEventListener('offline', () => {
+    console.log("Sync Engine: Dispositivo offline. Sincronización en pausa.");
+    updateSyncStatus('offline');
+  });
+
   if (isSupabaseConfigured) {
     pullFromSupabase();
+    processSyncQueue();
   }
 }
 
-// Background pull function to sync local state with Supabase cloud database
 async function pullFromSupabase() {
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return; // No logged in user
+    if (!user) return;
 
-    console.log("Background Sync: Pulling fresh data from Supabase for studio:", user.id);
+    console.log("Sync Engine: Descargando datos actualizados de Supabase...");
 
-    // 1. Pull companies
     const { data: dbCompanies, error: coError } = await supabase
       .from('empresas')
       .select('*')
@@ -104,7 +253,6 @@ async function pullFromSupabase() {
     if (dbCompanies && dbCompanies.length > 0) {
       localStorage.setItem("vmp_studio_companies", JSON.stringify(dbCompanies));
       
-      // 2. Pull transactions for these companies
       const coIds = dbCompanies.map(c => c.id);
       const { data: dbTxs, error: txError } = await supabase
         .from('transacciones')
@@ -113,7 +261,6 @@ async function pullFromSupabase() {
 
       if (txError) throw txError;
 
-      // Group transactions by company ID
       const transactionsMap = {};
       coIds.forEach(id => {
         transactionsMap[id] = { ventas: [], compras: [] };
@@ -121,7 +268,7 @@ async function pullFromSupabase() {
 
       if (dbTxs) {
         dbTxs.forEach(t => {
-          const typeKey = t.tipo; // 'ventas' or 'compras'
+          const typeKey = t.tipo;
           if (transactionsMap[t.empresa_id]) {
             transactionsMap[t.empresa_id][typeKey].push({
               id: t.id,
@@ -142,15 +289,15 @@ async function pullFromSupabase() {
       }
 
       localStorage.setItem("vmp_studio_transactions", JSON.stringify(transactionsMap));
-      console.log("Background Sync completed successfully!");
+      console.log("Sync Engine: Pull y refresco local exitoso!");
     }
   } catch (err) {
-    console.error("Supabase pull sync error:", err);
+    console.error("Sync Engine: Error en pull de Supabase:", err);
   }
 }
 
 // -------------------------------------------------------------
-// CRUD Operations with Background Supabase Sinks
+// 3. OPERACIONES CRUD CON RESPUESTA DE UI INMEDIATA (OPTIMISTA)
 // -------------------------------------------------------------
 export function getCompanies() {
   initMockDB();
@@ -161,7 +308,7 @@ export function getCompanies() {
       return data;
     }
   } catch (e) {
-    console.error("Error parsing companies from localStorage, falling back to defaults:", e);
+    console.error("Error al leer empresas locales:", e);
   }
   return DEFAULT_COMPANIES;
 }
@@ -178,51 +325,43 @@ export function saveCompany(company) {
     company.id = "co-" + Date.now();
     cos.push(company);
     
-    // Initialize empty transactions map locally
     try {
       const txs = JSON.parse(localStorage.getItem("vmp_studio_transactions")) || {};
       txs[company.id] = { ventas: [], compras: [] };
       localStorage.setItem("vmp_studio_transactions", JSON.stringify(txs));
     } catch (e) {
-      console.error("Error setting empty transactions for new company:", e);
+      console.error("Error inicializando mapa transaccional local:", e);
     }
   }
   
   localStorage.setItem("vmp_studio_companies", JSON.stringify(cos));
 
-  // Push to Supabase asynchronously in background
-  if (isSupabaseConfigured) {
-    pushCompanyToSupabase(company, isNew);
-  }
+  // Encolar de forma resiliente la tarea en background sync
+  enqueueSyncTask('save_company', { company, isNew });
 
   return company;
 }
 
 async function pushCompanyToSupabase(company, isNew) {
-  try {
-    if (!supabase) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    const studioId = user ? user.id : '00000000-0000-0000-0000-000000000000'; // Fallback uuid for anonymous sessions
+  if (!supabase) return;
+  const { data: { user } } = await supabase.auth.getUser();
+  const studioId = user ? user.id : '00000000-0000-0000-0000-000000000000'; // Fallback anónimo
 
-    const payload = {
-      id: company.id,
-      estudio_id: studioId,
-      razon_social: company.razon_social,
-      cuit: company.cuit,
-      tipo: company.tipo,
-      condicion_iva: company.condicion_iva,
-      actividad: company.actividad || '',
-      inicio_actividades: company.inicio_actividades,
-      color: company.color,
-      delegation_active: company.delegation_active || false
-    };
+  const payload = {
+    id: company.id,
+    estudio_id: studioId,
+    razon_social: company.razon_social,
+    cuit: company.cuit,
+    tipo: company.tipo,
+    condicion_iva: company.condicion_iva,
+    actividad: company.actividad || '',
+    inicio_actividades: company.inicio_actividades,
+    color: company.color,
+    delegation_active: company.delegation_active || false
+  };
 
-    console.log("Background Sync: Pushing company to Supabase:", company.id);
-    const { error } = await supabase.from('empresas').upsert(payload);
-    if (error) throw error;
-  } catch (err) {
-    console.error("Supabase push company error:", err);
-  }
+  const { error } = await supabase.from('empresas').upsert(payload);
+  if (error) throw error;
 }
 
 export function getActiveCompanyId() {
@@ -237,13 +376,12 @@ export function getActiveCompany() {
     const found = cos.find(c => c.id === id);
     if (found) return found;
     
-    // If active CUIT is not in local storage list, default to first available
     if (cos.length > 0) {
       localStorage.setItem("vmp_studio_active_co", cos[0].id);
       return cos[0];
     }
   } catch (e) {
-    console.error("Error getting active company, falling back:", e);
+    console.error("Error cargando empresa activa, reintentando...", e);
   }
   return DEFAULT_COMPANIES[0];
 }
@@ -261,7 +399,7 @@ export function getTransactions(companyId) {
       return txs[companyId];
     }
   } catch (e) {
-    console.error("Error parsing transactions from localStorage, falling back:", e);
+    console.error("Error al parsear transacciones de localStorage:", e);
   }
   return DEFAULT_TRANSACTIONS[companyId] || { ventas: [], compras: [] };
 }
@@ -270,41 +408,45 @@ export function addTransaction(companyId, type, item) {
   const txs = JSON.parse(localStorage.getItem("vmp_studio_transactions"));
   if (!txs[companyId]) txs[companyId] = { ventas: [], compras: [] };
   
-  item.id = (type === "ventas" ? "v-" : "c-") + Date.now();
+  if (!item.id) {
+    item.id = (type === "ventas" ? "v-" : "c-") + Date.now() + Math.floor(Math.random() * 1000);
+  }
+  
+  // Evitar duplicados
+  const exists = txs[companyId][type].some(tx => tx.id === item.id || (tx.numero === item.numero && tx.fecha === item.fecha));
+  if (exists) {
+    console.warn("DB local: Comprobante duplicado omitido:", item.numero);
+    return item;
+  }
+
   txs[companyId][type].unshift(item);
   localStorage.setItem("vmp_studio_transactions", JSON.stringify(txs));
 
-  // Push to Supabase asynchronously in background
-  if (isSupabaseConfigured) {
-    pushTransactionToSupabase(companyId, type, item);
-  }
+  // Registrar encolamiento seguro de sincronización en background
+  enqueueSyncTask('insert_transaction', { companyId, type, item });
 
   return item;
 }
 
 async function pushTransactionToSupabase(companyId, type, item) {
-  try {
-    const payload = {
-      id: item.id,
-      empresa_id: companyId,
-      tipo: type, // 'ventas' or 'compras'
-      fecha: item.fecha,
-      tipo_comprobante: item.tipo_comprobante,
-      numero: item.numero,
-      proveedor: item.proveedor || null,
-      cliente: item.cliente || null,
-      cuit: item.cuit,
-      neto: item.neto,
-      iva: item.iva,
-      total: item.total,
-      es_activo: item.es_activo || false,
-      categoria: item.categoria || 'General'
-    };
+  if (!supabase) return;
+  const payload = {
+    id: item.id,
+    empresa_id: companyId,
+    tipo: type,
+    fecha: item.fecha,
+    tipo_comprobante: item.tipo_comprobante,
+    numero: item.numero,
+    proveedor: item.proveedor || null,
+    cliente: item.cliente || null,
+    cuit: item.cuit,
+    neto: item.neto,
+    iva: item.iva,
+    total: item.total,
+    es_activo: item.es_activo || false,
+    categoria: item.categoria || 'General'
+  };
 
-    console.log("Background Sync: Pushing transaction to Supabase:", item.id);
-    const { error } = await supabase.from('transacciones').insert(payload);
-    if (error) throw error;
-  } catch (err) {
-    console.error("Supabase push transaction error:", err);
-  }
+  const { error } = await supabase.from('transacciones').insert(payload);
+  if (error) throw error;
 }

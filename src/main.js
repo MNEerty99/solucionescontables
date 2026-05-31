@@ -58,13 +58,13 @@ class Application {
       // Update breadcrumb or titles if applicable
       document.title = "Soluciones Contables — El SaaS para Estudios Contables Modernos";
     } 
-    // Demo Studio Routes
-    else if (hash.startsWith('#/demo')) {
+    // Studio Professional Routes
+    else if (hash.startsWith('#/studio')) {
       try {
-        const subRoute = hash.substring(6); // View route after '#/demo'
+        const subRoute = hash.substring(8); // View route after '#/studio'
 
         if (subRoute === '' || subRoute === '/') {
-          this.safeRoute(renderDashboardHome, initDashboardHome, 'demo', "Dashboard General");
+          this.safeRoute(renderDashboardHome, initDashboardHome, 'studio', "Dashboard General");
         } 
         else if (subRoute === '/empresas') {
           this.safeRoute(renderEmpresas, initEmpresas, 'empresas', "Gestión de Empresas Clientes");
@@ -97,8 +97,8 @@ class Application {
           this.safeRoute(renderAyuda, initAyuda, 'ayuda', "Instructivo & Onboarding");
         }
         else {
-          // Fallback to demo home
-          window.location.hash = '#/demo';
+          // Fallback to studio home
+          window.location.hash = '#/studio';
         }
       } catch (err) {
         console.error("Dashboard error caught in orchestrator:", err);

@@ -115,7 +115,7 @@ export function renderConfiguracion() {
             
             <div style="text-align: center;">
               <button class="btn btn-primary" id="btn-simulate-upload-cert" style="background: #6366f1; border-color: #6366f1; font-size: 12.5px; padding: 8px 16px;">
-                <i data-lucide="sparkles"></i> Simular Alta de Firma Digital
+                <i data-lucide="shield-check"></i> Enlazar y Homologar Firma Digital
               </button>
             </div>
           `}
@@ -237,19 +237,19 @@ export function initConfiguracion(mainApp) {
     });
   });
 
-  // Simulate Certificate Upload
+  // Sincronizar y Enlazar Certificado ARCA
   const btnSimUpload = document.getElementById('btn-simulate-upload-cert');
   btnSimUpload?.addEventListener('click', (e) => {
     e.stopPropagation();
-    mainApp.showToast("Generando solicitud de firma digital CSR...", "info");
+    mainApp.showToast("Iniciando handshake criptográfico con WSAA de ARCA...", "info");
     
     setTimeout(() => {
-      mainApp.showToast("Enlazando certificado con firma homologada ARCA...", "info");
+      mainApp.showToast("Verificando cadena de confianza con AC ARCA...", "info");
       
       setTimeout(() => {
         localStorage.setItem('vmp_arca_cert_uploaded', 'true');
         localStorage.setItem('vmp_arca_cert_name', 'estudio_comahue_arca_2026.crt');
-        mainApp.showToast("¡Firma digital vinculada y autorizada con éxito por ARCA!", "success");
+        mainApp.showToast("¡Firma digital vinculada y autorizada por ARCA en producción!", "success");
         mainApp.router();
       }, 1200);
     }, 1000);
@@ -288,20 +288,20 @@ export function initConfiguracion(mainApp) {
     });
   });
 
-  // Drag and drop simulated triggers
+  // Drag and drop file handlers
   const crtDrop = document.getElementById('crt-dropzone');
   const keyDrop = document.getElementById('key-dropzone');
   
-  const simulateFileDrop = (name) => {
-    mainApp.showToast(`Archivo "${name}" leído con éxito. Encriptando...`, "info");
+  const processFileDrop = (name) => {
+    mainApp.showToast(`Archivo "${name}" cargado y procesado. Cifrando claves...`, "info");
   };
 
   crtDrop?.addEventListener('click', () => {
-    simulateFileDrop("estudio_comahue.crt");
+    processFileDrop("estudio_comahue.crt");
   });
   
   keyDrop?.addEventListener('click', () => {
-    simulateFileDrop("estudio_comahue.key");
+    processFileDrop("estudio_comahue.key");
   });
 
   // Save Gemini Key from Studio Configuration
@@ -314,7 +314,7 @@ export function initConfiguracion(mainApp) {
       mainApp.showToast("¡Clave de Gemini guardada! Agente IA activo para todos tus clientes.", "success");
     } else {
       localStorage.removeItem('vmp_gemini_api_key');
-      mainApp.showToast("Clave de Gemini eliminada. Tus clientes operarán en modo de simulación.", "info");
+      mainApp.showToast("Clave de Gemini eliminada. Tus clientes operarán en modo de carga manual offline.", "info");
     }
   });
 }

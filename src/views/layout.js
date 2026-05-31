@@ -1,18 +1,59 @@
 /* -------------------------------------------------------------
    VMP Studio Contable - Dashboard Layout Component
    ------------------------------------------------------------- */
-import { getCompanies, getActiveCompany } from '../db/mockdb.js';
+import { getCompanies, getActiveCompany, getSyncStatus } from '../db/mockdb.js';
 
 export function renderDashboardLayout(childHTML, activeRoute) {
   const activeCompany = getActiveCompany();
   const companies = getCompanies();
+
+  // Calcular estado inicial de sincronización
+  const syncStatus = getSyncStatus();
+  let syncPillHTML = '';
+  
+  if (syncStatus === 'offline') {
+    syncPillHTML = `
+      <div id="topbar-sync-status-indicator" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); transition: all 0.25s ease;">
+        <span class="sync-dot" style="background:#ef4444; box-shadow:0 0 8px #ef4444; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+        <span style="color:#ef4444;">Sin Conexión</span>
+      </div>
+    `;
+  } else if (syncStatus === 'syncing') {
+    syncPillHTML = `
+      <div id="topbar-sync-status-indicator" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); transition: all 0.25s ease;">
+        <span class="sync-dot" style="border:1.5px solid #fbbf24; border-top:1.5px solid transparent; width:8px; height:8px; border-radius:50%; display:inline-block; animation: spin 0.8s linear infinite;"></span>
+        <span style="color:#fbbf24; margin-left: 4px;">Sincronizando...</span>
+      </div>
+    `;
+  } else if (syncStatus === 'error') {
+    syncPillHTML = `
+      <div id="topbar-sync-status-indicator" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(220, 38, 38, 0.06); border: 1px solid rgba(220, 38, 38, 0.2); transition: all 0.25s ease;">
+        <span class="sync-dot" style="background:#dc2626; box-shadow:0 0 8px #dc2626; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+        <span style="color:#dc2626;">Error Sync</span>
+      </div>
+    `;
+  } else if (syncStatus === 'pending') {
+    syncPillHTML = `
+      <div id="topbar-sync-status-indicator" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.15); transition: all 0.25s ease;">
+        <span class="sync-dot" style="background:#fbbf24; box-shadow:0 0 8px #fbbf24; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+        <span style="color:#fbbf24;">Sync Pendiente</span>
+      </div>
+    `;
+  } else {
+    syncPillHTML = `
+      <div id="topbar-sync-status-indicator" style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); transition: all 0.25s ease;">
+        <span class="sync-dot" style="background:#10b981; box-shadow:0 0 8px #10b981; width:8px; height:8px; border-radius:50%; display:inline-block;"></span>
+        <span style="color:#10b981;">Sincronizado</span>
+      </div>
+    `;
+  }
 
   return `
   <div class="db-wrapper" id="db-wrapper-root">
     <!-- Sidebar -->
     <aside class="db-sidebar">
       <div class="db-sidebar-header">
-        <a href="#/demo" class="db-sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
+        <a href="#/studio" class="db-sidebar-logo" style="display: flex; align-items: center; gap: 10px;">
           <img src="/SolucionesContables_Logo.png" alt="SolucionesContables Logo" style="height: 32px; width: 32px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(15, 23, 42, 0.15);" />
           <div class="db-sidebar-logo-text" style="font-size: 13.5px; font-weight: 800; letter-spacing: 0.02em; color: var(--color-primary);">
             SOLUCIONES CONTABLES
@@ -41,25 +82,25 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         </div>
 
         <div class="db-nav-label">Estudio</div>
-        <a href="#/demo" class="db-nav-item ${activeRoute === 'demo' ? 'active' : ''}" data-route="demo">
+        <a href="#/studio" class="db-nav-item ${activeRoute === 'studio' ? 'active' : ''}" data-route="studio">
           <i data-lucide="layout-dashboard"></i>
           <span>Dashboard</span>
         </a>
 
         <div class="db-nav-label">Operaciones</div>
-        <a href="#/demo/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
+        <a href="#/studio/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
           <i data-lucide="file-text"></i>
           <span>Comprobantes</span>
         </a>
 
         <div class="db-nav-label">Fiscal</div>
-        <a href="#/demo/iva" class="db-nav-item ${activeRoute === 'iva' ? 'active' : ''}" data-route="iva">
+        <a href="#/studio/iva" class="db-nav-item ${activeRoute === 'iva' ? 'active' : ''}" data-route="iva">
           <i data-lucide="book-open"></i>
           <span>Libro IVA Digital</span>
         </a>
 
         <div class="db-nav-label">Soporte</div>
-        <a href="#/demo/ayuda" class="db-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}" data-route="ayuda">
+        <a href="#/studio/ayuda" class="db-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}" data-route="ayuda">
           <i data-lucide="help-circle"></i>
           <span>Instructivo & Onboarding</span>
         </a>
@@ -76,7 +117,7 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <span class="user-name">Estudio Contable Comahue</span>
           <span class="user-role">Administrador</span>
         </div>
-        <button class="btn-icon-sm" id="logout-demo-btn" title="Cerrar sesión">
+        <button class="btn-icon-sm" id="logout-studio-btn" title="Cerrar sesión">
           <i data-lucide="log-out"></i>
         </button>
       </div>
@@ -90,6 +131,9 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         </div>
 
         <div style="display: flex; align-items: center; gap: 16px;">
+          <!-- GLOBAL SYNC STATUS PILL -->
+          ${syncPillHTML}
+
           <!-- Global Fiscal Period Selector -->
           <div style="display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 6px 12px; box-shadow: var(--shadow-sm);">
             <i data-lucide="calendar" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
@@ -106,31 +150,33 @@ export function renderDashboardLayout(childHTML, activeRoute) {
 
           <!-- Dynamic Company Selector Pill -->
           <div style="position: relative;">
-            <div class="company-selector-container" id="topbar-company-selector">
-              <div class="company-avatar" style="background: ${activeCompany.color}">
+            <div class="company-selector-container" id="topbar-company-selector" style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 5px 12px; display: flex; align-items: center; gap: 8px; background: #fff; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color 0.2s;">
+              <div class="company-avatar" style="background: ${activeCompany.color}; width: 22px; height: 22px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
                 ${activeCompany.razon_social[0]}
               </div>
-              <div class="company-select-text">
-                <span class="c-sel-name">${activeCompany.razon_social}</span>
-                <span class="c-sel-cuit">CUIT: ${activeCompany.cuit}</span>
+              <div class="company-select-text" style="display: flex; flex-direction: column; text-align: left;">
+                <span class="c-sel-name" style="font-size: 12.5px; font-weight: 700; color: var(--color-primary); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${activeCompany.razon_social}</span>
+                <span class="c-sel-cuit" style="font-size: 9.5px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; line-height: 1;">CUIT: ${activeCompany.cuit}</span>
               </div>
-              <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 8px;"></i>
+              <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 4px; color: var(--text-secondary);"></i>
             </div>
 
             <!-- Selector Dropdown -->
-            <div class="company-dropdown" id="company-selector-dropdown">
-              <div style="padding: 6px 12px; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Cambiar Empresa</div>
-              ${companies.map(c => `
-                <div class="dropdown-item ${c.id === activeCompany.id ? 'active' : ''}" data-id="${c.id}">
-                  <div class="company-avatar" style="background: ${c.color}; width: 24px; height: 24px; font-size: 11px;">
-                    ${c.razon_social[0]}
+            <div class="company-dropdown" id="company-selector-dropdown" style="display: none; position: absolute; top: calc(100% + 4px); right: 0; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 100; min-width: 240px; padding: 6px 0;">
+              <div style="padding: 6px 12px; font-size: 9.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;">Cambiar Empresa</div>
+              <div style="max-height: 250px; overflow-y: auto;">
+                ${companies.map(c => `
+                  <div class="dropdown-item ${c.id === activeCompany.id ? 'active' : ''}" data-id="${c.id}" style="padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.15s;">
+                    <div class="company-avatar" style="background: ${c.color}; width: 22px; height: 22px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">
+                      ${c.razon_social[0]}
+                    </div>
+                    <div class="company-select-text" style="display: flex; flex-direction: column; text-align: left;">
+                      <span class="c-sel-name" style="font-size: 12px; font-weight: 600; color: var(--text-primary); max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${c.razon_social}</span>
+                      <span class="c-sel-cuit" style="font-size: 9.5px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace;">${c.cuit}</span>
+                    </div>
                   </div>
-                  <div class="company-select-text">
-                    <span class="c-sel-name" style="font-size: 12px; font-weight: 600; max-width: 180px;">${c.razon_social}</span>
-                    <span class="c-sel-cuit" style="font-size: 10px;">${c.cuit}</span>
-                  </div>
-                </div>
-              `).join('')}
+                `).join('')}
+              </div>
             </div>
           </div>
         </div>
@@ -142,19 +188,19 @@ export function renderDashboardLayout(childHTML, activeRoute) {
 
       <!-- Mobile Bottom Navigation Bar -->
       <nav class="mobile-bottom-nav">
-        <a href="#/demo" class="mb-nav-item ${activeRoute === 'demo' ? 'active' : ''}">
+        <a href="#/studio" class="mb-nav-item ${activeRoute === 'studio' ? 'active' : ''}">
           <i data-lucide="layout-dashboard"></i>
           <span>Inicio</span>
         </a>
-        <a href="#/demo/ventas" class="mb-nav-item ${activeRoute === 'ventas' ? 'active' : ''}">
+        <a href="#/studio/ventas" class="mb-nav-item ${activeRoute === 'ventas' ? 'active' : ''}">
           <i data-lucide="file-text"></i>
           <span>Comprobantes</span>
         </a>
-        <a href="#/demo/iva" class="mb-nav-item ${activeRoute === 'iva' ? 'active' : ''}">
+        <a href="#/studio/iva" class="mb-nav-item ${activeRoute === 'iva' ? 'active' : ''}">
           <i data-lucide="book-open"></i>
           <span>Libro IVA</span>
         </a>
-        <a href="#/demo/ayuda" class="mb-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}">
+        <a href="#/studio/ayuda" class="mb-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}">
           <i data-lucide="help-circle"></i>
           <span>Ayuda</span>
         </a>
@@ -165,6 +211,22 @@ export function renderDashboardLayout(childHTML, activeRoute) {
 }
 
 export function initDashboardLayout(mainApp) {
+  // Inyectar keyframes CSS dinámicos para spin del cargador impositivo
+  if (!document.getElementById('vmp-sync-keyframes')) {
+    const style = document.createElement('style');
+    style.id = 'vmp-sync-keyframes';
+    style.innerHTML = `
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .company-selector-container { cursor: pointer; transition: all 0.2s; }
+      .company-selector-container:hover { border-color: #818cf8 !important; }
+      .dropdown-item { transition: background 0.15s; }
+      .dropdown-item:hover { background: rgba(99, 102, 241, 0.04); }
+      .dropdown-item.active { background: rgba(13, 148, 136, 0.05); }
+      .company-dropdown.show { display: block !important; }
+    `;
+    document.head.appendChild(style);
+  }
+
   // Toggle sidebar collapse
   document.getElementById('sidebar-collapse-btn')?.addEventListener('click', () => {
     document.getElementById('db-wrapper-root').classList.toggle('sidebar-collapsed');
@@ -215,7 +277,7 @@ export function initDashboardLayout(mainApp) {
     };
     
     mainApp.showToast(`Cambiando período fiscal a: ${periodNames[newPeriod] || newPeriod}`, 'success');
-    mainApp.router(); // Refresh current page instantly to filter by new period!
+    mainApp.router(); 
   });
 
   // Explicit handlers for mobile bottom navigation to prevent dead taps or clicks on cell phones
@@ -231,8 +293,61 @@ export function initDashboardLayout(mainApp) {
     item.addEventListener('touchstart', handleNavigation, { passive: false });
   });
 
-  // Logout demo
-  document.getElementById('logout-demo-btn')?.addEventListener('click', () => {
+  // Logout studio
+  document.getElementById('logout-studio-btn')?.addEventListener('click', () => {
     window.location.hash = '#/';
   });
+
+  // -------------------------------------------------------------
+  // ACTUALIZACIÓN DINÁMICA DEL PILL DE SINCRONIZACIÓN (SYNC INDICATOR)
+  // -------------------------------------------------------------
+  const syncIndicator = document.getElementById('topbar-sync-status-indicator');
+  const updateSyncUI = (status) => {
+    if (!syncIndicator) return;
+    
+    if (status === 'offline') {
+      syncIndicator.style.background = 'rgba(239, 68, 68, 0.06)';
+      syncIndicator.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+      syncIndicator.innerHTML = `
+        <span class="sync-dot" style="background:#ef4444; box-shadow:0 0 8px #ef4444; width:8px; height:8px; border-radius:50%; display:inline-block;"></span> 
+        <span style="color:#ef4444; font-size:11px; font-weight:700; margin-left:2px;">Sin Conexión</span>
+      `;
+    } else if (status === 'syncing') {
+      syncIndicator.style.background = 'rgba(245, 158, 11, 0.06)';
+      syncIndicator.style.border = '1px solid rgba(245, 158, 11, 0.2)';
+      syncIndicator.innerHTML = `
+        <span class="sync-dot" style="border:1.5px solid #fbbf24; border-top:1.5px solid transparent; width:8px; height:8px; border-radius:50%; display:inline-block; animation: spin 0.8s linear infinite;"></span> 
+        <span style="color:#fbbf24; font-size:11px; font-weight:700; margin-left:4px;">Sincronizando...</span>
+      `;
+    } else if (status === 'error') {
+      syncIndicator.style.background = 'rgba(220, 38, 38, 0.06)';
+      syncIndicator.style.border = '1px solid rgba(220, 38, 38, 0.2)';
+      syncIndicator.innerHTML = `
+        <span class="sync-dot" style="background:#dc2626; box-shadow:0 0 8px #dc2626; width:8px; height:8px; border-radius:50%; display:inline-block;"></span> 
+        <span style="color:#dc2626; font-size:11px; font-weight:700; margin-left:2px;">Error Sync</span>
+      `;
+    } else if (status === 'pending') {
+      syncIndicator.style.background = 'rgba(245, 158, 11, 0.04)';
+      syncIndicator.style.border = '1px solid rgba(245, 158, 11, 0.15)';
+      syncIndicator.innerHTML = `
+        <span class="sync-dot" style="background:#fbbf24; box-shadow:0 0 8px #fbbf24; width:8px; height:8px; border-radius:50%; display:inline-block;"></span> 
+        <span style="color:#fbbf24; font-size:11px; font-weight:700; margin-left:2px;">Sync Pendiente</span>
+      `;
+    } else {
+      syncIndicator.style.background = 'rgba(16, 185, 129, 0.06)';
+      syncIndicator.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+      syncIndicator.innerHTML = `
+        <span class="sync-dot" style="background:#10b981; box-shadow:0 0 8px #10b981; width:8px; height:8px; border-radius:50%; display:inline-block;"></span> 
+        <span style="color:#10b981; font-size:11px; font-weight:700; margin-left:2px;">Sincronizado</span>
+      `;
+    }
+  };
+
+  // Escuchar a los cambios dinámicos del background engine
+  window.addEventListener('vmp_sync_status_change', (e) => {
+    updateSyncUI(e.detail);
+  });
+  
+  // Establecer valor inicial
+  updateSyncUI(getSyncStatus());
 }

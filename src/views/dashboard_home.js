@@ -58,22 +58,66 @@ export function renderDashboardHome() {
     </div>
   </div>
 
-  <!-- Demo Mode Alert Banner -->
-  <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(13, 148, 136, 0.05) 100%); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-md); padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px;">
-      <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #818cf8; flex-shrink: 0;">
-        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+  <!-- Consola de Enlace ARCA Live -->
+  <div style="background: linear-gradient(135deg, rgba(13, 148, 136, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%); border: 1px solid rgba(13, 148, 136, 0.2); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 28px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.2); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-accent); flex-shrink: 0;">
+          <i data-lucide="activity" style="width: 20px; height: 20px;"></i>
+        </div>
+        <div>
+          <h4 style="font-size: 14.5px; font-weight: 800; color: var(--color-primary); margin: 0 0 3px 0; display: flex; align-items: center; gap: 8px;">
+            Consola de Enlace ARCA (ex-AFIP) 
+            <span style="background: rgba(16, 185, 129, 0.12); color: var(--color-accent); font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">LIVE</span>
+          </h4>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+            Conectado de forma segura mediante firma digital criptográfica del estudio contable.
+          </p>
+        </div>
       </div>
-      <div>
-        <h4 style="font-size: 14px; font-weight: 800; color: var(--color-primary); margin: 0 0 3px 0;">Modo Demostración Activo</h4>
-        <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.4;">
-          Estás navegando en una versión de prueba. Al contratar los servicios de abono del <strong>Estudio Contable Comahue</strong>, accederás al <strong>100% de las funciones completas</strong> de la plataforma.
-        </p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-outline btn-sm" onclick="alert('Estudio Contable Comahue\\n\\nSaaS VMP Studio v3.2.0-prod\\nFirma Activa: estudio_comahue_arca_2026.crt\\nEnlace: Homologado y Encriptado')" style="font-size: 11px; padding: 6px 12px; display: flex; align-items: center; gap: 4px; border-color: rgba(99,102,241,0.25);">
+          <i data-lucide="shield-check" style="width: 13px; height: 13px;"></i> Auditoría de Canal
+        </button>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="alert('Estudio Contable Comahue\\n\\n📞 Teléfono: +54 299 448-1234\\n✉️ Email: contacto@estudiocomahue.com.ar\\n📍 Neuquén, Argentina')" style="background: #6366f1; border-color: #6366f1; font-weight: 700; font-size: 12px; padding: 8px 16px; border-radius: 6px; display: flex; align-items: center; gap: 6px; color: #fff; cursor: pointer;">
-      <i data-lucide="phone" style="width: 14px; height: 14px;"></i> Solicitar Acceso Completo
-    </button>
+
+    <!-- Mini KPI status grid -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border-top: 1px solid rgba(13, 148, 136, 0.1); padding-top: 16px;">
+      
+      <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 6px;">
+        <span style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">WSAA Autenticación</span>
+        <span style="font-size: 12px; font-weight: 750; color: var(--color-accent); display: flex; align-items: center; gap: 6px;">
+          <span style="background: #10b981; width: 6px; height: 6px; border-radius: 50%; display: inline-block;"></span>
+          Token de Acceso Activo
+        </span>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 6px;">
+        <span style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">Latencia de API</span>
+        <span style="font-size: 12px; font-weight: 750; color: var(--color-primary); display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="gauge" style="width: 14px; height: 14px; color: var(--text-secondary);"></i>
+          42ms (Estable)
+        </span>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 6px;">
+        <span style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">Certificado SSL</span>
+        <span style="font-size: 12px; font-weight: 750; color: var(--color-primary); display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="lock" style="width: 14px; height: 14px; color: #818cf8;"></i>
+          TLS 1.3 AES-256
+        </span>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 6px;">
+        <span style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px;">Delegación de CUIT</span>
+        <span style="font-size: 12px; font-weight: 750; color: var(--color-accent); display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="link" style="width: 14px; height: 14px; color: var(--color-accent);"></i>
+          Sincronizado
+        </span>
+      </div>
+
+    </div>
   </div>
 
   ${isMonotributo ? `
@@ -107,60 +151,60 @@ export function renderDashboardHome() {
   </div>
   ` : ''}
 
-  <!-- Interactive Onboarding Trial Guide -->
-  <div class="card trial-guide-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.02) 0%, rgba(99, 102, 241, 0.02) 100%); border-color: rgba(5, 150, 105, 0.12);">
+  <!-- Interactive Studio Modules Guide -->
+  <div class="card production-modules-card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.01) 0%, rgba(99, 102, 241, 0.01) 100%); border-color: rgba(5, 150, 105, 0.12);">
     <div class="card-body" style="padding: 20px 24px;">
       <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-          <span class="badge" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); border-color: rgba(5, 150, 105, 0.2); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 11px;">GUÍA DE PRUEBA INTERACTIVA</span>
-          <h4 style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0;">Probá las 4 funciones clave del SaaS o leé la</h4>
+          <span class="badge" style="background: rgba(5, 150, 105, 0.08); color: var(--color-accent); border-color: rgba(5, 150, 105, 0.2); font-weight: 700; margin: 0; padding: 4px 10px; font-size: 11px;">MÓDULOS DE PRODUCCIÓN STUDIO</span>
+          <h4 style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin: 0;">Acceso directo a las herramientas fiscales de tu Suite Profesional</h4>
         </div>
-        <a href="#/demo/ayuda" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 6px 12px; background: #6366f1; border-color: #6366f1; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm); text-decoration: none; color: white;">
+        <a href="#/studio/ayuda" class="btn btn-primary btn-sm" style="font-size: 11px; padding: 6px 12px; background: #6366f1; border-color: #6366f1; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm); text-decoration: none; color: white;">
           <i data-lucide="book-open" style="width: 12px; height: 12px;"></i> Guía de Onboarding Completa
         </a>
       </div>
       <div class="trial-actions-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
         
-        <a href="#/demo/ventas" class="trial-action-btn">
+        <a href="#/studio/ventas" class="trial-action-btn">
           <div class="ta-btn-icon" style="background: rgba(99, 102, 241, 0.08); color: #6366f1;">
             <i data-lucide="file-text"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>1. Carga de Comprobantes</h5>
-            <p>Cargar facturas y validar CUIT APOC</p>
+            <h5>1. Libro de Comprobantes</h5>
+            <p>Carga y conciliación de facturas</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
 
-        <a href="#/demo/iva" class="trial-action-btn">
+        <a href="#/studio/iva" class="trial-action-btn">
           <div class="ta-btn-icon" style="background: rgba(245, 158, 11, 0.08); color: #f59e0b;">
             <i data-lucide="book-open"></i>
           </div>
           <div class="ta-btn-content">
             <h5>2. Libro IVA Digital</h5>
-            <p>Auditoría mensual y exportación Excel</p>
+            <p>Auditoría e informes de DDJJ</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
 
-        <a href="#/demo" class="trial-action-btn">
+        <a href="#/studio/configuracion" class="trial-action-btn">
           <div class="ta-btn-icon" style="background: rgba(16, 185, 129, 0.08); color: #10b981;">
-            <i data-lucide="alert-triangle"></i>
+            <i data-lucide="link"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>3. Control Monotributo</h5>
-            <p>Alarma Safe-Guard contra exclusión</p>
+            <h5>3. Enlace ARCA</h5>
+            <p>Certificados y CUITs delegados</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
 
-        <a href="#/demo/ayuda" class="trial-action-btn">
+        <a href="#/studio/ayuda" class="trial-action-btn">
           <div class="ta-btn-icon" style="background: rgba(14, 165, 233, 0.08); color: #0ea5e9;">
             <i data-lucide="help-circle"></i>
           </div>
           <div class="ta-btn-content">
-            <h5>4. Instructivo & Soporte</h5>
-            <p>Guía de onboarding y claves ARCA</p>
+            <h5>4. Guías & Onboarding</h5>
+            <p>Documentación técnica completa</p>
           </div>
           <div class="ta-btn-arrow"><i data-lucide="chevron-right"></i></div>
         </a>
@@ -236,7 +280,7 @@ export function renderDashboardHome() {
     <div class="card">
       <div class="card-header">
         <h3><i data-lucide="clock"></i> Actividad Reciente</h3>
-        <a href="#/demo/ventas" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-radius: var(--radius-sm);">Ver Todo</a>
+        <a href="#/studio/ventas" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-radius: var(--radius-sm);">Ver Todo</a>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">

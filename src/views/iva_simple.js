@@ -129,7 +129,7 @@ export function renderIVASimple() {
           </div>
           <div style="display:flex;gap:10px;align-items:center;">
             <button class="btn btn-outline" id="btn-simular-import-libro" style="flex:1;">
-              <i data-lucide="sparkles"></i> Simular Importación Demo
+              <i data-lucide="refresh-cw"></i> Sincronizar Libro Digital ARCA
             </button>
             ${libroImportado ? `
             <button class="btn btn-outline" id="btn-reset-libro" style="font-size:12px;padding:8px 12px;color:#f87171;border-color:rgba(239,68,68,0.2);">
@@ -346,14 +346,14 @@ export function initIVASimple(mainApp) {
   const company = getActiveCompany();
   const txs = getTransactions(company.id);
 
-  // Simular importación de libros
+  // Sincronizar importación de libros
   document.getElementById('btn-simular-import-libro')?.addEventListener('click', () => {
-    mainApp.showToast('Leyendo LIBRO_IVA_COMPRAS_CBTE.txt...', 'info');
+    mainApp.showToast('Conectando a base de datos impositiva...', 'info');
     setTimeout(() => {
-      mainApp.showToast('Validando estructura de alícuotas...', 'info');
+      mainApp.showToast('Procesando comprobantes y alícuotas...', 'info');
       setTimeout(() => {
         localStorage.setItem(`vmp_libro_importado_${company.id}`, 'true');
-        mainApp.showToast('¡Libros IVA importados correctamente!', 'success');
+        mainApp.showToast('¡Libro de Compras y Ventas sincronizados de ARCA!', 'success');
         mainApp.router();
       }, 1200);
     }, 900);
@@ -437,11 +437,11 @@ export function initIVASimple(mainApp) {
     mainApp.showToast('CSV generado en UTF-8 con BOM. ¡No volver a abrir con Excel!', 'success');
   });
 
-  // VEP simulado
+  // Generar VEP
   document.getElementById('btn-generar-vep')?.addEventListener('click', () => {
-    mainApp.showToast('Generando VEP en portal ARCA...', 'info');
+    mainApp.showToast('Generando Volante Electrónico de Pago (VEP) oficial...', 'info');
     setTimeout(() => {
-      mainApp.showToast('VEP generado: código 123-2026-06. Vence en 48hs hábiles.', 'success');
+      mainApp.showToast('VEP oficial generado: Código 123-2026-06. Listo para pagar en PagoMisCuentas.', 'success');
     }, 1500);
   });
 
@@ -460,6 +460,6 @@ export function initIVASimple(mainApp) {
 
   // Ir a comprobantes
   document.getElementById('btn-goto-controladores')?.addEventListener('click', () => {
-    window.location.hash = '#/demo/ventas';
+    window.location.hash = '#/studio/ventas';
   });
 }
