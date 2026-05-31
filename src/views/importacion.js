@@ -1,8 +1,8 @@
 /* -------------------------------------------------------------
-   VMP Studio Contable - Importación ARCA View Component (REAL PARSER)
+   VMP Studio Contable - Importación ARCA View Component
    ------------------------------------------------------------- */
-import { getActiveCompany, addTransaction } from '../db/mockdb.js';
-import { renderPremiumTeaser } from '../utils.js';
+import { getActiveCompany, addTransaction, getTransactions } from '../db/mockdb.js';
+import { fmt } from '../utils.js';
 
 const ARCA_MOCK_EMITIDAS = [
   { fecha: "2026-05-24", tipo_comprobante: "Factura A", numero: "0003-00000850", cliente: "Comercio Mayorista Patagonia", cuit: "30-58930219-4", neto: 150000, iva: 31500, total: 181500, es_activo: false, categoria: "Venta" },
@@ -17,105 +17,274 @@ const ARCA_MOCK_RECIBIDAS = [
   { fecha: "2026-05-23", tipo_comprobante: "Factura A", numero: "0094-00293812", proveedor: "Papelera del Valle", cuit: "30-66442299-5", neto: 38000, iva: 7980, total: 45980, es_activo: false, categoria: "Librería" },
   { fecha: "2026-05-20", tipo_comprobante: "Factura B", numero: "8391-09283746", proveedor: "Librería La Favorita", cuit: "30-11221122-3", neto: 12000, iva: 2520, total: 14520, es_activo: false, categoria: "Librería" },
   { fecha: "2026-05-18", tipo_comprobante: "Factura A", numero: "0103-00048192", proveedor: "Estudio Contable Centenario", cuit: "30-70809010-4", neto: 120000, iva: 25200, total: 145200, es_activo: false, categoria: "Servicios" },
-  { fecha: "2026-05-15", tipo_comprobante: "Factura A - Retención", numero: "0002-00003291", proveedor: "Constructora Norpat S.A.", cuit: "30-84920193-7", neto: 350000, iva: 73500, total: 423500, es_activo: true, categoria: "Construcciones" },
+  { fecha: "2026-05-15", tipo_comprobante: "Factura A", numero: "0002-00003291", proveedor: "Constructora Norpat S.A.", cuit: "30-84920193-7", neto: 350000, iva: 73500, total: 423500, es_activo: true, categoria: "Construcciones" },
   { fecha: "2026-05-10", tipo_comprobante: "Factura A", numero: "0008-00012743", proveedor: "Computación Neuquen", cuit: "30-72849102-3", neto: 537190, iva: 112810, total: 650000, es_activo: true, categoria: "Computación" }
 ];
 
 export function renderImportacion() {
   const activeCompany = getActiveCompany();
 
-  return renderPremiumTeaser(`
+  return `
   <div class="view-header">
     <div>
-      <h1 class="view-title">Importación ARCA</h1>
-      <p class="view-subtitle">Importá facturas masivamente desde los archivos descargados de "Mis Comprobantes" en ARCA.</p>
+      <h1 class="view-title">Importación & Reconciliación ARCA</h1>
+      <p class="view-subtitle">Consola impositiva para la sincronización y auditoría cruzada de comprobantes con ARCA.</p>
+    </div>
+    <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: #818cf8;">
+      Empresa: ${activeCompany.razon_social}
     </div>
   </div>
 
-  <div class="card" style="margin-bottom: 32px;">
-    <div class="card-body">
-      <!-- Drag & Drop Zone -->
-      <div class="import-area" id="afip-dropzone">
-        <div class="import-icon">
-          <i data-lucide="file-text"></i>
-        </div>
-        <h4 id="dropzone-title">Arrastrá aquí tus comprobantes ARCA</h4>
-        <p id="dropzone-desc">Soportamos formatos oficiales de ARCA (Excel .xls / .xlsx, TXT o CSV de "Mis Comprobantes Emitidos/Recibidos").</p>
-        
-        <label class="btn btn-outline btn-sm" style="cursor: pointer;">
-          Examinar Archivo Real
-          <input type="file" id="afip-file-input" style="display: none;" accept=".csv,.txt,.xlsx,.xls">
-        </label>
+  <!-- Solapas de la vista de importación -->
+  <div style="display: flex; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px; gap: 4px; margin-bottom: 24px;">
+    <button class="btn btn-sm import-tab-btn active" data-tab="import" style="flex: 1; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
+      <i data-lucide="upload-cloud" style="width: 15px; height: 15px;"></i>
+      Sincronización Masiva
+    </button>
+    <button class="btn btn-sm import-tab-btn" data-tab="reconcile" style="flex: 1; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
+      <i data-lucide="scale" style="width: 15px; height: 15px; color: var(--color-accent);"></i>
+      Consola de Reconciliación ARCA Live
+    </button>
+  </div>
 
-        <div class="demo-afip-pills">
-          <div class="afip-sample-pill" id="btn-simulate-emitidas">
-            <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px;"></i>
-            Sincronizar Emitidas ARCA (Ventas)
+  <!-- PANEL 1: IMPORTACIÓN MASIVA Y SINCRONIZACIÓN -->
+  <div id="import-panel-masiva">
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-body">
+        <!-- Drag & Drop Zone -->
+        <div class="import-area" id="afip-dropzone" style="border-color: rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.01);">
+          <div class="import-icon" style="background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.2);">
+            <i data-lucide="file-text"></i>
           </div>
-          <div class="afip-sample-pill" id="btn-simulate-recibidas">
-            <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px;"></i>
-            Sincronizar Recibidas ARCA (Compras)
+          <h4 id="dropzone-title" style="font-size: 14px; font-weight: 700;">Arrastrá aquí tus comprobantes ARCA</h4>
+          <p id="dropzone-desc" style="font-size: 12px; margin-top: 4px; margin-bottom: 16px;">Soportamos formatos oficiales de ARCA (Excel .xls / .xlsx, TXT o CSV de "Mis Comprobantes").</p>
+          
+          <label class="btn btn-outline btn-sm" style="cursor: pointer; border-color: rgba(99, 102, 241, 0.3); color: #818cf8;">
+            Examinar Archivo Real
+            <input type="file" id="afip-file-input" style="display: none;" accept=".csv,.txt,.xlsx,.xls">
+          </label>
+
+          <div class="demo-afip-pills" style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
+            <div class="afip-sample-pill" id="btn-simulate-emitidas" style="border-color: rgba(99, 102, 241, 0.25);">
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
+              Sincronizar Emitidas ARCA (Ventas)
+            </div>
+            <div class="afip-sample-pill" id="btn-simulate-recibidas" style="border-color: rgba(99, 102, 241, 0.25);">
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
+              Sincronizar Recibidas ARCA (Compras)
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Live simulation progress -->
-      <div id="sim-progress-container" style="display: none; padding: 24px; border-top: 1px solid var(--border-color); text-align: center;">
-        <div class="spinner" style="margin: 0 auto 16px;"></div>
-        <h4 id="sim-progress-title">Procesando y validando firmas fiscales ARCA...</h4>
-        <div style="width: 100%; max-width: 400px; height: 6px; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); margin: 12px auto; overflow: hidden; position: relative;">
-          <div id="sim-progress-bar" style="width: 0%; height: 100%; background: var(--gradient-brand); transition: width 0.1s linear;"></div>
+        <!-- Live simulation progress -->
+        <div id="sim-progress-container" style="display: none; padding: 24px; border-top: 1px solid var(--border-color); text-align: center;">
+          <div class="spinner" style="margin: 0 auto 16px;"></div>
+          <h4 id="sim-progress-title">Procesando y validando firmas fiscales ARCA...</h4>
+          <div style="width: 100%; max-width: 400px; height: 6px; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); margin: 12px auto; overflow: hidden; position: relative;">
+            <div id="sim-progress-bar" style="width: 0%; height: 100%; background: var(--gradient-brand); transition: width 0.1s linear;"></div>
+          </div>
+          <span id="sim-progress-percent" style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">0%</span>
         </div>
-        <span id="sim-progress-percent" style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">0%</span>
-      </div>
 
-      <!-- Simulation results -->
-      <div id="sim-results-container" style="display: none; border-top: 1px solid var(--border-color); padding-top: 24px;">
-        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-          <i data-lucide="check-circle" style="color: var(--color-emerald-light)"></i>
-          Comprobantes Importados con Éxito
-        </h3>
-        <div class="table-responsive">
-          <table class="table table-sm">
-            <thead>
-              <tr id="sim-table-header">
+        <!-- Simulation results -->
+        <div id="sim-results-container" style="display: none; border-top: 1px solid var(--border-color); padding-top: 24px;">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="check-circle" style="color: #10b981;"></i>
+            Comprobantes Importados con Éxito
+          </h3>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr id="sim-table-header">
+                  <!-- Injected via JS -->
+                </tr>
+              </thead>
+              <tbody id="sim-table-body">
                 <!-- Injected via JS -->
-              </tr>
-            </thead>
-            <tbody id="sim-table-body">
-              <!-- Injected via JS -->
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i data-lucide="help-circle"></i> ¿Cómo descargar los comprobantes desde ARCA?</h3>
+      </div>
+      <div class="card-body">
+        <ul style="list-style-type: decimal; padding-left: 20px; font-size: 13.5px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
+          <li>Ingresá a <strong>ARCA (www.arca.gob.ar)</strong> con tu Clave Fiscal.</li>
+          <li>Accedé al servicio interactivo de <strong>"Mis Comprobantes"</strong>.</li>
+          <li>Seleccioná la opción <strong>"Emitidos"</strong> (para ventas) o <strong>"Recibidos"</strong> (para compras).</li>
+          <li>Elegí el rango de fechas (ej: mes actual) y hacé clic en Buscar.</li>
+          <li>En el listado, seleccioná <strong>"Exportar" → Formato XLS o CSV</strong>. El sistema descarga el archivo directamente sin necesidad del botón Excel antiguo.</li>
+          <li>¡Listo! Arrastrá ese archivo descargado en este panel y el sistema cargará todo al instante.</li>
+        </ul>
+        <div style="margin-top:16px; background:rgba(99,102,241,0.03); border:1px solid rgba(99,102,241,0.15); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:var(--text-secondary);">
+          <strong style="color:#818cf8;">Tip RPA:</strong> Para automatizar la descarga sin ingresar manualmente, configurá el bot de descarga en <strong>Configuración ARCA</strong>. Los robots descargan en horarios nocturnos con la clave fiscal del administrador.
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <h3><i data-lucide="help-circle"></i> ¿Cómo descargar los comprobantes desde ARCA?</h3>
-    </div>
-    <div class="card-body">
-      <ul style="list-style-type: decimal; padding-left: 20px; font-size: 14px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 12px;">
-        <li>Ingresá a <strong>ARCA (www.arca.gob.ar)</strong> con tu Clave Fiscal.</li>
-        <li>Accedé al servicio interactivo de <strong>"Mis Comprobantes"</strong>.</li>
-        <li>Seleccioná la opción <strong>"Emitidos"</strong> (para ventas) o <strong>"Recibidos"</strong> (para compras).</li>
-        <li>Elegí el rango de fechas (ej: mes actual) y hacé clic en Buscar.</li>
-        <li>En el listado, seleccioná <strong>"Exportar" → Formato XLS o CSV</strong>. El sistema descarga el archivo directamente sin necesidad del botón Excel antiguo.</li>
-        <li>¡Listo! Arrastrá ese archivo descargado en este panel y el sistema cargará todo al instante.</li>
-      </ul>
-      <div style="margin-top:16px; background:rgba(99,102,241,0.03); border:1px solid rgba(99,102,241,0.15); border-radius:var(--radius-sm); padding:12px 16px; font-size:12px; color:var(--text-secondary);">
-        <strong style="color:#818cf8;">Tip RPA:</strong> Para automatizar la descarga sin ingresar manualmente, configurá el bot de descarga en <strong>Configuración ARCA</strong>. Los robots descargan en horarios nocturnos con la clave fiscal del administrador.
+  <!-- PANEL 2: CONSOLA DE RECONCILIACIÓN AFIP LIVE -->
+  <div id="import-panel-reconcile" style="display: none; flex-direction: column; gap: 20px;">
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3><i data-lucide="scale" style="color: var(--color-accent);"></i> Cruce de Cuentas y Auditoría Cruzada</h3>
+        <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.2);">ARCA vs VMP Studio</span>
+      </div>
+      <div class="card-body">
+        <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 16px;">
+          Esta herramienta cruza de forma inteligente los comprobantes reportados en la base de datos fiscal de ARCA contra los cargados en el Ledger local de VMP Studio. Detecta facturas duplicadas, descuadres de IVA y **documentos omitidos por el cliente (pérdida de crédito fiscal)**.
+        </p>
+
+        <!-- Quick actions reconciler buttons -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+          <button class="btn btn-outline" id="btn-reconcile-compras" style="display: flex; align-items: center; justify-content: center; gap: 6px; border-color: rgba(99, 102, 241, 0.25);">
+            <i data-lucide="arrow-down" style="color: #6366f1;"></i> Reconciliar Compras (Mis Comprobantes Recibidos)
+          </button>
+          <button class="btn btn-outline" id="btn-reconcile-ventas" style="display: flex; align-items: center; justify-content: center; gap: 6px; border-color: rgba(99, 102, 241, 0.25);">
+            <i data-lucide="arrow-up" style="color: #10b981;"></i> Reconciliar Ventas (Mis Comprobantes Emitidos)
+          </button>
+        </div>
+
+        <!-- Reconciliation status dashboard metrics cards -->
+        <div id="reconcile-metrics-dashboard" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
+          <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-sm); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase;">Coincidentes</div>
+            <div class="font-mono" id="rec-val-coincident" style="font-size: 24px; font-weight: 800; margin-top: 4px; color: var(--color-primary);">0</div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Cruce exacto en CUIT y monto.</div>
+          </div>
+          <div style="background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-sm); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #ef4444; text-transform: uppercase;">Faltantes en Ledger</div>
+            <div class="font-mono" id="rec-val-missing-ledger" style="font-size: 24px; font-weight: 800; margin-top: 4px; color: var(--color-primary);">0</div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Declarados en AFIP pero omitidos aquí.</div>
+          </div>
+          <div style="background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-sm); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase;">Faltantes en AFIP</div>
+            <div class="font-mono" id="rec-val-missing-afip" style="font-size: 24px; font-weight: 800; margin-top: 4px; color: var(--color-primary);">0</div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Cargados a mano pero sin CAE legal.</div>
+          </div>
+        </div>
+
+        <!-- Reconciliation Results Lists -->
+        <div id="reconcile-results-container" style="display: none; flex-direction: column; gap: 20px;">
+          
+          <!-- MISSING IN LEDGER CARD BLOCK -->
+          <div id="block-missing-ledger" style="display: flex; flex-direction: column; gap: 10px;">
+            <h4 style="font-size: 13px; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+              Alerta de Crédito Fiscal Omitido: Comprobantes en ARCA no registrados en el Estudio Contable
+            </h4>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr style="font-size: 11px;">
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Número</th>
+                    <th>Emisor/Proveedor</th>
+                    <th>CUIT</th>
+                    <th class="text-right">Total</th>
+                    <th class="text-center" style="width: 140px;">Acción CPN</th>
+                  </tr>
+                </thead>
+                <tbody id="rec-tbody-missing-ledger">
+                  <!-- Filled dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- COINCIDENT MATCHING CARD BLOCK -->
+          <div id="block-coincident" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <h4 style="font-size: 13px; font-weight: 800; color: #10b981; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+              Comprobantes Reconciliados y Conciliados Correctamente (100% Cruzados)
+            </h4>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr style="font-size: 11px;">
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Número</th>
+                    <th>Entidad</th>
+                    <th>CUIT</th>
+                    <th class="text-right">Total</th>
+                    <th class="text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="rec-tbody-coincident">
+                  <!-- Filled dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- MISSING IN AFIP CARD BLOCK -->
+          <div id="block-missing-afip" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <h4 style="font-size: 13px; font-weight: 800; color: #f59e0b; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span>
+              Comprobantes con Carga Manual únicamente (No informados en AFIP)
+            </h4>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr style="font-size: 11px;">
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Número</th>
+                    <th>Entidad</th>
+                    <th>CUIT</th>
+                    <th class="text-right">Total</th>
+                    <th class="text-center">Diagnóstico</th>
+                  </tr>
+                </thead>
+                <tbody id="rec-tbody-missing-afip">
+                  <!-- Filled dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
-  `, "Importador de Comprobantes ARCA", "Sincronizá el estudio contable directamente con ARCA. Habilitá la descarga y carga automatizada de comprobantes de compras y ventas sin carga manual ni planillas externas.");
+  `;
 }
 
 export function initImportacion(mainApp) {
   if (window.lucide) window.lucide.createIcons();
 
   const activeCompany = getActiveCompany();
+
+  // Tab switching setup
+  const tabBtns = document.querySelectorAll('.import-tab-btn');
+  const panelMasiva = document.getElementById('import-panel-masiva');
+  const panelReconcile = document.getElementById('import-panel-reconcile');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const tabKey = btn.dataset.tab;
+      if (tabKey === 'import') {
+        panelMasiva.style.display = 'block';
+        panelReconcile.style.display = 'none';
+      } else {
+        panelMasiva.style.display = 'none';
+        panelReconcile.style.display = 'flex';
+      }
+    });
+  });
 
   const dropzone = document.getElementById('afip-dropzone');
   const fileInput = document.getElementById('afip-file-input');
@@ -131,6 +300,20 @@ export function initImportacion(mainApp) {
   const resContainer = document.getElementById('sim-results-container');
   const resHeader = document.getElementById('sim-table-header');
   const resBody = document.getElementById('sim-table-body');
+
+  // Reconciliation DOM
+  const btnRecCompras = document.getElementById('btn-reconcile-compras');
+  const btnRecVentas = document.getElementById('btn-reconcile-ventas');
+  const recMetrics = document.getElementById('reconcile-metrics-dashboard');
+  const recContainer = document.getElementById('reconcile-results-container');
+
+  const recValCoincident = document.getElementById('rec-val-coincident');
+  const recValMissingLedger = document.getElementById('rec-val-missing-ledger');
+  const recValMissingAfip = document.getElementById('rec-val-missing-afip');
+
+  const tbodyMissingLedger = document.getElementById('rec-tbody-missing-ledger');
+  const tbodyCoincident = document.getElementById('rec-tbody-coincident');
+  const tbodyMissingAfip = document.getElementById('rec-tbody-missing-afip');
 
   const startSimulation = (batch, type) => {
     if (batch.length === 0) {
@@ -163,10 +346,8 @@ export function initImportacion(mainApp) {
         clearInterval(interval);
         
         // Cargar en la DB temporal real
-        let duplicateCount = 0;
         batch.forEach(tx => {
-          const added = addTransaction(activeCompany.id, type, tx);
-          // Si el CUIT o número ya existía localmente, mockdb.js retornó el mismo elemento sin agregarlo doble
+          addTransaction(activeCompany.id, type, tx);
         });
 
         // Mostrar listado de resultados
@@ -191,7 +372,7 @@ export function initImportacion(mainApp) {
               <td class="font-mono text-sm">${tx.numero}</td>
               <td style="font-weight:600;">${tx.cliente}</td>
               <td class="font-mono">${tx.cuit}</td>
-              <td class="font-mono text-right" style="font-weight:700; color: var(--color-emerald-light);">$ ${tx.total.toLocaleString('es-AR')}</td>
+              <td class="font-mono text-right" style="font-weight:700; color: #10b981;">$ ${tx.total.toLocaleString('es-AR')}</td>
             </tr>
           `).join('');
         } else {
@@ -221,7 +402,162 @@ export function initImportacion(mainApp) {
   };
 
   // -------------------------------------------------------------
-  // MOTOR DE ANALIZADOR SINTÁCTICO DE ARCHIVOS REALES DE LA AFIP (CPN PARSER)
+  // RECONCILIATION MATCHING ALGORITHM
+  // -------------------------------------------------------------
+  const executeReconciliation = (afipComprobantes, type) => {
+    mainApp.showToast("Iniciando auditoría cruzada de comprobantes en tiempo real...", "info");
+    
+    // Get existing local transactions for the active company
+    const localTxs = getTransactions(activeCompany.id);
+    const localList = type === 'compras' ? localTxs.compras : localTxs.ventas;
+
+    const coincident = [];
+    const missingLedger = [];
+    const missingAfip = [];
+
+    // Helper key creator
+    const getCcbteKey = (tx) => {
+      const numClean = tx.numero.replace(/[^\d]/g, '');
+      return `${numClean}`;
+    };
+
+    const localKeysMap = {};
+    localList.forEach(tx => {
+      const key = getCcbteKey(tx);
+      localKeysMap[key] = tx;
+    });
+
+    const afipKeysMap = {};
+    afipComprobantes.forEach(tx => {
+      const key = getCcbteKey(tx);
+      afipKeysMap[key] = tx;
+    });
+
+    // 1. Cross reference what is in AFIP
+    afipComprobantes.forEach(afipTx => {
+      const key = getCcbteKey(afipTx);
+      const match = localKeysMap[key];
+      if (match) {
+        coincident.push({ afip: afipTx, local: match });
+      } else {
+        missingLedger.push(afipTx);
+      }
+    });
+
+    // 2. Find what is in local list but missing in AFIP
+    localList.forEach(localTx => {
+      const key = getCcbteKey(localTx);
+      const match = afipKeysMap[key];
+      if (!match) {
+        missingAfip.push(localTx);
+      }
+    });
+
+    // Render Metrics
+    recMetrics.style.display = 'grid';
+    recContainer.style.display = 'flex';
+
+    recValCoincident.textContent = coincident.length;
+    recValMissingLedger.textContent = missingLedger.length;
+    recValMissingAfip.textContent = missingAfip.length;
+
+    // Render lists
+    // A. Missing in ledger
+    if (missingLedger.length === 0) {
+      tbodyMissingLedger.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:16px; font-size:12px;">🎉 ¡Excelente! No se detectaron comprobantes omitidos en el libro contable.</td></tr>`;
+    } else {
+      tbodyMissingLedger.innerHTML = missingLedger.map((tx, index) => `
+        <tr>
+          <td class="font-mono text-sm">${tx.fecha.split('-').reverse().join('/')}</td>
+          <td><span class="badge-status active" style="font-size:10px; padding:1px 6px;">${tx.tipo_comprobante}</span></td>
+          <td class="font-mono text-sm">${tx.numero}</td>
+          <td style="font-weight:600;">${type === 'compras' ? tx.proveedor : tx.cliente}</td>
+          <td class="font-mono">${tx.cuit}</td>
+          <td class="font-mono text-right" style="font-weight:700;">$ ${tx.total.toLocaleString('es-AR')}</td>
+          <td class="text-center">
+            <button class="btn btn-xs btn-primary btn-rec-incorporate" data-index="${index}" style="font-size: 10px; padding: 2px 8px; background: #6366f1; border-color: #6366f1;">
+              <i data-lucide="plus" style="width:10px; height:10px; display:inline;"></i> Registrar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Incorporate actions
+      document.querySelectorAll('.btn-rec-incorporate').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = Number(btn.dataset.index);
+          const item = missingLedger[idx];
+          
+          // Inject into database
+          addTransaction(activeCompany.id, type, item);
+          mainApp.showToast(`¡Comprobante N° ${item.numero} incorporado con éxito al Ledger!`, "success");
+          
+          // Re-trigger reconciler instantly
+          if (type === 'compras') {
+            executeReconciliation(ARCA_MOCK_RECIBIDAS, 'compras');
+          } else {
+            executeReconciliation(ARCA_MOCK_EMITIDAS, 'ventas');
+          }
+        });
+      });
+    }
+
+    // B. Coincident
+    if (coincident.length === 0) {
+      tbodyCoincident.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:16px; font-size:12px;">Sin comprobantes coincidentes aún.</td></tr>`;
+    } else {
+      tbodyCoincident.innerHTML = coincident.map(pair => `
+        <tr>
+          <td class="font-mono text-sm">${pair.afip.fecha.split('-').reverse().join('/')}</td>
+          <td><span class="badge-status active" style="font-size:10px; padding:1px 6px; background: rgba(16, 185, 129, 0.08); color: #10b981;">${pair.afip.tipo_comprobante}</span></td>
+          <td class="font-mono text-sm">${pair.afip.numero}</td>
+          <td style="font-weight:600;">${type === 'compras' ? pair.afip.proveedor : pair.afip.cliente}</td>
+          <td class="font-mono">${pair.afip.cuit}</td>
+          <td class="font-mono text-right" style="font-weight:700;">$ ${pair.afip.total.toLocaleString('es-AR')}</td>
+          <td class="text-center">
+            <span style="font-size: 10px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 8px; border-radius:4px;">
+              ✅ CONCILIADO
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // C. Missing in AFIP
+    if (missingAfip.length === 0) {
+      tbodyMissingAfip.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="padding:16px; font-size:12px;">Todos los comprobantes locales están respaldados legalmente por ARCA.</td></tr>`;
+    } else {
+      tbodyMissingAfip.innerHTML = missingAfip.map(tx => `
+        <tr>
+          <td class="font-mono text-sm">${tx.fecha.split('-').reverse().join('/')}</td>
+          <td><span class="badge-status active" style="font-size:10px; padding:1px 6px; background: rgba(245, 158, 11, 0.08); color: #f59e0b;">${tx.tipo_comprobante}</span></td>
+          <td class="font-mono text-sm">${tx.numero}</td>
+          <td style="font-weight:600;">${type === 'compras' ? (tx.proveedor || 'Proveedor') : (tx.cliente || 'Cliente')}</td>
+          <td class="font-mono">${tx.cuit}</td>
+          <td class="font-mono text-right" style="font-weight:700;">$ ${tx.total.toLocaleString('es-AR')}</td>
+          <td class="text-center" style="font-size: 10.5px; font-weight:600; color: #f59e0b; line-height:1.2;">
+            ⚠️ Carga interna manual<br><span style="font-size:9px; color:var(--text-muted);">Verificar CAE impositivo</span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    if (window.lucide) window.lucide.createIcons({ root: recContainer });
+  };
+
+  btnRecCompras?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    executeReconciliation(ARCA_MOCK_RECIBIDAS, 'compras');
+  });
+
+  btnRecVentas?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    executeReconciliation(ARCA_MOCK_EMITIDAS, 'ventas');
+  });
+
+  // -------------------------------------------------------------
+  // MOTOR DE ANALIZADOR SINTÁCTICO DE ARCHIVOS REALES DE LA AFIP
   // -------------------------------------------------------------
   const parseAFIPFileContent = (fileContent, fileName) => {
     try {
@@ -281,7 +617,6 @@ export function initImportacion(mainApp) {
       }
 
       // E. Detectar si el reporte es de Ventas o de Compras
-      // Generalmente AFIP incluye la palabra "Receptor" para Ventas, "Emisor" para Compras, o lo deducimos por el nombre del archivo
       let operationType = 'ventas';
       const isFileNameCompras = /recibidos|compras|purchases|compr/i.test(fileName);
       const isHeaderCompras = columns.some(c => /emisor/i.test(c) || /proveedor/i.test(c));
@@ -398,7 +733,14 @@ export function initImportacion(mainApp) {
       }
 
       console.log(`CPN Parser: Archivo analizado correctamente. Registros listos: ${parsedTransactions.length}`);
-      startSimulation(parsedTransactions, operationType);
+      
+      // If we are in the Reconcile Solapa, we run the Reconciler directly with the parsed list!
+      const activeTab = document.querySelector('.import-tab-btn.active').dataset.tab;
+      if (activeTab === 'reconcile') {
+        executeReconciliation(parsedTransactions, operationType);
+      } else {
+        startSimulation(parsedTransactions, operationType);
+      }
 
     } catch (err) {
       console.error("CPN Parser Error:", err);
@@ -435,7 +777,7 @@ export function initImportacion(mainApp) {
       reader.onload = (evt) => {
         parseAFIPFileContent(evt.target.result, file.name);
       };
-      reader.readAsText(file, 'ISO-8859-1'); // Codificación típica de exportación AFIP en español
+      reader.readAsText(file, 'ISO-8859-1');
     }
   });
 

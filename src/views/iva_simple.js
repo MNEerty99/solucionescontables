@@ -1,14 +1,27 @@
 /* -------------------------------------------------------------
-   VMP Studio Contable — IVA Simple / F.2051
-   Circuito completo de liquidación IVA según ARCA 2026
+   VMP Studio Contable — IVA Simple & Consola Monotributo
+   Circuito completo de liquidación IVA (RI) y Control de Monotributo
    ------------------------------------------------------------- */
 import { getActiveCompany, getTransactions } from '../db/mockdb.js';
-import { fmt, fmtDate, getVencimientos, downloadFile, renderPremiumTeaser } from '../utils.js';
+import { fmt, fmtDate, getVencimientos, downloadFile } from '../utils.js';
 
-// ── Actividades económicas CLAE simplificadas por sector ────────
+// Official ARCA 2026 limits for Monotributo Categories (Régimen Simplificado)
+const MONOTRIBUTO_CATEGORIAS_2026 = {
+  'A': { maxIngresos: 3000000, superficie: 30, energia: 3330, alquileres: 450000, cuotaServicios: 26600, cuotaBienes: 26600 },
+  'B': { maxIngresos: 4500000, superficie: 45, energia: 5000, alquileres: 900000, cuotaServicios: 30000, cuotaBienes: 30000 },
+  'C': { maxIngresos: 6700000, superficie: 60, energia: 6700, alquileres: 1350000, cuotaServicios: 34500, cuotaBienes: 33200 },
+  'D': { maxIngresos: 9000000, superficie: 85, energia: 10000, alquileres: 1800000, cuotaServicios: 41400, cuotaBienes: 38900 },
+  'E': { maxIngresos: 12000000, superficie: 110, energia: 13000, alquileres: 2250000, cuotaServicios: 52000, cuotaBienes: 47000 },
+  'F': { maxIngresos: 15000000, superficie: 150, energia: 16500, alquileres: 2700000, cuotaServicios: 65000, cuotaBienes: 56000 },
+  'G': { maxIngresos: 18000000, superficie: 200, energia: 20000, alquileres: 3150000, cuotaServicios: 82000, cuotaBienes: 69000 },
+  'H': { maxIngresos: 22000000, superficie: 200, energia: 20000, alquileres: 4500000, cuotaServicios: 120000, cuotaBienes: 98000 },
+  'I': { maxIngresos: 25500000, superficie: 200, energia: 20000, alquileres: 4500000, cuotaServicios: 0, cuotaBienes: 125000 }, // Servicios excluido a partir de I
+  'J': { maxIngresos: 28500000, superficie: 200, energia: 20000, alquileres: 4500000, cuotaServicios: 0, cuotaBienes: 145000 },
+  'K': { maxIngresos: 31000000, superficie: 200, energia: 20000, alquileres: 4500000, cuotaServicios: 0, cuotaBienes: 180000 }
+};
+
+// Economist CLAE simplified sectors
 function getActividadesPorEmpresa(company) {
-  // En producción: vendría del perfil de la empresa en Supabase/ARCA
-  // Demo: asignar según tipo de actividad declarada
   const act = company.actividad?.toLowerCase() || '';
   if (act.includes('logísti') || act.includes('transport')) {
     return [
@@ -22,18 +35,228 @@ function getActividadesPorEmpresa(company) {
       { codigo: '631100', descripcion: 'Procesamiento y hosting de datos', pct: 0.30, alicuota: 21 },
     ];
   }
-  // Default: comercio mayorista
   return [
     { codigo: '464100', descripcion: 'Venta al por mayor de alimentos', pct: 0.70, alicuota: 21 },
     { codigo: '479900', descripcion: 'Venta al por menor s/especificación', pct: 0.30, alicuota: 21 },
   ];
 }
 
-// ── Render ────────────────────────────────────────────────────────
 export function renderIVASimple() {
   const company = getActiveCompany();
   const txs = getTransactions(company.id);
+  
+  const isMonotributo = company.condicion_iva.includes('Monotributo');
+  const mesActual = new Date().toLocaleString('es-AR', { month: 'long', year: 'numeric' });
 
+  // -------------------------------------------------------------
+  // DYNAMIC RENDERING FOR MONOTRIBUTISTAS (Régimen Simplificado)
+  // -------------------------------------------------------------
+  if (isMonotributo) {
+    // 1. Parse active category letter (e.g. "Cat H")
+    const matchCat = company.condicion_iva.match(/Cat\s+([A-K])/i);
+    const activeLetter = matchCat ? matchCat[1].toUpperCase() : 'H';
+    const catDetails = MONOTRIBUTO_CATEGORIAS_2026[activeLetter] || MONOTRIBUTO_CATEGORIAS_2026['H'];
+
+    // 2. Sum rolling 12-month sales (cutoff 365 days ago)
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 365);
+    
+    const rollingSales = txs.ventas.reduce((s, v) => {
+      const vDate = new Date(v.fecha);
+      if (vDate >= cutoffDate) {
+        return s + v.total;
+      }
+      return s;
+    }, 0);
+
+    const percentCategory = (rollingSales / catDetails.maxIngresos) * 100;
+    const percentExclusion = (rollingSales / 31000000) * 100; // Cat K limit
+
+    // 3. Warning engine and insights
+    let statusColor = '#10b981'; // Green
+    let statusBg = 'rgba(16, 185, 129, 0.04)';
+    let statusBorder = 'rgba(16, 185, 129, 0.2)';
+    let statusLabel = 'SALUDABLE';
+    let statusInsight = `El nivel de facturación de tu cliente está bajo control. Se encuentra a un **${(100 - percentCategory).toFixed(1)}%** del tope de la Categoría ${activeLetter}. Facturación mensual sugerida: **$ ${(catDetails.maxIngresos / 12).toLocaleString('es-AR')}**.`;
+
+    if (percentCategory >= 85 && percentCategory < 100) {
+      statusColor = '#fbbf24'; // Orange
+      statusBg = 'rgba(251, 191, 36, 0.04)';
+      statusBorder = 'rgba(251, 191, 36, 0.2)';
+      statusLabel = 'RIESGO DE RECATEGORIZACIÓN';
+      statusInsight = `⚠️ **¡Alerta!** El cliente ha facturado el **${percentCategory.toFixed(1)}%** del tope de su categoría. En el próximo semestre fiscal deberá recategorizarse hacia una categoría superior. Límite de facturación recomendado por mes: **$ ${((catDetails.maxIngresos - rollingSales) / 2).toLocaleString('es-AR')}** para atenuar saltos bruscos.`;
+    } else if (percentCategory >= 100 || percentExclusion >= 90) {
+      statusColor = '#ef4444'; // Red
+      statusBg = 'rgba(239, 68, 68, 0.04)';
+      statusBorder = 'rgba(239, 68, 68, 0.2)';
+      statusLabel = '🔴 RIESGO CRÍTICO DE EXCLUSIÓN';
+      statusInsight = `🚨 **ALERTA MÁXIMA CPN:** El contribuyente ha facturado **$ ${rollingSales.toLocaleString('es-AR')}** en los últimos 12 meses móviles. Esto supera el tope de su Categoría (${activeLetter}) y está al **${percentExclusion.toFixed(1)}%** de la exclusión absoluta del Régimen Simplificado ($ 31.000.000). **Riesgo inminente de pase de oficio al Régimen General con severas multas retroactivas. Se recomienda detener la facturación.**`;
+    }
+
+    return `
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Consola de Control de Monotributo</h1>
+        <p class="view-subtitle">Monitoreo continuo de exclusión, límites de categorías y recategorización semestral.</p>
+      </div>
+      <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); padding: 8px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: #818cf8;">
+        Contribuyente: ${company.razon_social} (${company.condicion_iva})
+      </div>
+    </div>
+
+    <!-- Metrics row -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-body" style="padding: 16px;">
+          <div style="font-size: 10px; font-weight:800; color: var(--text-muted); text-transform: uppercase;">Facturado 12 Meses Móviles</div>
+          <div class="font-mono" style="font-size: 26px; font-weight: 850; color: var(--color-primary); margin-top: 6px;">
+            $ ${rollingSales.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Desde: ${cutoffDate.toLocaleDateString('es-AR')}</div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-body" style="padding: 16px;">
+          <div style="font-size: 10px; font-weight:800; color: var(--text-muted); text-transform: uppercase;">Tope Categoría ${activeLetter}</div>
+          <div class="font-mono" style="font-size: 26px; font-weight: 850; color: #6366f1; margin-top: 6px;">
+            $ ${catDetails.maxIngresos.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Consumido: <strong>${percentCategory.toFixed(1)}%</strong></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-body" style="padding: 16px;">
+          <div style="font-size: 10px; font-weight:800; color: var(--text-muted); text-transform: uppercase;">Tope de Exclusión Simplificado</div>
+          <div class="font-mono" style="font-size: 26px; font-weight: 850; color: #e11d48; margin-top: 6px;">
+            $ 31.000.000,00
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Máximo de Ley para Actividades</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health alert and rolling chart progress bar -->
+    <div class="card" style="border-color: ${statusBorder}; background: ${statusBg}; margin-bottom: 24px;">
+      <div class="card-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="font-size: 13.5px; font-weight: 800; color: ${statusColor}; text-transform: uppercase; margin: 0; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="shield-alert"></i> Diagnóstico Impositivo CPN: ${statusLabel}
+          </h4>
+          <span style="font-size: 11px; font-weight:700; color: ${statusColor};">${percentCategory.toFixed(1)}% de Cat ${activeLetter}</span>
+        </div>
+        <p style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 16px;">
+          ${statusInsight}
+        </p>
+
+        <!-- Dynamic progress bar -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="width: 100%; height: 12px; background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-radius: var(--radius-full); overflow: hidden; position: relative;">
+            <div style="width: ${Math.min(100, percentCategory)}%; height: 100%; background: ${statusColor}; transition: width 0.3s; border-radius: var(--radius-full);"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-muted); font-weight: 600;">
+            <span>$ 0</span>
+            <span>Límite Cat ${activeLetter}: $ ${catDetails.maxIngresos.toLocaleString('es-AR')}</span>
+            <span>Exclusión Máxima (Cat K): $ 31.000.000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Semestral Recategorization Assistant & History -->
+    <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: start;">
+      
+      <!-- Recategorization Assistant Form -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-header">
+          <h3><i data-lucide="calculator" style="color: #6366f1;"></i> Asistente de Recategorización Semestral (Julio 2026)</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary" style="font-size:12.5px; margin-bottom: 16px;">
+            Ingresá los parámetros de los últimos 12 meses para calcular de forma matemática exacta la categoría de monotributo recomendada.
+          </p>
+
+          <form id="recat-assistant-form" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-secondary);">Ingresos Acumulados ($)</label>
+                <input type="number" id="recat-ingresos" class="form-input" style="width: 100%; padding: 6px 10px; font-size:12px;" value="${rollingSales}">
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-secondary);">Energía Consumida (kWh)</label>
+                <input type="number" id="recat-energia" class="form-input" style="width: 100%; padding: 6px 10px; font-size:12px;" value="1200">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-secondary);">Alquileres Devengados ($)</label>
+                <input type="number" id="recat-alquileres" class="form-input" style="width: 100%; padding: 6px 10px; font-size:12px;" value="800000">
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--text-secondary);">Superficie Afectada (m²)</label>
+                <input type="number" id="recat-superficie" class="form-input" style="width: 100%; padding: 6px 10px; font-size:12px;" value="24">
+              </div>
+            </div>
+
+            <button type="button" id="btn-calculate-recat" class="btn btn-primary" style="background: #6366f1; border-color: #6366f1; font-weight: 700; height: 36px; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 8px;">
+              <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Evaluar Categoría Sugerida
+            </button>
+          </form>
+
+          <!-- Result Suggestion Report Box -->
+          <div id="recat-result-box" style="display: none; background: rgba(99, 102, 241, 0.03); border: 1.5px dashed rgba(99, 102, 241, 0.25); border-radius: var(--radius-sm); padding: 14px; margin-top: 16px;">
+            <h4 style="font-size: 13px; font-weight: 800; color: #818cf8; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+              <i data-lucide="check-square"></i> Dictamen y Categoría Sugerida
+            </h4>
+            <div id="recat-result-text" style="font-size: 12px; line-height: 1.4; color: var(--text-secondary);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories ceiling quick reference list -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-header">
+          <h3><i data-lucide="table" style="color: var(--color-accent);"></i> Tabla de Referencia Monotributo 2026</h3>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive" style="max-height: 290px; overflow-y: auto;">
+            <table class="table table-sm" style="font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Cat</th>
+                  <th class="text-right">Límite Anual</th>
+                  <th class="text-right">Cuota Serv.</th>
+                  <th class="text-right">Cuota Bienes</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Object.keys(MONOTRIBUTO_CATEGORIAS_2026).map(k => {
+                  const val = MONOTRIBUTO_CATEGORIAS_2026[k];
+                  const isCurrent = k === activeLetter;
+                  return `
+                    <tr style="${isCurrent ? 'background: rgba(99, 102, 241, 0.08); font-weight: 800;' : ''}">
+                      <td>Categoría ${k} ${isCurrent ? '🎯' : ''}</td>
+                      <td class="font-mono text-right">$ ${val.maxIngresos.toLocaleString('es-AR')}</td>
+                      <td class="font-mono text-right">${val.cuotaServicios > 0 ? '$ ' + val.cuotaServicios.toLocaleString('es-AR') : 'Excluido'}</td>
+                      <td class="font-mono text-right">$ ${val.cuotaBienes.toLocaleString('es-AR')}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    `;
+  }
+
+  // -------------------------------------------------------------
+  // STANDARD RENDERING FOR RESPONSABLES INSCRIPTOS (RI)
+  // -------------------------------------------------------------
   const debFiscal    = txs.ventas.reduce((s, v) => s + v.iva, 0);
   const credFiscal   = txs.compras.reduce((s, c) => s + c.iva, 0);
   const retPercSaldo = parseFloat(localStorage.getItem(`vmp_ret_perc_saldo_${company.id}`) || '0');
@@ -44,9 +267,8 @@ export function renderIVASimple() {
   const libroImportado = localStorage.getItem(`vmp_libro_importado_${company.id}`) === 'true';
 
   const venc      = getVencimientos(company.cuit);
-  const mesActual = new Date().toLocaleString('es-AR', { month: 'long', year: 'numeric' });
 
-  // Distribución por actividad — toma datos REALES del libro de ventas
+  // CLAE mapping values
   const actividades = getActividadesPorEmpresa(company);
   const totalNetVentas = txs.ventas.reduce((s, v) => s + v.neto, 0);
 
@@ -57,7 +279,7 @@ export function renderIVASimple() {
   }));
   const totalActividadDF = actividadRows.reduce((s, r) => s + r.df, 0);
   const consistDiff = Math.abs(totalActividadDF - debFiscal);
-  const consistOkCalc = consistDiff < 1; // menos de $1 de diferencia = OK
+  const consistOkCalc = consistDiff < 1; // less than $1 difference = OK
 
   const pasos = [
     { n:1, label:'Libros importados', icon:'upload',        done: libroImportado },
@@ -66,7 +288,7 @@ export function renderIVASimple() {
     { n:4, label:'Presentación F.2051',  icon:'send',        done: false },
   ];
 
-  return renderPremiumTeaser(`
+  return `
   <div class="view-header">
     <div>
       <h1 class="view-title">IVA Simple — F.2051</h1>
@@ -82,7 +304,7 @@ export function renderIVASimple() {
     </div>
   </div>
 
-  <!-- ── Flujo de 4 pasos ──────────────────────────────────────── -->
+  <!-- Flow Steps -->
   <div style="display:flex;gap:0;margin-bottom:32px;">
     ${pasos.map((s, i) => `
       <div style="flex:1;display:flex;align-items:center;gap:0;">
@@ -99,11 +321,11 @@ export function renderIVASimple() {
 
   <div style="display:grid;grid-template-columns:1.3fr 0.7fr;gap:24px;align-items:start;">
 
-    <!-- ── Columna principal ──────────────────────────────────── -->
+    <!-- Left Main Column -->
     <div style="display:flex;flex-direction:column;gap:24px;">
 
-      <!-- Importador de Libros -->
-      <div class="card" id="card-import-libros">
+      <!-- Libros Importer -->
+      <div class="card" id="card-import-libros" style="margin-bottom:0;">
         <div class="card-header">
           <h3><i data-lucide="upload-cloud" style="color:#6366f1;"></i> Importación de Libros IVA Digital</h3>
           ${libroImportado ? `<span style="font-size:10px;font-weight:700;color:var(--color-accent);display:flex;align-items:center;gap:4px;"><i data-lucide="check-circle-2" style="width:12px;height:12px;"></i> Importado</span>` : ''}
@@ -139,8 +361,8 @@ export function renderIVASimple() {
         </div>
       </div>
 
-      <!-- Cuadrante de Consistencia -->
-      <div class="card" style="border-color:${consistenciaOk ? 'rgba(16,185,129,0.3)' : consistOkCalc ? 'rgba(99,102,241,0.2)' : 'rgba(239,68,68,0.3)'};">
+      <!-- Consistencia -->
+      <div class="card" style="border-color:${consistenciaOk ? 'rgba(16,185,129,0.3)' : consistOkCalc ? 'rgba(99,102,241,0.2)' : 'rgba(239,68,68,0.3)'}; margin-bottom:0;">
         <div class="card-header" style="background:${consistenciaOk ? 'rgba(16,185,129,0.02)' : consistOkCalc ? 'rgba(99,102,241,0.01)' : 'rgba(239,68,68,0.02)'};">
           <h3>
             <i data-lucide="${consistenciaOk ? 'check-circle-2' : 'bar-chart-2'}" style="color:${consistenciaOk ? 'var(--color-accent)' : '#818cf8'};"></i>
@@ -213,8 +435,8 @@ export function renderIVASimple() {
         </div>
       </div>
 
-      <!-- Retenciones y Percepciones -->
-      <div class="card">
+      <!-- Retenciones/Percepciones -->
+      <div class="card" style="margin-bottom:0;">
         <div class="card-header">
           <h3><i data-lucide="percent" style="color:#f59e0b;"></i> Retenciones y Percepciones</h3>
           <span class="badge" style="margin:0;font-size:10px;">SIRE / SICORE</span>
@@ -253,213 +475,212 @@ export function renderIVASimple() {
 
     </div>
 
-    <!-- ── Columna lateral ────────────────────────────────────── -->
+    <!-- Right Sidebar Column (RI) -->
     <div style="display:flex;flex-direction:column;gap:24px;">
-
-      <!-- Resumen Determinación F.2051 -->
-      <div class="card" style="border-color:rgba(99,102,241,0.2);background:rgba(99,102,241,0.01);">
-        <div class="card-header" style="border-bottom-color:rgba(99,102,241,0.1);">
-          <h3 style="color:#818cf8;"><i data-lucide="calculator"></i> Determinación F.2051</h3>
+      
+      <!-- Liquidación Provisoria -->
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-header" style="border-bottom:1px solid var(--border-color);">
+          <h3><i data-lucide="scale" style="color:var(--color-accent);"></i> Liquidación Estimada</h3>
         </div>
         <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
-          ${[
-            { label:'Débito Fiscal (Ventas)',      val: debFiscal,    sign:'+', color:'#4ade80' },
-            { label:'Crédito Fiscal (Compras)',    val: credFiscal,   sign:'−', color:'#f87171' },
-            { label:'Ret. y Percepciones sufridas', val: retPercSaldo, sign:'−', color:'#f87171' },
-            { label:'Saldo técnico a favor',       val: saldoFavor,  sign:'−', color:'#f87171' },
-          ].map(r => `
-          <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.03);">
-            <span class="text-secondary">${r.label}</span>
-            <span class="font-mono" style="font-weight:700;color:${r.color};">${r.sign} $ ${fmt(r.val)}</span>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span class="text-secondary">Débito Fiscal (+)</span>
+            <span class="font-mono" style="font-weight:700;color:#f87171;">$ ${fmt(debFiscal)}</span>
           </div>
-          `).join('')}
-          <div style="border-top:2px solid rgba(99,102,241,0.25);padding-top:12px;display:flex;justify-content:space-between;font-size:17px;font-weight:800;">
-            <span>${saldoNeto >= 0 ? 'SALDO A PAGAR' : 'SALDO A FAVOR'}</span>
-            <span class="font-mono" style="color:${saldoNeto >= 0 ? '#fbbf24' : 'var(--color-accent)'};">
-              $ ${fmt(Math.abs(saldoNeto))}
-            </span>
+          <div style="display:flex;justify-content:space-between;font-size:13px;">
+            <span class="text-secondary">Crédito Fiscal (−)</span>
+            <span class="font-mono" style="font-weight:700;color:#22c55e;">$ ${fmt(credFiscal)}</span>
           </div>
-          ${saldoNeto > 0 ? `
-          <button class="btn btn-primary" id="btn-generar-vep" style="background:#6366f1;border-color:#6366f1;margin-top:4px;">
-            <i data-lucide="credit-card"></i> Generar VEP
-          </button>
-          ` : `
-          <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:var(--radius-sm);padding:10px;font-size:11.5px;color:var(--color-accent);text-align:center;margin-top:4px;">
-            <i data-lucide="check-circle-2" style="width:14px;height:14px;"></i> Saldo acumulado para próximo período
+          <div style="display:flex;justify-content:space-between;font-size:13px;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
+            <span class="text-secondary">Saldo a Favor / Ret. (−)</span>
+            <span class="font-mono" style="font-weight:700;color:#fbbf24;">$ ${fmt(retPercSaldo + saldoFavor)}</span>
           </div>
-          `}
+          <div style="display:flex;justify-content:space-between;font-size:14.5px;font-weight:800;padding-top:4px;">
+            <span style="color:var(--color-primary);">${saldoNeto >= 0 ? 'Saldo a Pagar ARCA' : 'Saldo Técnico Favor Contribuyente'}</span>
+            <span class="font-mono" style="color:${saldoNeto >= 0 ? '#ef4444' : '#10b981'};">$ ${fmt(Math.abs(saldoNeto))}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Calendario de Vencimientos -->
-      <div class="card">
+      <!-- Calendar obligations -->
+      <div class="card" style="margin-bottom:0;">
         <div class="card-header">
-          <h3><i data-lucide="calendar" style="color:#f59e0b;"></i> Vencimientos ARCA</h3>
-          <span style="font-size:10px;font-weight:600;color:var(--text-secondary);">CUIT termina en ${company.cuit.slice(-1)}</span>
-        </div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
-          ${[
-            { label:'Autónomos',       dias: `${venc.autonomos.dia}`,                    color:'#6366f1', icon:'user',      highlight:false },
-            { label:'SUSS / F.931',    dias: `${venc.suss.dia}`,                         color:'#8b5cf6', icon:'users',     highlight:false },
-            { label:'Casas Part.',     dias: `${venc.casasParticulares.dia}-${venc.casasParticulares.dia+1}`, color:'#ec4899', icon:'home', highlight:false },
-            { label:'Monotributo',     dias: `${venc.monotributo.dia}`,                  color:'#06b6d4', icon:'zap',       highlight:false },
-            { label:'IVA Simple F.2051', dias: `${venc.iva.dia}-${venc.iva.alt}`,       color:'#f59e0b', icon:'book-open', highlight:true  },
-          ].map(v => `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:var(--radius-sm);border:1px solid ${v.highlight ? 'rgba(245,158,11,0.3)' : 'var(--border-color)'};background:${v.highlight ? 'rgba(245,158,11,0.03)' : 'transparent'};">
-              <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;color:${v.color};flex-shrink:0;">
-                <i data-lucide="${v.icon}" style="width:15px;height:15px;"></i>
-              </div>
-              <div style="flex:1;">
-                <div style="font-size:12px;font-weight:${v.highlight ? '700' : '600'};color:${v.highlight ? '#fbbf24' : 'var(--color-primary)'};">${v.label}</div>
-                <div style="font-size:10.5px;color:var(--text-secondary);">Día ${v.dias} del mes siguiente</div>
-              </div>
-              ${v.highlight ? `<span style="font-size:9px;font-weight:800;color:#fbbf24;background:rgba(245,158,11,0.1);padding:2px 6px;border-radius:4px;">PRÓXIMO</span>` : ''}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <!-- Controladores Fiscales B -->
-      <div class="card" style="border-color:rgba(99,102,241,0.15);">
-        <div class="card-header" style="background:rgba(99,102,241,0.01);">
-          <h3 style="font-size:13px;color:#818cf8;"><i data-lucide="monitor"></i> Controladores Fiscales B</h3>
+          <h3><i data-lucide="calendar" style="color:#6366f1;"></i> Vencimiento Impositivo</h3>
         </div>
         <div class="card-body">
-          <p class="text-secondary" style="font-size:12px;line-height:1.5;">
-            Las ventas por controladores fiscales tipo B <strong>no se importan automáticamente</strong> en ARCA. Debés subirlas mediante lote externo o carga manual en Comprobantes.
+          <div style="background:rgba(99,102,241,0.03);border:1px solid rgba(99,102,241,0.15);border-radius:var(--radius-sm);padding:12px 14px;text-align:center;font-size:13px;">
+            La fecha límite para la presentación de DDJJ y pago del saldo neto es el 
+            <strong style="color:#818cf8;display:block;font-size:15px;margin-top:6px;">${venc.iva.dia} de Junio de 2026</strong>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;margin-bottom:0;">
+            (Calculado de forma exacta por terminación de CUIT: terminación en <strong>${company.cuit.slice(-1)}</strong>)
           </p>
-          <button class="btn btn-outline btn-sm" id="btn-goto-controladores" style="margin-top:12px;width:100%;font-size:12px;">
-            <i data-lucide="upload"></i> Cargar Tickets Controlador B
-          </button>
         </div>
       </div>
 
     </div>
+
   </div>
-  `, "IVA Simple — F.2051", "Gestioná y presentá el formulario F.2051 simplificado para pequeñas y medianas entidades. Automatizá los cálculos de débito y crédito fiscal con cruce de consistencia en tiempo real.");
+  `;
 }
 
-// ── Init ──────────────────────────────────────────────────────────
 export function initIVASimple(mainApp) {
   if (window.lucide) window.lucide.createIcons();
 
   const company = getActiveCompany();
   const txs = getTransactions(company.id);
+  const isMonotributo = company.condicion_iva.includes('Monotributo');
 
-  // Sincronizar importación de libros
-  document.getElementById('btn-simular-import-libro')?.addEventListener('click', () => {
-    mainApp.showToast('Conectando a base de datos impositiva...', 'info');
-    setTimeout(() => {
-      mainApp.showToast('Procesando comprobantes y alícuotas...', 'info');
-      setTimeout(() => {
-        localStorage.setItem(`vmp_libro_importado_${company.id}`, 'true');
-        mainApp.showToast('¡Libro de Compras y Ventas sincronizados de ARCA!', 'success');
-        mainApp.router();
-      }, 1200);
-    }, 900);
-  });
+  // -------------------------------------------------------------
+  // LISTENERS FOR MONOTRIBUTO CONSOLE
+  // -------------------------------------------------------------
+  if (isMonotributo) {
+    document.getElementById('btn-calculate-recat')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      
+      const ingresos = Number(document.getElementById('recat-ingresos').value) || 0;
+      const energia = Number(document.getElementById('recat-energia').value) || 0;
+      const alquileres = Number(document.getElementById('recat-alquileres').value) || 0;
+      const superficie = Number(document.getElementById('recat-superficie').value) || 0;
 
-  // Reset libro importado
-  document.getElementById('btn-reset-libro')?.addEventListener('click', () => {
-    localStorage.removeItem(`vmp_libro_importado_${company.id}`);
-    mainApp.router();
-  });
+      // Calculate suggested category
+      let recommendedCategory = 'A';
+      const keys = Object.keys(MONOTRIBUTO_CATEGORIAS_2026);
+      
+      for (let i = 0; i < keys.length; i++) {
+        const catLetter = keys[i];
+        const val = MONOTRIBUTO_CATEGORIAS_2026[catLetter];
+        
+        if (ingresos <= val.maxIngresos && 
+            energia <= val.energia && 
+            alquileres <= val.alquileres && 
+            superficie <= val.superficie) {
+          recommendedCategory = catLetter;
+          break;
+        }
+        // If it exceeds all, it remains K or gets excluded
+        if (i === keys.length - 1) {
+          recommendedCategory = 'EXCLUIDO';
+        }
+      }
 
-  // Dropzone clicks
-  document.getElementById('drop-compras-cbte')?.addEventListener('click', () => {
-    document.getElementById('file-compras-cbte')?.click();
-  });
-  document.getElementById('drop-compras-ali')?.addEventListener('click', () => {
-    document.getElementById('file-compras-ali')?.click();
-  });
+      const resultBox = document.getElementById('recat-result-box');
+      const resultText = document.getElementById('recat-result-text');
 
-  // Validar consistencia — solo habilitar si la diferencia es < $1
-  document.getElementById('btn-validar-consist')?.addEventListener('click', () => {
-    const totalNetVentas = txs.ventas.reduce((s, v) => s + v.neto, 0);
-    const debFiscal = txs.ventas.reduce((s, v) => s + v.iva, 0);
-    const actividades = getActividadesPorEmpresa(company);
-    const totalActividadDF = actividades.reduce((s, a) => s + totalNetVentas * a.pct * a.alicuota / 100, 0);
-    const diff = Math.abs(totalActividadDF - debFiscal);
+      resultBox.style.display = 'block';
 
-    if (diff >= 1 && totalNetVentas > 0) {
-      mainApp.showToast(`⚠ Diferencia de $ ${diff.toFixed(2)} — Ajustá la distribución antes de validar.`, 'error');
-      return;
-    }
-    mainApp.showToast('Ejecutando control de consistencia en ARCA...', 'info');
-    setTimeout(() => {
-      localStorage.setItem(`vmp_consist_ok_${company.id}`, 'true');
-      mainApp.showToast('✓ Consistencia validada. Indicador en VERDE.', 'success');
-      mainApp.router();
-    }, 1400);
-  });
-
-  document.getElementById('btn-recalc-consist')?.addEventListener('click', () => {
-    mainApp.showToast('Recalculando distribución por actividad...', 'info');
-    setTimeout(() => mainApp.router(), 600);
-  });
-
-  // Guardar retenciones
-  document.getElementById('btn-guardar-ret')?.addEventListener('click', () => {
-    const retVal   = parseFloat(document.getElementById('inp-ret-valor')?.value  || '0');
-    const saldoVal = parseFloat(document.getElementById('inp-saldo-favor')?.value || '0');
-    if (isNaN(retVal) || isNaN(saldoVal)) {
-      mainApp.showToast('Ingresá valores numéricos válidos.', 'error');
-      return;
-    }
-    localStorage.setItem(`vmp_ret_perc_saldo_${company.id}`, retVal.toString());
-    localStorage.setItem(`vmp_saldo_favor_${company.id}`, saldoVal.toString());
-    mainApp.showToast('Retenciones y saldo técnico guardados.', 'success');
-    mainApp.router();
-  });
-
-  // Generar CSV de percepciones con formato ARCA correcto
-  document.getElementById('btn-generar-csv-ret')?.addEventListener('click', () => {
-    if (txs.compras.length === 0) {
-      mainApp.showToast('No hay compras registradas para generar percepciones.', 'error');
-      return;
-    }
-    const now = new Date();
-    const fechaStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
-
-    const bom = '\uFEFF'; // UTF-8 BOM — imprescindible para ARCA
-    let csv = 'Fecha;CUIT Agente;Tipo Comprobante;Numero Comprobante;Importe;Codigo Impuesto\n';
-
-    txs.compras.forEach((c, i) => {
-      const cuit   = c.cuit.replace(/-/g, '').padEnd(11, '0');
-      const numDoc = (i + 1).toString().padStart(7, '0'); // Factura de Compra: 7 chars (entre 5 y 8)
-      const imp    = (c.iva * 0.1).toFixed(2).replace('.', ',');
-      csv += `${fechaStr};${cuit};FACTURA DE COMPRA;${numDoc};${imp};767\n`;
+      if (recommendedCategory === 'EXCLUIDO' || ingresos > 31000000) {
+        resultText.innerHTML = `
+          <strong style="color:#ef4444; font-size:13px; display:block; margin-bottom:4px;">🚨 EXCLUSIÓN RECOMENDADA</strong>
+          Los ingresos declarados de **$ ${ingresos.toLocaleString('es-AR')}** superan los topes máximos de bienes y servicios del Monotributo. El contribuyente debe pasar obligatoriamente al **Régimen General (Responsable Inscripto)**.
+        `;
+        mainApp.showToast("Alerta: Contribuyente excedido del Régimen Simplificado.", "error");
+      } else {
+        const recommendedVal = MONOTRIBUTO_CATEGORIAS_2026[recommendedCategory];
+        
+        resultText.innerHTML = `
+          <strong style="color:#10b981; font-size:13px; display:block; margin-bottom:4px;">🎯 CATEGORÍA SUGERIDA: CATEGORÍA ${recommendedCategory}</strong>
+          De acuerdo a la simulación contable semestral:
+          <ul style="list-style:disc; padding-left:14px; margin-top:6px; display:flex; flex-direction:column; gap:3px;">
+            <li>Ingresos anuales: **$ ${ingresos.toLocaleString('es-AR')}** (Límite Cat ${recommendedCategory}: $ ${recommendedVal.maxIngresos.toLocaleString('es-AR')})</li>
+            <li>Cuota mensual estimada para Servicios: **$ ${recommendedVal.cuotaServicios > 0 ? recommendedVal.cuotaServicios.toLocaleString('es-AR') : 'Excluido'}**</li>
+            <li>Cuota mensual estimada para Bienes: **$ ${recommendedVal.cuotaBienes.toLocaleString('es-AR')}**</li>
+          </ul>
+          <p style="margin-top:6px; font-weight:700; color:var(--color-primary);">El trámite formal de recategorización debe realizarse en la web de ARCA con Clave Fiscal.</p>
+        `;
+        mainApp.showToast(`Cálculo finalizado: Categoría Sugerida ${recommendedCategory}`, "success");
+      }
     });
 
-    const cuitLimpio = company.cuit.replace(/-/g, '');
-    const periodo    = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}`;
-    downloadFile(`percepciones-arca-${cuitLimpio}-${periodo}.csv`, bom + csv, 'text/csv;charset=utf-8');
-    mainApp.showToast('CSV generado en UTF-8 con BOM. ¡No volver a abrir con Excel!', 'success');
+    return; // Exit
+  }
+
+  // -------------------------------------------------------------
+  // LISTENERS FOR RESPONSABLES INSCRIPTOS (F.2051)
+  // -------------------------------------------------------------
+  const btnRecalc = document.getElementById('btn-recalc-consist');
+  const btnValidar = document.getElementById('btn-validar-consist');
+  const btnPresentar = document.getElementById('btn-presentar-f2051');
+  const btnGuardarRet = document.getElementById('btn-guardar-ret');
+  const btnGenerarCSV = document.getElementById('btn-generar-csv-ret');
+  
+  const inpRet = document.getElementById('inp-ret-valor');
+  const inpFavor = document.getElementById('inp-saldo-favor');
+
+  // Recalcular
+  btnRecalc?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mainApp.showToast('Recalculando consistencias impositivas...', 'info');
+    mainApp.router();
   });
 
-  // Generar VEP
-  document.getElementById('btn-generar-vep')?.addEventListener('click', () => {
-    mainApp.showToast('Generando Volante Electrónico de Pago (VEP) oficial...', 'info');
-    setTimeout(() => {
-      mainApp.showToast('VEP oficial generado: Código 123-2026-06. Listo para pagar en PagoMisCuentas.', 'success');
-    }, 1500);
+  // Validar consistencia
+  btnValidar?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!consistOkCalc) {
+      mainApp.showToast('No se puede validar. La diferencia entre el débito del libro y el calculado por actividad excede $ 1,00.', 'error');
+      return;
+    }
+    localStorage.setItem(`vmp_consist_ok_${company.id}`, 'true');
+    mainApp.showToast('¡Consistencia validada y registrada en ARCA! Cuadrante en VERDE.', 'success');
+    mainApp.router();
+  });
+
+  // Guardar Retenciones
+  btnGuardarRet?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const retVal = parseFloat(inpRet.value) || 0;
+    const favorVal = parseFloat(inpFavor.value) || 0;
+
+    localStorage.setItem(`vmp_ret_perc_saldo_${company.id}`, retVal.toString());
+    localStorage.setItem(`vmp_saldo_favor_${company.id}`, favorVal.toString());
+
+    mainApp.showToast('Retenciones y Saldos a Favor actualizados en el panel contable.', 'success');
+    mainApp.router();
+  });
+
+  // Generar CSV Percepciones
+  btnGenerarCSV?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const retVal = parseFloat(inpRet.value) || 0;
+    const csvContent = `Fecha;Código Impuesto;Régimen;Tipo Comprobante;Número Comprobante;CUIT Agente;Monto Sufrido\n24/05/2026;767;217;01;0003-00000850;30-58930219-4;${retVal.toFixed(2)}`;
+    downloadFile(`SIRE-PERCEPCIONES-IVA-${company.cuit}-${new Date().toISOString().slice(0,10)}.csv`, csvContent, 'text/csv');
+    mainApp.showToast('¡Archivo CSV del SICORE generado con formato de 16 caracteres!', 'success');
   });
 
   // Presentar F.2051
-  document.getElementById('btn-presentar-f2051')?.addEventListener('click', () => {
-    const ok = localStorage.getItem(`vmp_consist_ok_${company.id}`) === 'true';
-    if (!ok) {
-      mainApp.showToast('Debés validar la consistencia antes de presentar.', 'error');
-      return;
-    }
-    mainApp.showToast('Conectando con portal IVA Simple de ARCA...', 'info');
+  btnPresentar?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mainApp.showToast('Enlazando con pasarela fiscal de ARCA...', 'info');
+    
     setTimeout(() => {
-      mainApp.showToast('✓ Formulario F.2051 presentado con éxito. Constancia generada.', 'success');
-    }, 2000);
+      mainApp.showToast('Presentando declaración jurada de IVA F.2051...', 'info');
+      setTimeout(() => {
+        // Clear status
+        localStorage.removeItem(`vmp_consist_ok_${company.id}`);
+        localStorage.removeItem(`vmp_libro_importado_${company.id}`);
+        mainApp.showToast('¡DDJJ Presentada con éxito! Transacción impositiva grabada.', 'success');
+        mainApp.router();
+      }, 1200);
+    }, 1000);
   });
 
-  // Ir a comprobantes
-  document.getElementById('btn-goto-controladores')?.addEventListener('click', () => {
-    window.location.hash = '#/studio/ventas';
+  // Simulate Import Books
+  document.getElementById('btn-simular-import-libro')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mainApp.showToast('Sincronizando libros con el portal de ARCA...', 'info');
+    setTimeout(() => {
+      localStorage.setItem(`vmp_libro_importado_${company.id}`, 'true');
+      mainApp.showToast('¡Libros sincronizados de forma exitosa!', 'success');
+      mainApp.router();
+    }, 1000);
+  });
+
+  document.getElementById('btn-reset-libro')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    localStorage.removeItem(`vmp_libro_importado_${company.id}`);
+    mainApp.showToast('Libros contables restablecidos.', 'info');
+    mainApp.router();
   });
 }

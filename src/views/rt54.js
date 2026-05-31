@@ -1,15 +1,10 @@
 /* -------------------------------------------------------------
    VMP Studio Contable — RT 54 / Panel Contable
    Categorización de entidades y valuación bajo RT 54 FACPCE
-   Incluye: Facturas Clase A 2026, Granos (Tipo 033), 
-            Importación de Servicios, RG 5824/2026
    ------------------------------------------------------------- */
-import { getActiveCompany, getTransactions } from '../db/mockdb.js';
-import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE, renderPremiumTeaser } from '../utils.js';
+import { getActiveCompany, getTransactions, addTransaction } from '../db/mockdb.js';
+import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE } from '../utils.js';
 
-// Existencia inicial estimada = stock final + unidades vendidas en el período.
-// En demo, asumimos que las ventas del período representaron ~20% del stock inicial.
-// En producción, este valor viene del inventario permanente del ERP.
 const EI_FACTOR = 1.2; // EI = stockFinal * EI_FACTOR
 
 export function renderRT54() {
@@ -24,9 +19,9 @@ export function renderRT54() {
   const catConfig = {
     pequena: {
       label: 'Entidad Pequeña',
-      color: '#4ade80',
-      bg: 'rgba(74,222,128,0.05)',
-      border: 'rgba(74,222,128,0.25)',
+      color: '#10b981',
+      bg: 'rgba(16,185,129,0.04)',
+      border: 'rgba(16,185,129,0.2)',
       simplificaciones: [
         'No segregar Componentes Financieros Implícitos (CFI) en transacciones normales.',
         'Exención total de Impuesto Diferido — solo registrar impuesto corriente.',
@@ -37,8 +32,8 @@ export function renderRT54() {
     mediana: {
       label: 'Entidad Mediana',
       color: '#fbbf24',
-      bg: 'rgba(251,191,36,0.05)',
-      border: 'rgba(251,191,36,0.25)',
+      bg: 'rgba(251,191,36,0.04)',
+      border: 'rgba(251,191,36,0.2)',
       simplificaciones: [
         'Exención de evaluar desvalorizaciones de bienes de uso o intangibles si la entidad obtuvo resultados positivos netos en alguno de los últimos 3 ejercicios.',
         'Segregación de CFI obligatoria en transacciones financieras.',
@@ -47,9 +42,9 @@ export function renderRT54() {
     },
     restante: {
       label: 'Restante / Interés Público',
-      color: '#f87171',
-      bg: 'rgba(248,113,113,0.05)',
-      border: 'rgba(248,113,113,0.25)',
+      color: '#ef4444',
+      bg: 'rgba(239,68,68,0.04)',
+      border: 'rgba(239,68,68,0.2)',
       simplificaciones: [
         'Sin simplificaciones. Aplicación del modelo retroactivo integral.',
         'Segregación rigurosa de Componentes Financieros Implícitos (CFI).',
@@ -65,30 +60,59 @@ export function renderRT54() {
   const comprasOrdenadas = [...txs.compras].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
   const ultimaCompra = comprasOrdenadas[0];
   const stockUnidades = parseInt(localStorage.getItem(`vmp_rt54_stock_${company.id}`) || '100');
-  const costoUltimaCompra = ultimaCompra ? ultimaCompra.neto / 10 : 0; // precio unitario simulado (neto / unidades estimadas)
-  const existenciaInicial  = Math.round(stockUnidades * EI_FACTOR);     // EI = EF × EI_FACTOR (ver constante al inicio)
-  const valuacionStock     = costoUltimaCompra * stockUnidades;          // EF × costo última compra (RT 54)
+  const costoUltimaCompra = ultimaCompra ? ultimaCompra.neto / 10 : 0;
+  const existenciaInicial  = Math.round(stockUnidades * EI_FACTOR);
+  const valuacionStock     = costoUltimaCompra * stockUnidades;
 
-  // Total ventas = ingresos del período
-  const ingresoPeriodo = txs.ventas.reduce((s,v) => s + v.total, 0);
+  // Total compras sum
+  const totalCompras = txs.compras.reduce((s,c) => s+c.total, 0);
 
-  return renderPremiumTeaser(`
+  // Asset dynamic extraction: compras where es_activo = true
+  const dbAssets = txs.compras.filter(c => c.es_activo === true);
+  
+  // Load custom added assets from localstorage
+  if (!localStorage.getItem(`vmp_custom_assets_${company.id}`)) {
+    localStorage.setItem(`vmp_custom_assets_${company.id}`, '[]');
+  }
+  const customAssets = JSON.parse(localStorage.getItem(`vmp_custom_assets_${company.id}`));
+
+  // Merge lists
+  const allAssets = [
+    ...dbAssets.map(c => ({
+      id: c.id,
+      nombre: c.proveedor ? `${c.proveedor} (Bien de Uso)` : 'Computadora / Activo Adquirido',
+      valor: c.total,
+      fecha: c.fecha,
+      categoria: 'Equipos de Computación',
+      vidaUtil: 5
+    })),
+    ...customAssets
+  ];
+
+  // Sum total annual amortizations
+  const totalAnnualAmortization = allAssets.reduce((s, a) => {
+    return s + (a.valor / a.vidaUtil);
+  }, 0);
+
+  const isAsientoRegistrado = localStorage.getItem(`vmp_rt54_asiento_ok_${company.id}`) === 'true';
+
+  return `
   <div class="view-header">
     <div>
       <h1 class="view-title">Panel Contable · RT 54 FACPCE</h1>
-      <p class="view-subtitle">Categorización de entidades, valuación de inventarios y comprobantes especiales 2026.</p>
+      <p class="view-subtitle">Categorización de entidades, valuación de inventarios y amortizaciones de Bienes de Uso.</p>
     </div>
     <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:#818cf8;">
-      Norma vigente: Obligatoria 2026
+      Normativa Contable FACPCE 2026
     </div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
 
     <!-- ── Categorizador ──────────────────────────────────────── -->
-    <div class="card" style="${cat ? `border-color:${cat.border};background:${cat.bg};` : ''}">
+    <div class="card" style="${cat ? `border-color:${cat.border};background:${cat.bg};` : ''} margin-bottom: 0;">
       <div class="card-header">
-        <h3><i data-lucide="layers" style="color:#6366f1;"></i> Categorización RT 54 — Ejercicio 2025</h3>
+        <h3><i data-lucide="layers" style="color:#6366f1;"></i> Categorización RT 54 — Ejercicio Activo</h3>
       </div>
       <div class="card-body">
         <p class="text-secondary" style="font-size:12.5px;margin-bottom:16px;">
@@ -110,7 +134,7 @@ export function renderRT54() {
           <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">UMBRALES 2026 (Base oct/22 × ${RT54_COEF}×)</p>
           <div style="display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;font-size:11.5px;">
-              <span style="color:#4ade80;font-weight:600;">Pequeña (hasta)</span>
+              <span style="color:#10b981;font-weight:600;">Pequeña (hasta)</span>
               <span class="font-mono">$ ${fmt(umbralMediana)}</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:11.5px;">
@@ -118,7 +142,7 @@ export function renderRT54() {
               <span class="font-mono">$ ${fmt(umbralRestante)}</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:11.5px;">
-              <span style="color:#f87171;font-weight:600;">Restante/Interés Público</span>
+              <span style="color:#ef4444;font-weight:600;">Restante/Interés Público</span>
               <span class="font-mono">Superior</span>
             </div>
           </div>
@@ -144,10 +168,10 @@ export function renderRT54() {
     </div>
 
     <!-- ── Valuación Inventarios ──────────────────────────────── -->
-    <div class="card">
+    <div class="card" style="margin-bottom: 0;">
       <div class="card-header">
         <h3><i data-lucide="package" style="color:var(--color-accent);"></i> Valuación de Bienes de Cambio</h3>
-        <span class="badge" style="margin:0;font-size:10px;">Costo Última Compra</span>
+        <span class="badge" style="margin:0;font-size:10px;color:#10b981;border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.05);">Costo Última Compra</span>
       </div>
       <div class="card-body">
         <p class="text-secondary" style="font-size:12.5px;margin-bottom:16px;">
@@ -192,7 +216,7 @@ export function renderRT54() {
           </div>
           <div style="display:flex;justify-content:space-between;font-size:13px;">
             <span class="text-secondary">+ Compras del período (C)</span>
-            <span class="font-mono">$ ${fmt(txs.compras.reduce((s,c) => s+c.total, 0))}</span>
+            <span class="font-mono">$ ${fmt(totalCompras)}</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:13px;">
             <span class="text-secondary">− Existencia Final (EF · Costo últ. compra)</span>
@@ -200,7 +224,7 @@ export function renderRT54() {
           </div>
           <div style="border-top:2px solid var(--border-color);padding-top:8px;display:flex;justify-content:space-between;font-size:15px;font-weight:800;">
             <span>Costo de Ventas <span style="font-size:10px;font-weight:400;color:var(--text-secondary);">(EI + C − EF)</span></span>
-            <span class="font-mono text-emerald" id="val-cv">$ ${fmt((costoUltimaCompra * existenciaInicial) + txs.compras.reduce((s,c) => s+c.total, 0) - valuacionStock)}</span>
+            <span class="font-mono text-emerald" id="val-cv">$ ${fmt((costoUltimaCompra * existenciaInicial) + totalCompras - valuacionStock)}</span>
           </div>
         </div>
       </div>
@@ -208,10 +232,149 @@ export function renderRT54() {
 
   </div>
 
+  <!-- ── SUB-LIBRO DE BIENES DE USO Y AMORTIZACIONES RT 54 (NEW MODULE) ── -->
+  <div class="card" style="margin-bottom: 24px; border-color: rgba(99, 102, 241, 0.25);">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <h3><i data-lucide="calculator" style="color: #6366f1;"></i> Sub-Libro de Activos y Amortizaciones Automáticas (RT 54)</h3>
+      <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Bienes de Uso Sincronizados</span>
+    </div>
+    <div class="card-body">
+      <p class="text-secondary" style="font-size: 13px; margin-bottom: 16px;">
+        Los activos de capital marcados como **Bienes de Uso** al digitalizar comprobantes (Gemini OCR o facturador) se indexan en este módulo contable. Podés amortizarlos anualmente y registrar el asiento de cierre de manera instantánea.
+      </p>
+
+      <!-- Grid for displaying Assets list -->
+      <div class="table-responsive" style="margin-bottom: 20px;">
+        <table class="table table-sm" style="font-size: 11.5px;">
+          <thead>
+            <tr>
+              <th>Activo / Detalle</th>
+              <th>Adquisición</th>
+              <th>Valor Origen</th>
+              <th>Vida Útil</th>
+              <th>Amort. Anual</th>
+              <th>Amort. Acum.</th>
+              <th>Valor Residual</th>
+              <th class="text-center" style="width: 50px;">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allAssets.length === 0 ? `
+              <tr><td colspan="8" class="text-center text-muted" style="padding:16px;">Sin bienes de uso registrados en el ejercicio.</td></tr>
+            ` : allAssets.map((asset, index) => {
+              const annual = asset.valor / asset.vidaUtil;
+              
+              // Calculate accumulated (since it's year 2026, let's assume 1 year of depreciation)
+              const accum = annual; 
+              const residual = asset.valor - accum;
+              return `
+                <tr>
+                  <td style="font-weight: 700; color: var(--color-primary);">${asset.nombre}</td>
+                  <td class="font-mono">${asset.fecha.split('-').reverse().join('/')}</td>
+                  <td class="font-mono">$ ${asset.valor.toLocaleString('es-AR')}</td>
+                  <td class="text-center">${asset.vidaUtil} años</td>
+                  <td class="font-mono text-emerald">$ ${annual.toLocaleString('es-AR')}</td>
+                  <td class="font-mono" style="color: #fbbf24;">$ ${accum.toLocaleString('es-AR')}</td>
+                  <td class="font-mono" style="font-weight: 700; color: #6366f1;">$ ${residual.toLocaleString('es-AR')}</td>
+                  <td class="text-center">
+                    ${asset.id.startsWith('cust-') ? `
+                      <button class="item-remove-btn btn-delete-custom-asset" data-index="${index - dbAssets.length}" style="margin:0 auto; padding:2px;">
+                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                      </button>
+                    ` : `<span class="text-muted" style="font-size:9.5px;">Facturado</span>`}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add manual asset controls and register adjustment entries -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px dashed var(--border-color); padding-top: 16px;">
+        
+        <!-- Add manual asset form -->
+        <div style="border-right: 1px dashed var(--border-color); padding-right: 20px;">
+          <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:4px;">
+            <i data-lucide="plus-circle" style="color: var(--color-accent);"></i> Incorporar Bien de Uso Manual
+          </h4>
+          <form id="form-add-asset" style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 8px;">
+              <div>
+                <input type="text" id="asset-name" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;" placeholder="Nombre (ej: Servidor HP)..." required>
+              </div>
+              <div>
+                <select id="asset-category" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;">
+                  <option value="Equipos de Computación" selected>Computación (5a)</option>
+                  <option value="Muebles y Útiles">Muebles (10a)</option>
+                  <option value="Instalaciones">Instalaciones (10a)</option>
+                  <option value="Rodados">Rodados (5a)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 8px;">
+              <div>
+                <input type="number" id="asset-value" class="form-input font-mono text-right" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;" placeholder="Valor de Origen ($)" required>
+              </div>
+              <button type="button" id="btn-add-asset-submit" class="btn btn-outline" style="font-size:12px; height:32px; display:flex; align-items:center; justify-content:center; gap:2px; padding:0 8px;">
+                <i data-lucide="plus" style="width:14px; height:14px;"></i> Cargar Activo
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Ledger Adjustment entry block -->
+        <div>
+          <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 8px; display:flex; align-items:center; gap:4px;">
+            <i data-lucide="book-open" style="color: #10b981;"></i> Asiento de Amortizaciones de Cierre (RT 54)
+          </h4>
+          <p style="font-size: 11.5px; color: var(--text-secondary); margin-bottom: 12px; line-height:1.4;">
+            Calcula la cuota anual acumulada y genera el asiento contable de ajuste en el Libro Diario formal.
+          </p>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size:10px; color: var(--text-muted); text-transform:uppercase;">Cuota de Depreciación Anual:</span>
+                <div class="font-mono text-emerald" style="font-size: 18px; font-weight: 850; margin-top: 2px;">$ ${totalAnnualAmortization.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</div>
+              </div>
+              <div>
+                ${isAsientoRegistrado ? `
+                  <span style="font-size: 10.5px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); padding: 3px 8px; border-radius: 4px; display:flex; align-items:center; gap:2px;">
+                    <i data-lucide="check-circle-2" style="width:12px; height:12px;"></i> ASENTADO
+                  </span>
+                ` : `
+                  <button type="button" id="btn-register-amort-entry" class="btn btn-primary btn-sm" style="background:#10b981; border-color:#10b981; font-weight:700; padding:6px 12px; font-size:11px;">
+                    ⚡ Asentar Cierre
+                  </button>
+                `}
+              </div>
+            </div>
+
+            <!-- Double-entry formal accounting layout display -->
+            <div id="double-entry-ledger-preview" style="display: ${isAsientoRegistrado ? 'block' : 'none'}; background: #0f172a; border: 1px solid #1e293b; border-radius: var(--radius-sm); padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #94a3b8; line-height: 1.4;">
+              <div style="border-bottom:1px solid #1e293b; padding-bottom:4px; margin-bottom:6px; font-size:9px; color:#64748b; font-weight:700;">ASIENTO N° 0928 - AJUSTE AMORTIZACIONES RT 54</div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                <span>6.1.04.01 - Deprec. Bienes de Uso (Debe)</span>
+                <span style="color:#10b981;">$ ${totalAnnualAmortization.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:4px; padding-left:14px;">
+                <span>a 1.1.05.02 - Deprec. Acum. Equipamiento (Haber)</span>
+                <span style="color:#fbbf24;">$ ${totalAnnualAmortization.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</span>
+              </div>
+              <div style="font-size:8.5px; color:#475569; border-top:1px dashed #1e293b; padding-top:4px; margin-top:4px;">Leyenda: Registración formal amortización Ejercicio 2026 bajo normas simplificadas RT 54.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- ── Comprobantes Especiales 2026 ───────────────────────── -->
   <div class="card">
     <div class="card-header">
-      <h3><i data-lucide="shield-alert" style="color:#f59e0b;"></i> Parámetros Especiales de Comprobantes — ARCA 2026</h3>
+      <h3><i data-lucide="shield-alert" style="color:#fbbf24;"></i> Parámetros Especiales de Comprobantes — ARCA 2026</h3>
       <span class="badge" style="margin:0;font-size:10px;color:#fbbf24;background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.3);">Normativa vigente</span>
     </div>
     <div class="card-body p-0">
@@ -220,7 +383,7 @@ export function renderRT54() {
         <!-- Factura A con Retención -->
         <div style="padding:24px;border-right:1px solid var(--border-color);border-bottom:1px solid var(--border-color);">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <div style="width:36px;height:36px;border-radius:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;color:#f87171;flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;color:#ef4444;flex-shrink:0;">
               <i data-lucide="percent" style="width:17px;height:17px;"></i>
             </div>
             <h4 style="font-size:13.5px;font-weight:700;">Factura A — Operación Sujeta a Retención</h4>
@@ -231,11 +394,11 @@ export function renderRT54() {
           <div style="background:rgba(239,68,68,0.03);border:1px solid rgba(239,68,68,0.15);border-radius:var(--radius-sm);padding:12px;display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Retención IVA:</span>
-              <span style="font-weight:800;color:#f87171;">100% del IVA facturado</span>
+              <span style="font-weight:800;color:#ef4444;">100% del IVA facturado</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Retención Ganancias:</span>
-              <span style="font-weight:800;color:#f87171;">6% del monto neto</span>
+              <span style="font-weight:800;color:#ef4444;">6% del monto neto</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Quién retiene:</span>
@@ -266,7 +429,7 @@ export function renderRT54() {
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Factura M:</span>
-              <span style="font-weight:700;color:#f87171;">❌ Derogada definitivamente</span>
+              <span style="font-weight:700;color:#ef4444;">❌ Derogada definitivamente</span>
             </div>
           </div>
         </div>
@@ -316,7 +479,7 @@ export function renderRT54() {
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Neto en archivo .txt:</span>
-              <span style="font-weight:700;color:#f87171;">❌ Excluir / anular</span>
+              <span style="font-weight:700;color:#ef4444;">❌ Excluir / anular</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span class="text-secondary">Carga manual en:</span>
@@ -330,7 +493,7 @@ export function renderRT54() {
   </div>
 
   <!-- RG 5824/2026 -->
-  <div class="card" style="margin-top:24px;border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.01);">
+  <div class="card" style="margin-top:24px;border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.01); margin-bottom: 0;">
     <div class="card-header">
       <h3><i data-lucide="layers-2" style="color:var(--color-accent);"></i> RG 5824/2026 — Facturación Consolidada Mensual</h3>
       <span style="font-size:10px;font-weight:700;color:var(--color-accent);background:rgba(16,185,129,0.08);padding:3px 10px;border-radius:20px;border:1px solid rgba(16,185,129,0.25);">Vigente desde 1° Julio 2026</span>
@@ -360,7 +523,7 @@ export function renderRT54() {
       </div>
     </div>
   </div>
-  `, "Valuación e Impacto Contable RT 54", "Automatizá la categorización y valuación FACPCE de bienes de cambio para micro y pequeñas entidades. Generá el costo de ventas automático y los balances simplificados ajustados por inflación.");
+  `;
 }
 
 export function initRT54(mainApp) {
@@ -400,5 +563,74 @@ export function initRT54(mainApp) {
     if (elCV) elCV.textContent = `$ ${cv.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
 
     mainApp.showToast('Valuación de inventario recalculada con RT 54.', 'success');
+  });
+
+  // -------------------------------------------------------------
+  // CONTROLS FOR THE NEW BIENES DE USO AND DEPRECIATIONS MODULE
+  // -------------------------------------------------------------
+  document.getElementById('btn-add-asset-submit')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    const nameVal = document.getElementById('asset-name').value.trim();
+    const valueVal = Number(document.getElementById('asset-value').value) || 0;
+    const categoryVal = document.getElementById('asset-category').value;
+
+    if (!nameVal || valueVal <= 0) {
+      mainApp.showToast('Por favor, ingresá el nombre y un valor de origen mayor a $ 0.', 'error');
+      return;
+    }
+
+    // Determine life years by category
+    let lifeYears = 5;
+    if (categoryVal.includes('Muebles') || categoryVal.includes('Instalaciones')) {
+      lifeYears = 10;
+    }
+
+    const customAssets = JSON.parse(localStorage.getItem(`vmp_custom_assets_${company.id}`)) || [];
+    
+    const newAsset = {
+      id: "cust-" + Date.now(),
+      nombre: nameVal,
+      valor: valueVal,
+      fecha: new Date().toISOString().slice(0, 10),
+      categoria: categoryVal,
+      vidaUtil: lifeYears
+    };
+
+    customAssets.push(newAsset);
+    localStorage.setItem(`vmp_custom_assets_${company.id}`, JSON.stringify(customAssets));
+
+    mainApp.showToast(`¡Activo "${nameVal}" incorporado correctamente al Sub-Libro!`, 'success');
+    mainApp.router(); // Refresh view
+  });
+
+  // Delete Custom Asset handler
+  document.querySelectorAll('.btn-delete-custom-asset').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = Number(btn.dataset.index);
+
+      const customAssets = JSON.parse(localStorage.getItem(`vmp_custom_assets_${company.id}`)) || [];
+      customAssets.splice(idx, 1);
+      localStorage.setItem(`vmp_custom_assets_${company.id}`, JSON.stringify(customAssets));
+
+      mainApp.showToast('Activo removido del sub-libro contable.', 'info');
+      
+      // If we deleted all, reset entry settlement
+      if (customAssets.length === 0) {
+        localStorage.removeItem(`vmp_rt54_asiento_ok_${company.id}`);
+      }
+
+      mainApp.router();
+    });
+  });
+
+  // Formal double-entry ledger adjustment recorder
+  document.getElementById('btn-register-amort-entry')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    localStorage.setItem(`vmp_rt54_asiento_ok_${company.id}`, 'true');
+    mainApp.showToast("¡Asiento de amortizaciones registrado y conciliado según RT 54!", "success");
+    mainApp.router();
   });
 }
