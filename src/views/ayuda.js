@@ -347,42 +347,76 @@ const TabContents = {
   portal: `
     <div class="help-section-flow" style="display: flex; flex-direction: column; gap: 20px;">
       <p class="text-primary" style="font-size: 13.5px; line-height: 1.5; font-weight: 500;">
-        El **Portal del Cliente** es el puente digital para eliminar la carga manual de facturas y acelerar la entrega de documentación mensual.
+        El **Portal del Cliente (Suite Operativa)** es el puente de producción definitivo entre la PyME o contribuyente individual y el estudio contable. Integra en una única herramienta simplificada dos módulos fundamentales que eliminan el papelerío físico y automatizan la gestión impositiva.
       </p>
 
-      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: start;">
-        <div>
-          <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">¿Cómo lo usa el cliente final (PyME)?</h4>
-          <ol style="padding-left: 16px; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; line-height: 1.4;">
-            <li>Entra a su cuenta desde su celular (no requiere descargar App, es una WebApp ultra-liviana).</li>
-            <li>Saca una foto a un ticket de compra (por ejemplo, nafta, almuerzo o mercadería).</li>
-            <li>El sistema extrae los datos usando nuestro motor de OCR Inteligente con Inteligencia Artificial.</li>
-            <li>El ticket se clasifica automáticamente por su rubro y se envía al panel del contador para que lo apruebe con un solo clic.</li>
-          </ol>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+        
+        <!-- Módulo 1 -->
+        <div style="background: rgba(99, 102, 241, 0.01); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h4 style="font-size: 14px; font-weight: 800; color: #818cf8; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="camera" style="width: 18px; height: 18px;"></i>
+            1. Digitalización de Comprobantes (OCR con IA)
+          </h4>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+            Permite a los clientes enviar fotos de tickets impresos o PDFs de gastos directamente en el momento en que se generan.
+          </p>
+          <ul style="padding-left: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px; line-height: 1.4; margin-bottom: 0;">
+            <li><strong>Reconocimiento por IA:</strong> Extracción automática de CUIT de emisor, montos neto/IVA, fecha y números usando Gemini 2.5 Flash.</li>
+            <li><strong>Detección de Bienes de Uso:</strong> Clasifica de forma inteligente si una compra califica como gasto corriente o como un activo amortizable (Bien de Uso).</li>
+            <li><strong>Sincronización en un Clic:</strong> Los gastos aparecen pre-cargados al instante en el módulo contable del estudio para su aprobación formal.</li>
+          </ul>
         </div>
 
-        <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.12); border-radius: var(--radius-md); padding: 16px;">
-          <h4 style="font-size: 12.5px; font-weight: 700; color: var(--color-accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-            <i data-lucide="smartphone"></i> Visualizar la experiencia del Cliente
+        <!-- Módulo 2 -->
+        <div style="background: rgba(16, 185, 129, 0.01); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+          <h4 style="font-size: 14px; font-weight: 800; color: #10b981; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+            2. Facturador Directo ARCA (ex-AFIP) Live
+          </h4>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+            Una consola de facturación móvil y de escritorio de nivel corporativo que emite comprobantes oficiales directamente en el portal.
+          </p>
+          <ul style="padding-left: 16px; font-size: 11.5px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px; line-height: 1.4; margin-bottom: 0;">
+            <li><strong>Formulario Reactivo Integrado:</strong> Previsualización de la factura en tiempo real en la pantalla (Split Screen) a medida que se completan los campos.</li>
+            <li><strong>Validación CUIT Módulo 11:</strong> Algoritmo en vivo que comprueba la validez matemática del dígito verificador impositivo de AFIP antes de enviar la petición.</li>
+            <li><strong>Inteligencia de Restricciones Contables:</strong> Configura y restringe automáticamente Facturas A/B (RI) o Factura C (Monotributo) previniendo infracciones técnicas.</li>
+            <li><strong>Liquidación y Percepciones de IIBB:</strong> Soporte para liquidación automática de IIBB por jurisdicción provincial y fechas operativas de servicios.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; border-top: 1px solid var(--border-color); padding-top: 20px; align-items: center;">
+        <div>
+          <h4 style="font-size: 13.5px; font-weight: 800; margin-bottom: 6px; color: var(--color-primary);">Exportaciones Directas e Intercambio Seguro SOAP</h4>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+            El facturador cuenta con una **Consola de Intercambio SOAP XML** integrada que detalla los logs cifrados de comunicación con las pasarelas WSAA y WSFE de ARCA. Además, los clientes pueden exportar sus lotes en un archivo <strong>.txt adaptado al diseño de registro oficial de AFIP (REGINFO Ventas)</strong>, permitiendo al contador importar los datos de forma inmediata y masiva en la plataforma tributaria nacional.
+          </p>
+        </div>
+
+        <div style="background: rgba(99, 102, 241, 0.03); border: 1px solid rgba(99, 102, 241, 0.12); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+          <h4 style="font-size: 12.5px; font-weight: 700; color: #818cf8; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <i data-lucide="smartphone"></i> Acceso a la Experiencia
           </h4>
           <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px;">
-            Podés ver exactamente lo que vería el cliente final en su celular ingresando al Portal del Cliente.
+            Visualizá de forma transparente el funcionamiento del portal de tus clientes y realizá emisiones reales de prueba.
           </p>
-          <a href="#/studio/portal" class="btn btn-primary btn-sm" style="font-size: 11px; background: var(--color-accent); border-color: var(--color-accent); padding: 6px 12px; display: inline-block;">
-            <i data-lucide="eye" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Probar Portal del Cliente
+          <a href="#/studio/portal" class="btn btn-primary btn-sm" style="font-size: 11px; background: #6366f1; border-color: #6366f1; padding: 8px 16px; display: inline-block;">
+            <i data-lucide="eye" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i> Abrir Portal del Cliente
           </a>
         </div>
       </div>
 
       <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-        <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">Canales Adicionales: Whatsapp Contable</h4>
+        <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-primary);">Canal Automatizado por WhatsApp RPA</h4>
         <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
-          Para clientes tradicionales de menor nivel tecnológico, el sistema puede enlazarse a un número de **Whatsapp corporativo del estudio contable**. 
-          El cliente simplemente le envía la foto del ticket a ese chat de Whatsapp, y el bot de VMP la procesa e importa a VMP Studio del mismo modo, sin que el cliente deba abrir ninguna web.
+          Para contribuyentes que prefieran no utilizar la web, el sistema cuenta con integración de **WhatsApp Contable Broker**. Al enviar la foto del ticket al número de WhatsApp del estudio contable, el bot realiza la extracción inteligente Gemini OCR, clasifica la categoría de gasto y la deposita automáticamente en el registro digital de VMP Studio.
         </p>
       </div>
     </div>
   `,
+
 
   faq: `
     <div class="help-section-flow" style="display: flex; flex-direction: column; gap: 16px;">
