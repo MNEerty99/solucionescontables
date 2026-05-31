@@ -61,25 +61,49 @@ export function renderIVA() {
       <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 20px;">
         Descargá los archivos de texto delimitados oficiales para subirlos directamente al portal de <strong>ARCA (Libro IVA Digital / IVA Simple F.2051)</strong> sin tipear una sola factura manualmente.
       </p>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
-          <i data-lucide="file-text" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px;"></i>
-          <h4 style="font-size: 14px; margin-bottom: 6px;">RE.CO. Ventas (Comprobantes)</h4>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Contiene las cabeceras de todas tus facturas de venta emitidas.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <i data-lucide="file-text" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px; margin-inline: auto;"></i>
+            <h4 style="font-size: 13.5px; margin-bottom: 6px;">RE.CO. Ventas (Comprobantes)</h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Cabeceras de todas tus facturas de venta emitidas.</p>
+          </div>
           <button class="btn btn-outline btn-sm w-full" id="btn-export-ventas-txt">Descargar TXT</button>
         </div>
 
-        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
-          <i data-lucide="percent" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px;"></i>
-          <h4 style="font-size: 14px; margin-bottom: 6px;">RE.CO. Ventas (Alícuotas)</h4>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Contiene los registros de alícuotas del 21%, 10.5% y exentos.</p>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <i data-lucide="percent" style="width: 32px; height: 32px; color: var(--color-teal-light); margin-bottom: 12px; margin-inline: auto;"></i>
+            <h4 style="font-size: 13.5px; margin-bottom: 6px;">RE.CO. Ventas (Alícuotas)</h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Detalle de alícuotas (21%, 10.5%, exento) de ventas.</p>
+          </div>
           <button class="btn btn-outline btn-sm w-full" id="btn-export-ventas-ali-txt">Descargar TXT</button>
         </div>
 
-        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center;">
-          <i data-lucide="file-check-2" style="width: 32px; height: 32px; color: #818cf8; margin-bottom: 12px;"></i>
-          <h4 style="font-size: 14px; margin-bottom: 6px;">F. 2051 Borrador (PDF)</h4>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Pre-declaración borrador consolidada con totales por actividad económica.</p>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <i data-lucide="file-spreadsheet" style="width: 32px; height: 32px; color: #fbbf24; margin-bottom: 12px; margin-inline: auto;"></i>
+            <h4 style="font-size: 13.5px; margin-bottom: 6px;">RE.CO. Compras (Comprobantes)</h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Cabeceras de facturas de compra recibidas del período.</p>
+          </div>
+          <button class="btn btn-outline btn-sm w-full" id="btn-export-compras-txt" style="border-color:#fbbf24; color:#fbbf24;">Descargar TXT</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <i data-lucide="calculator" style="width: 32px; height: 32px; color: #fbbf24; margin-bottom: 12px; margin-inline: auto;"></i>
+            <h4 style="font-size: 13.5px; margin-bottom: 6px;">RE.CO. Compras (Alícuotas)</h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Desglose de IVA alícuotas para crédito fiscal compras.</p>
+          </div>
+          <button class="btn btn-outline btn-sm w-full" id="btn-export-compras-ali-txt" style="border-color:#fbbf24; color:#fbbf24;">Descargar TXT</button>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <i data-lucide="file-check-2" style="width: 32px; height: 32px; color: #818cf8; margin-bottom: 12px; margin-inline: auto;"></i>
+            <h4 style="font-size: 13.5px; margin-bottom: 6px;">F. 2051 Borrador (PDF)</h4>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px;">Pre-declaración consolidada borrador de actividad.</p>
+          </div>
           <button class="btn btn-outline btn-sm w-full" id="btn-export-borrador-pdf">Descargar PDF</button>
         </div>
       </div>
@@ -349,6 +373,74 @@ export function initIVA(mainApp) {
 
     downloadTXT(`arca-ventas-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
     mainApp.showToast('¡Archivo de Alícuotas descargado con éxito!', 'success');
+  });
+
+  // RE.CO. Compras (Comprobantes) TXT structure simulation
+  document.getElementById('btn-export-compras-txt')?.addEventListener('click', () => {
+    const txs = getTransactions(activeCompany.id).compras;
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    const filteredCompras = txs.filter(c => c.fecha.startsWith(activePeriod));
+
+    if (filteredCompras.length === 0) {
+      mainApp.showToast('No hay compras registradas en este período para exportar.', 'error');
+      return;
+    }
+
+    let output = "";
+    filteredCompras.forEach(c => {
+      const dateStr = c.fecha.replace(/-/g, ''); // AAAAMMDD
+      const typeCode = c.tipo_comprobante.includes('A') ? '001' : (c.tipo_comprobante.includes('B') ? '006' : '011');
+      const pv = c.numero.split('-')[0].padStart(5, '0');
+      const num = c.numero.split('-')[1].padStart(20, '0');
+      const docType = '80'; // CUIT
+      const cleanCuit = c.cuit.replace(/-/g, '').padStart(20, '0');
+      const name = (c.proveedor || '').padEnd(30, ' ').substring(0, 30);
+      const totalStr = Math.round(c.total * 100).toString().padStart(15, '0');
+      const zeroField = "".padStart(15, '0');
+      const currency = 'PES';
+      const exchangeRate = '0001000000'; // 1.000000 (10 chars)
+      const countAli = '1';
+      const compIva = Math.round(c.iva * 100).toString().padStart(15, '0');
+      
+      output += `${dateStr}${typeCode}${pv}${num}${"".padStart(16, ' ')}${docType}${cleanCuit}${name}${totalStr}${zeroField}${zeroField}${zeroField}${zeroField}${zeroField}${zeroField}${zeroField}${currency}${exchangeRate}${countAli}${" "}${compIva}${zeroField}\r\n`;
+    });
+
+    downloadTXT(`arca-compras-comprobantes-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
+    mainApp.showToast('¡Libro de Compras (Comprobantes) descargado con éxito!', 'success');
+  });
+
+  // RE.CO. Compras (Alícuotas) TXT structure simulation
+  document.getElementById('btn-export-compras-ali-txt')?.addEventListener('click', () => {
+    const txs = getTransactions(activeCompany.id).compras;
+    const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+    const filteredCompras = txs.filter(c => c.fecha.startsWith(activePeriod));
+
+    if (filteredCompras.length === 0) {
+      mainApp.showToast('No hay compras registradas en este período para exportar.', 'error');
+      return;
+    }
+
+    let output = "";
+    filteredCompras.forEach(c => {
+      const typeCode = c.tipo_comprobante.includes('A') ? '001' : (c.tipo_comprobante.includes('B') ? '006' : '011');
+      const pv = c.numero.split('-')[0].padStart(5, '0');
+      const num = c.numero.split('-')[1].padStart(20, '0');
+      const docType = '80'; // CUIT
+      const cleanCuit = c.cuit.replace(/-/g, '').padStart(20, '0');
+      const netStr = Math.round(c.neto * 100).toString().padStart(15, '0');
+      
+      let ivaCode = '0005'; // 21%
+      if (c.iva === 0) ivaCode = '0003';
+      else if (Math.abs((c.iva / c.neto) - 0.105) < 0.02) ivaCode = '0004';
+      else if (Math.abs((c.iva / c.neto) - 0.27) < 0.02) ivaCode = '0006';
+
+      const ivaStr = Math.round(c.iva * 100).toString().padStart(15, '0');
+      
+      output += `${typeCode}${pv}${num}${docType}${cleanCuit}${netStr}${ivaCode}${ivaStr}\r\n`;
+    });
+
+    downloadTXT(`arca-compras-alicuotas-${activeCompany.razon_social.toLowerCase().replace(/ /g, '-')}-${activePeriod}.txt`, output);
+    mainApp.showToast('¡Libro de Compras (Alícuotas) descargado con éxito!', 'success');
   });
 
   // Mock borrador PDF download

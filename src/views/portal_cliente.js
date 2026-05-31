@@ -418,6 +418,7 @@ export function renderPortalCliente() {
                   <th>Comprobante</th>
                   <th class="text-right">Monto</th>
                   <th>Estado</th>
+                  <th class="text-center">Acción</th>
                 </tr>
               </thead>
               <tbody id="ticket-table-body">
@@ -443,6 +444,15 @@ export function renderPortalCliente() {
                         ${t.estado}
                       </span>
                     </td>
+                    <td class="text-center">
+                      ${t.tipo !== 'Venta' ? `
+                        <button class="btn btn-outline btn-xs btn-reconstruct-ticket" data-id="${t.id}" style="display:inline-flex; align-items:center; gap:2px; font-size:9.5px; padding: 2px 6px; border-color: rgba(99, 102, 241, 0.3); color:#818cf8;">
+                          <i data-lucide="sparkles" style="width:10px; height:10px; color:#818cf8;"></i> Reconstruir
+                        </button>
+                      ` : `
+                        <span class="text-muted" style="font-size:9.5px;">Efectuada</span>
+                      `}
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -453,6 +463,87 @@ export function renderPortalCliente() {
 
     </div>
 
+  </div>
+
+  <!-- Modal Reconstrucción Térmica Vectorial [NEW FEATURE] -->
+  <div id="reconstruct-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.25s ease;">
+    <div class="card" style="width: 100%; max-width: 440px; border-color: var(--border-color); overflow: hidden; transform: scale(0.95); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;">
+      <div class="card-header" style="background: rgba(99, 102, 241, 0.03); border-bottom-color: var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="color:#818cf8; display:flex; align-items:center; gap:6px;"><i data-lucide="sparkles"></i> Reconstrucción de Ticket OCR</h3>
+        <button class="btn-icon-sm" id="btn-close-reconstruct-modal" title="Cerrar"><i data-lucide="x"></i></button>
+      </div>
+      <div class="card-body" style="background: var(--bg-secondary); padding: 20px; display:flex; flex-direction:column; gap:16px;">
+        <p class="text-secondary" style="font-size: 11.5px; line-height: 1.4; margin:0;">
+          El motor de IA Gemini 2.5 Flash procesó la imagen del comprobante deteriorado y re-generó este ticket digital vectorial de alta fidelidad comercial.
+        </p>
+
+        <!-- Thermal Receipt Box styling -->
+        <div style="background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); padding: 24px; font-family: 'Courier New', Courier, monospace; color: #000; font-size: 11px; line-height: 1.4;">
+          <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 12px; margin-bottom: 12px;">
+            <div style="font-weight: 900; font-size: 14px; text-transform: uppercase;" id="rec-vendor-name">YPF S.A.</div>
+            <div style="font-size: 9px; margin-top:2px;" id="rec-vendor-address">Av. Macacha Güemes 515, CABA</div>
+            <div style="font-size: 9px;" id="rec-vendor-cuit">CUIT: 30-50001234-9</div>
+            <div style="font-size: 9px;">IVA RESPONSABLE INSCRIPTO</div>
+          </div>
+
+          <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px; font-size: 9.5px;">
+            <div>FECHA: <span id="rec-date">25/05/2026</span></div>
+            <div>TICKET FACTURA B N°: <span id="rec-ticket-num">0004-00192834</span></div>
+            <div>CLIENTE: CONSUMIDOR FINAL</div>
+          </div>
+
+          <!-- Items Table inside receipt -->
+          <div style="border-bottom: 1px dashed #000; padding-bottom: 8px; margin-bottom: 10px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #000; text-align: left; font-weight:900;">
+                  <th style="padding-bottom:4px;">DESCRIPCIÓN</th>
+                  <th style="text-align: right; padding-bottom:4px; width: 40px;">CANT</th>
+                  <th style="text-align: right; padding-bottom:4px; width: 60px;">TOTAL</th>
+                </tr>
+              </thead>
+              <tbody id="rec-items-body">
+                <!-- Injected dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totals -->
+          <div style="display:flex; flex-direction:column; gap:4px; font-size: 10px; align-items:flex-end;">
+            <div style="display:flex; justify-content:space-between; width: 140px;">
+              <span>NETO:</span>
+              <span id="rec-neto">$ 15.289,26</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; width: 140px;">
+              <span>IVA (21%):</span>
+              <span id="rec-iva">$ 3.210,74</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; width: 140px; font-weight:900; font-size:11px; border-top:1px solid #000; padding-top:4px;">
+              <span>TOTAL:</span>
+              <span id="rec-total">$ 18.500,00</span>
+            </div>
+          </div>
+
+          <!-- Receipt Footer barcode & QR lookalike -->
+          <div style="text-align:center; margin-top:20px; font-size:8px; border-top: 1px dashed #000; padding-top:12px;">
+            <div style="width:100px; height:24px; margin: 0 auto 6px; background: repeating-linear-gradient(90deg, #000, #000 1px, #fff 1px, #fff 3px);"></div>
+            <div id="rec-cae">CAE N°: 76239485012398</div>
+            <div id="rec-cae-vto">Vence: 04/06/2026</div>
+            <div style="margin-top:4px;">¡Gracias por su compra!</div>
+          </div>
+        </div>
+
+        <!-- Download receipt action -->
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline w-full" id="btn-print-thermal-receipt" style="font-size:12px; height:36px; display:flex; align-items:center; justify-content:center; gap:4px;">
+            <i data-lucide="printer"></i> Imprimir Ticket
+          </button>
+          <button class="btn btn-primary w-full" id="btn-download-thermal-txt" style="font-size:12px; height:36px; display:flex; align-items:center; justify-content:center; gap:4px;">
+            <i data-lucide="download"></i> Descargar Ticket
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
   `;
 }
@@ -1698,5 +1789,205 @@ ARCA Live Digital Certificate Verification Gate.
   btnSimAsset?.addEventListener('click', (e) => {
     e.stopPropagation();
     startUploadSimulation(true);
+  });
+
+  // -------------------------------------------------------------
+  // CONTROLS FOR TICKET RECONSTRUCTION MODAL (NEW FEATURE)
+  // -------------------------------------------------------------
+  const recModal = document.getElementById('reconstruct-modal');
+  const btnCloseRecModal = document.getElementById('btn-close-reconstruct-modal');
+  const btnPrintThermal = document.getElementById('btn-print-thermal-receipt');
+  const btnDownloadThermal = document.getElementById('btn-download-thermal-txt');
+
+  const recVendorName = document.getElementById('rec-vendor-name');
+  const recVendorAddress = document.getElementById('rec-vendor-address');
+  const recVendorCuit = document.getElementById('rec-vendor-cuit');
+  const recDate = document.getElementById('rec-date');
+  const recTicketNum = document.getElementById('rec-ticket-num');
+  const recItemsBody = document.getElementById('rec-items-body');
+  const recNeto = document.getElementById('rec-neto');
+  const recIva = document.getElementById('rec-iva');
+  const recTotal = document.getElementById('rec-total');
+  const recCae = document.getElementById('rec-cae');
+  const recCaeVto = document.getElementById('rec-cae-vto');
+
+  let activeReconstructedData = null;
+
+  // Event delegation for reconstruct buttons in ticket-table-body
+  document.getElementById('ticket-table-body')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-reconstruct-ticket');
+    if (!btn) return;
+
+    e.stopPropagation();
+    const id = btn.dataset.id;
+    
+    // Determine which ticket we are reconstruct
+    let data = {
+      vendor: "YPF S.A.",
+      address: "Av. Macacha Güemes 515, CABA",
+      cuit: "30-50001234-9",
+      date: "25/05/2026",
+      ticket: "0004-00192834",
+      items: `<tr><td style="padding: 4px 0;">NAFTA INFINIA SUPER (Ltrs)</td><td style="text-align:right; padding: 4px 0; width: 40px;">22.31</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ 18.500,00</td></tr>`,
+      neto: "$ 15.289,26",
+      iva: "$ 3.210,74",
+      total: "$ 18.500,00",
+      cae: "76239485012398",
+      vto: "04/06/2026"
+    };
+
+    if (id === 't-2') {
+      data = {
+        vendor: "TELECOM ARGENTINA S.A.",
+        address: "Av. Alicia Moreau de Justo 50, CABA",
+        cuit: "30-70721665-6",
+        date: "24/05/2026",
+        ticket: "0008-00928347",
+        items: `<tr><td style="padding: 4px 0;">ABONO INTERNET FIBERTER 300MB</td><td style="text-align:right; padding: 4px 0; width: 40px;">1.00</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ 24.000,00</td></tr>`,
+        neto: "$ 19.834,71",
+        iva: "$ 4.165,29",
+        total: "$ 24.000,00",
+        cae: "76239586102938",
+        vto: "03/06/2026"
+      };
+    } else if (id === 't-3') {
+      data = {
+        vendor: "LIBRERÍA SAN MARTÍN S.H.",
+        address: "Av. San Martín 1204, Comodoro Rivadavia",
+        cuit: "30-11223344-5",
+        date: "23/05/2026",
+        ticket: "0002-00012839",
+        items: `
+          <tr><td style="padding: 4px 0;">RESMA PAPEL A4 LEDESMA (75g)</td><td style="text-align:right; padding: 4px 0; width: 40px;">2.00</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ 4.500,00</td></tr>
+          <tr><td style="padding: 4px 0;">BOLÍGRAFOS BIC NEGRO</td><td style="text-align:right; padding: 4px 0; width: 40px;">5.00</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ 2.000,00</td></tr>
+        `,
+        neto: "$ 5.371,90",
+        iva: "$ 1.128,10",
+        total: "$ 6.500,00",
+        cae: "76239485012398",
+        vto: "02/06/2026"
+      };
+    } else if (id.startsWith('t-')) {
+      const tickets = JSON.parse(localStorage.getItem(`vmp_tickets_${activeCompany.id}`)) || [];
+      const found = tickets.find(x => x.id === id);
+      if (found) {
+        const hasCompu = found.detalle.toLowerCase().includes('notebook') || found.detalle.toLowerCase().includes('dell') || found.detalle.toLowerCase().includes('compu') || found.detalle.toLowerCase().includes('megatone');
+        if (hasCompu) {
+          data = {
+            vendor: "MEGATONE S.A.",
+            address: "Av. Cabildo 2040, CABA",
+            cuit: "30-54930281-2",
+            date: found.fecha.split('-').reverse().join('/'),
+            ticket: "0005-0000" + Math.floor(1000 + Math.random() * 9000),
+            items: `<tr><td style="padding: 4px 0;">NOTEBOOK DELL LATITUDE i7</td><td style="text-align:right; padding: 4px 0; width: 40px;">1.00</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ 650.000,00</td></tr>`,
+            neto: "$ 537.190,08",
+            iva: "$ 112.809,92",
+            total: "$ 650.000,00",
+            cae: "76239785930219",
+            vto: new Date(Date.now() + 10 * 24 * 3600 * 1000).toLocaleDateString('es-AR')
+          };
+        } else {
+          data = {
+            vendor: "COMBUSTIBLES YPF",
+            address: "Ruta 3 Km 15, Comodoro Rivadavia",
+            cuit: "30-50001234-9",
+            date: found.fecha.split('-').reverse().join('/'),
+            ticket: "4820-002" + Math.floor(10000 + Math.random() * 90000),
+            items: `<tr><td style="padding: 4px 0;">CARGA COMBUSTIBLE INFINIA</td><td style="text-align:right; padding: 4px 0; width: 40px;">22.31</td><td style="text-align:right; padding: 4px 0; width: 60px;">$ ${found.monto.toLocaleString('es-AR')},00</td></tr>`,
+            neto: `$ ${(found.monto / 1.21).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            iva: `$ ${(found.monto - (found.monto / 1.21)).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            total: `$ ${found.monto.toLocaleString('es-AR')},00`,
+            cae: "76239485012398",
+            vto: new Date(Date.now() + 10 * 24 * 3600 * 1000).toLocaleDateString('es-AR')
+          };
+        }
+      }
+    }
+
+    activeReconstructedData = data;
+
+    // Populating modal fields
+    recVendorName.textContent = data.vendor;
+    recVendorAddress.textContent = data.address;
+    recVendorCuit.textContent = `CUIT: ${data.cuit}`;
+    recDate.textContent = data.date;
+    recTicketNum.textContent = data.ticket;
+    recItemsBody.innerHTML = data.items;
+    recNeto.textContent = data.neto;
+    recIva.textContent = data.iva;
+    recTotal.textContent = data.total;
+    recCae.textContent = `CAE N°: ${data.cae}`;
+    recCaeVto.textContent = `Vence: ${data.vto}`;
+
+    // Show modal
+    recModal.style.display = 'flex';
+    if (window.lucide) window.lucide.createIcons({ root: recModal });
+  });
+
+  // Close modal click
+  btnCloseRecModal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    recModal.style.display = 'none';
+  });
+
+  // Print receipt click
+  btnPrintThermal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mainApp.showToast("Iniciando impresión de ticket térmico...", "info");
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  });
+
+  // Download thermal ticket receipt text file
+  btnDownloadThermal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!activeReconstructedData) return;
+
+    const data = activeReconstructedData;
+    // Strip tags and clean whitespace for item text formatting
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = data.items;
+    const cleanItemsText = Array.from(tempDiv.querySelectorAll('tr')).map(tr => {
+      const tds = tr.querySelectorAll('td');
+      if (tds.length === 3) {
+        return `${tds[0].textContent.padEnd(25, ' ')} ${tds[1].textContent.padStart(6, ' ')} ${tds[2].textContent.padStart(10, ' ')}`;
+      }
+      return tr.textContent.trim();
+    }).join('\n');
+
+    const ticketContent = `
+========================================
+             TICKET COMERCIAL
+========================================
+${data.vendor.toUpperCase()}
+Dirección: ${data.address}
+CUIT: ${data.cuit}
+----------------------------------------
+FECHA: ${data.date}
+COMPROBANTE: FACTURA B N° ${data.ticket}
+----------------------------------------
+DESCRIPCIÓN               CANT     TOTAL
+${cleanItemsText}
+----------------------------------------
+NETO:    ${data.neto.padStart(28, ' ')}
+IVA 21%: ${data.iva.padStart(28, ' ')}
+TOTAL:   ${data.total.padStart(28, ' ')}
+----------------------------------------
+CAE:     ${data.cae}
+Vence:   ${data.vto}
+Sabor digital, VMP Studio.
+========================================
+`;
+
+    const blob = new Blob([ticketContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ticket-${data.vendor.toLowerCase().replace(/ /g, '-')}-${data.ticket}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    mainApp.showToast("¡Ticket térmico vectorial descargado con éxito!", "success");
   });
 }

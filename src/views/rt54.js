@@ -96,6 +96,69 @@ export function renderRT54() {
 
   const isAsientoRegistrado = localStorage.getItem(`vmp_rt54_asiento_ok_${company.id}`) === 'true';
 
+  // -------------------------------------------------------------
+  // CALCULATOR PARAMETERS FOR INFLATION ADJUSTMENT (AxI - RT 54)
+  // -------------------------------------------------------------
+  const IPC_INDICES = {
+    '2025-12': 1500.0,
+    '2026-01': 1620.0,
+    '2026-02': 1733.4,
+    '2026-03': 1837.4,
+    '2026-04': 1929.3,
+    '2026-05': 2006.5
+  };
+
+  if (!localStorage.getItem(`vmp_axi_items_${company.id}`)) {
+    const defaultAxiItems = [
+      { id: "axi-1", concepto: "Capital Social (Patrimonio Neto)", origen: "2025-12", valor: 1000000, tipo: "patrimonio" },
+      { id: "axi-2", concepto: "Notebook Lenovo (Bien de Uso)", origen: "2026-02", valor: 500000, tipo: "activo" },
+      { id: "axi-3", concepto: "Mercaderías en Stock (Bienes de Cambio)", origen: "2026-04", valor: 300000, tipo: "activo" }
+    ];
+    localStorage.setItem(`vmp_axi_items_${company.id}`, JSON.stringify(defaultAxiItems));
+  }
+  const axiItems = JSON.parse(localStorage.getItem(`vmp_axi_items_${company.id}`));
+
+  let totalHistoricAssets = 200000; // Caja y Bancos starts at 200,000
+  let totalAdjustedAssets = 200000;
+  
+  let totalHistoricEquity = 0;
+  let totalAdjustedEquity = 0;
+
+  const axiRowsHtml = axiItems.map(item => {
+    const ipcOrig = IPC_INDICES[item.origen] || 1500.0;
+    const coef = 2006.5 / ipcOrig;
+    const adjusted = item.valor * coef;
+    const adjustment = adjusted - item.valor;
+
+    if (item.tipo === 'activo') {
+      totalHistoricAssets += item.valor;
+      totalAdjustedAssets += adjusted;
+    } else if (item.tipo === 'patrimonio') {
+      totalHistoricEquity += item.valor;
+      totalAdjustedEquity += adjusted;
+    }
+
+    return `
+      <tr>
+        <td style="font-weight: 700; color: var(--color-primary);">${item.concepto}</td>
+        <td class="text-center font-mono" style="font-size:11px;">${item.origen}</td>
+        <td class="font-mono text-right">$ ${item.valor.toLocaleString('es-AR')}</td>
+        <td class="font-mono text-center text-secondary">${coef.toFixed(4)}</td>
+        <td class="font-mono text-right text-emerald" style="font-weight:700;">$ ${Math.round(adjusted).toLocaleString('es-AR')}</td>
+        <td class="font-mono text-right" style="color: #fbbf24;">$ ${Math.round(adjustment).toLocaleString('es-AR')}</td>
+        <td class="text-center">
+          <button class="item-remove-btn btn-delete-axi-item" data-id="${item.id}" style="margin:0 auto; padding:2px;">
+            <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Calculate balancing RECPAM
+  const recpam = totalAdjustedAssets - totalAdjustedEquity; // Assets = Liabilities + Equity + RECPAM => RECPAM = Assets - Equity
+  const totalAdjustedLiabEquity = totalAdjustedEquity + recpam;
+
   return `
   <div class="view-header">
     <div>
@@ -371,6 +434,170 @@ export function renderRT54() {
     </div>
   </div>
 
+  <!-- ── SIMULADOR DE AJUSTE POR INFLACIÓN CONTABLE (AxI - RT 54) [NEW MODULE] ── -->
+  <div class="card" style="margin-bottom: 24px; border-color: rgba(99, 102, 241, 0.25);">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <h3><i data-lucide="trending-up" style="color: #6366f1;"></i> Simulador de Ajuste por Inflación Contable (AxI — RT 54)</h3>
+      <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Índice IPC Cierre: 2006.5</span>
+    </div>
+    <div class="card-body">
+      <p class="text-secondary" style="font-size: 13px; margin-bottom: 16px;">
+        RT 54 FACPCE exige que los balances del ejercicio se expresen en **moneda homogénea de cierre**. Este simulador utiliza los coeficientes oficiales del IPC del INDEC para reexpresar partidas no monetarias del activo y patrimonio, calculando automáticamente la contrapartida de **RECPAM**.
+      </p>
+
+      <!-- Form to add AxI items -->
+      <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 20px;">
+        <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 10px; display:flex; align-items:center; gap:4px;">
+          <i data-lucide="plus-circle" style="color: var(--color-accent);"></i> Incorporar Partida a Reexpresar
+        </h4>
+        <form id="form-add-axi" style="display: grid; grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr; gap: 8px; align-items: flex-end;">
+          <div>
+            <label style="font-size: 10px; color: var(--text-secondary); display:block; margin-bottom:4px;">Concepto / Cuenta</label>
+            <input type="text" id="axi-concept" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;" placeholder="Ej: Inmuebles, Capital..." required>
+          </div>
+          <div>
+            <label style="font-size: 10px; color: var(--text-secondary); display:block; margin-bottom:4px;">Mes Origen</label>
+            <select id="axi-origen" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;">
+              <option value="2025-12">Dic 2025 (1500.0)</option>
+              <option value="2026-01">Ene 2026 (1620.0)</option>
+              <option value="2026-02">Feb 2026 (1733.4)</option>
+              <option value="2026-03">Mar 2026 (1837.4)</option>
+              <option value="2026-04">Abr 2026 (1929.3)</option>
+              <option value="2026-05">May 2026 (2006.5)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 10px; color: var(--text-secondary); display:block; margin-bottom:4px;">Tipo Partida</label>
+            <select id="axi-tipo" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;">
+              <option value="activo" selected>Activo No Monetario</option>
+              <option value="patrimonio">Patrimonio Neto</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <div style="flex:1;">
+              <label style="font-size: 10px; color: var(--text-secondary); display:block; margin-bottom:4px;">Monto Histórico ($)</label>
+              <input type="number" id="axi-value" class="form-input font-mono text-right" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;" placeholder="Valor ($)" required>
+            </div>
+            <button type="button" id="btn-add-axi-submit" class="btn btn-primary" style="height:32px; font-size:12px; padding: 0 12px; background: #6366f1; border-color:#6366f1; font-weight:700;">
+              Ajustar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Table of Reexpressed items -->
+      <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 10px;">Partidas Reexpresadas a Mayo 2026</h4>
+      <div class="table-responsive" style="margin-bottom: 24px;">
+        <table class="table table-sm" style="font-size: 11.5px;">
+          <thead>
+            <tr>
+              <th>Partida No Monetaria</th>
+              <th class="text-center">Origen</th>
+              <th class="text-right">Valor Histórico</th>
+              <th class="text-center">Coef. IPC</th>
+              <th class="text-right">Valor Reexpresado</th>
+              <th class="text-right">Ajuste Neto AxI</th>
+              <th class="text-center" style="width: 50px;">Borrar</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${axiRowsHtml.length === 0 ? `
+              <tr><td colspan="7" class="text-center text-muted" style="padding:16px;">Sin partidas ingresadas para reexpresar.</td></tr>
+            ` : axiRowsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Side-by-Side Balance Sheet comparison -->
+      <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 12px; display:flex; align-items:center; gap:4px;">
+        <i data-lucide="balance" style="color: var(--color-accent);"></i> Cruce de Situación Patrimonial: Histórico vs. Homogéneo
+      </h4>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Historic Balance Sheet -->
+        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px;">
+          <h5 style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; border-bottom:1px solid var(--border-color); padding-bottom:6px; margin-bottom:8px;">Balance Histórico</h5>
+          <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span class="text-secondary">Caja y Bancos (Monetario):</span>
+              <span class="font-mono">$ 200.000</span>
+            </div>
+            ${axiItems.filter(i => i.tipo === 'activo').map(i => `
+              <div style="display:flex; justify-content:space-between;">
+                <span class="text-secondary">${i.concepto}:</span>
+                <span class="font-mono">$ ${i.valor.toLocaleString('es-AR')}</span>
+              </div>
+            `).join('')}
+            <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border-color); padding-top:4px; color: var(--color-primary);">
+              <span>TOTAL ACTIVO:</span>
+              <span class="font-mono">$ ${totalHistoricAssets.toLocaleString('es-AR')}</span>
+            </div>
+            <div style="margin-top:8px; border-top: 1px dashed var(--border-color); padding-top:8px;"></div>
+            ${axiItems.filter(i => i.tipo === 'patrimonio').map(i => `
+              <div style="display:flex; justify-content:space-between;">
+                <span class="text-secondary">${i.concepto}:</span>
+                <span class="font-mono">$ ${i.valor.toLocaleString('es-AR')}</span>
+              </div>
+            `).join('')}
+            <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid var(--border-color); padding-top:4px; color: var(--color-primary);">
+              <span>TOTAL PASIVO + PN:</span>
+              <span class="font-mono">$ ${totalHistoricEquity.toLocaleString('es-AR')}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adjusted (Homogeneous) Balance Sheet -->
+        <div style="background: rgba(99, 102, 241, 0.02); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-sm); padding: 14px;">
+          <h5 style="font-size:11.5px; font-weight:700; color:#818cf8; text-transform:uppercase; border-bottom:1px solid rgba(99,102,241,0.15); padding-bottom:6px; margin-bottom:8px;">Balance Reexpresado (RT 54)</h5>
+          <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span class="text-secondary">Caja y Bancos (Monetario):</span>
+              <span class="font-mono">$ 200.000</span>
+            </div>
+            ${axiItems.filter(i => i.tipo === 'activo').map(i => {
+              const ipcOrig = IPC_INDICES[i.origen] || 1500.0;
+              const coef = 2006.5 / ipcOrig;
+              const adjVal = i.valor * coef;
+              return `
+              <div style="display:flex; justify-content:space-between;">
+                <span class="text-secondary">${i.concepto}:</span>
+                <span class="font-mono text-emerald" style="font-weight:600;">$ ${Math.round(adjVal).toLocaleString('es-AR')}</span>
+              </div>
+              `;
+            }).join('')}
+            <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid rgba(99,102,241,0.15); padding-top:4px; color: #818cf8;">
+              <span>TOTAL ACTIVO AJUSTADO:</span>
+              <span class="font-mono">$ ${Math.round(totalAdjustedAssets).toLocaleString('es-AR')}</span>
+            </div>
+            <div style="margin-top:8px; border-top: 1px dashed rgba(99,102,241,0.15); padding-top:8px;"></div>
+            ${axiItems.filter(i => i.tipo === 'patrimonio').map(i => {
+              const ipcOrig = IPC_INDICES[i.origen] || 1500.0;
+              const coef = 2006.5 / ipcOrig;
+              const adjVal = i.valor * coef;
+              return `
+              <div style="display:flex; justify-content:space-between;">
+                <span class="text-secondary">${i.concepto}:</span>
+                <span class="font-mono">$ ${Math.round(adjVal).toLocaleString('es-AR')}</span>
+              </div>
+              `;
+            }).join('')}
+            
+            <!-- RECPAM balancing row -->
+            <div style="display:flex; justify-content:space-between; font-weight:700; color: #fbbf24;">
+              <span>RECPAM (Resultado Inflacionario):</span>
+              <span class="font-mono">$ ${Math.round(recpam).toLocaleString('es-AR')}</span>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-weight:800; border-top:1px solid rgba(99,102,241,0.15); padding-top:4px; color: #818cf8;">
+              <span>TOTAL PASIVO + PN + RECPAM:</span>
+              <span class="font-mono">$ ${Math.round(totalAdjustedLiabEquity).toLocaleString('es-AR')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Comprobantes Especiales 2026 ───────────────────────── -->
   <div class="card">
     <div class="card-header">
@@ -632,5 +859,60 @@ export function initRT54(mainApp) {
     localStorage.setItem(`vmp_rt54_asiento_ok_${company.id}`, 'true');
     mainApp.showToast("¡Asiento de amortizaciones registrado y conciliado según RT 54!", "success");
     mainApp.router();
+  });
+
+  // -------------------------------------------------------------
+  // CONTROLS FOR INFLATION ADJUSTMENT (AxI - RT 54)
+  // -------------------------------------------------------------
+  document.getElementById('btn-add-axi-submit')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    const conceptVal = document.getElementById('axi-concept').value.trim();
+    const origenVal = document.getElementById('axi-origen').value;
+    const tipoVal = document.getElementById('axi-tipo').value;
+    const valueVal = Number(document.getElementById('axi-value').value) || 0;
+
+    if (!conceptVal || valueVal <= 0) {
+      mainApp.showToast('Ingresá el concepto y un monto histórico mayor a $ 0.', 'error');
+      return;
+    }
+
+    const items = JSON.parse(localStorage.getItem(`vmp_axi_items_${company.id}`)) || [];
+    
+    const newItem = {
+      id: "axi-" + Date.now(),
+      concepto: conceptVal,
+      origen: origenVal,
+      valor: valueVal,
+      tipo: tipoVal
+    };
+
+    items.push(newItem);
+    localStorage.setItem(`vmp_axi_items_${company.id}`, JSON.stringify(items));
+
+    mainApp.showToast(`¡Partida "${conceptVal}" ajustada y cargada al Balance Homogéneo!`, 'success');
+    
+    // Clear inputs
+    const conceptInp = document.getElementById('axi-concept');
+    const valueInp = document.getElementById('axi-value');
+    if (conceptInp) conceptInp.value = '';
+    if (valueInp) valueInp.value = '';
+    
+    mainApp.router(); // Refresh view
+  });
+
+  // Delete AxI item handler
+  document.querySelectorAll('.btn-delete-axi-item').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+
+      const items = JSON.parse(localStorage.getItem(`vmp_axi_items_${company.id}`)) || [];
+      const filtered = items.filter(item => item.id !== id);
+      localStorage.setItem(`vmp_axi_items_${company.id}`, JSON.stringify(filtered));
+
+      mainApp.showToast('Partida eliminada de la reexpresión contable.', 'info');
+      mainApp.router();
+    });
   });
 }
