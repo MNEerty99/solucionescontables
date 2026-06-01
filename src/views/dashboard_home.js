@@ -1,12 +1,63 @@
 /* -------------------------------------------------------------
    VMP Studio Contable - Dashboard Home View (Charts & KPI)
    ------------------------------------------------------------- */
-import { getActiveCompany, getTransactions } from '../db/mockdb.js';
+import { getActiveCompany, getTransactions, getCompanies } from '../db/mockdb.js';
 
 export function renderDashboardHome() {
   const activeCompany = getActiveCompany();
   const txs = getTransactions(activeCompany.id);
   const activePeriod = localStorage.getItem('vmp_active_period') || '2026-05';
+  const companies = getCompanies();
+
+  // Helper dynamic dates generator by CUIT & Condition
+  const getVencimientoDates = (cuit, cond) => {
+    const clean = cuit.replace(/-/g, '').trim();
+    const lastChar = clean.slice(-1);
+    const lastDigit = isNaN(lastChar) ? 0 : parseInt(lastChar);
+    
+    // IVA
+    let ivaDate = '—';
+    if (!cond.toLowerCase().includes('monotributo')) {
+      if (lastDigit === 0 || lastDigit === 1) ivaDate = '18/06/2026';
+      else if (lastDigit === 2 || lastDigit === 3) ivaDate = '19/06/2026';
+      else if (lastDigit === 4 || lastDigit === 5) ivaDate = '20/06/2026';
+      else if (lastDigit === 6 || lastDigit === 7) ivaDate = '21/06/2026';
+      else ivaDate = '22/06/2026';
+    }
+
+    // SUSS F.931
+    let sussDate = '—';
+    if (!cond.toLowerCase().includes('monotributo')) {
+      if (lastDigit >= 0 && lastDigit <= 3) sussDate = '09/06/2026';
+      else if (lastDigit >= 4 && lastDigit <= 6) sussDate = '10/06/2026';
+      else sussDate = '11/06/2026';
+    }
+
+    // Monotributo / Autónomos
+    let monoDate = '—';
+    if (cond.toLowerCase().includes('monotributo')) {
+      monoDate = '20/06/2026';
+    } else {
+      if (lastDigit === 0 || lastDigit === 1) monoDate = '05/06/2026';
+      else if (lastDigit === 2 || lastDigit === 3) monoDate = '05/06/2026';
+      else if (lastDigit === 4 || lastDigit === 5) monoDate = '06/06/2026';
+      else if (lastDigit === 6 || lastDigit === 7) monoDate = '06/06/2026';
+      else monoDate = '07/06/2026';
+    }
+
+    return { ivaDate, sussDate, monoDate };
+  };
+
+  const getTaxStatus = (coId, taxName) => {
+    return localStorage.getItem(`vmp_venc_status_${coId}_${taxName}`) || 'Pendiente';
+  };
+
+  const getStatusClass = (status) => {
+    if (status === 'Presentado') return 'active'; // green
+    if (status === 'Pendiente') return 'pending'; // amber
+    if (status === 'Vencido') return 'inactive'; // red
+    return 'inactive';
+  };
 
   const periodNames = {
     '2026-05': 'Mayo 2026',
@@ -320,6 +371,94 @@ export function renderDashboardHome() {
       </div>
     </div>
   </div>
+
+  <!-- ── CONSOLA DE VENCIMIENTOS MULTI-CLIENTE INTERCONECTADA (NEW MODULE) ── -->
+  <div class="card" style="margin-top: 28px; border-color: rgba(99, 102, 241, 0.25);">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+      <h3><i data-lucide="calendar" style="color: #6366f1;"></i> Agenda de Vencimientos Impositivos Multi-Cliente</h3>
+      <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Control de Plazos CUIT</span>
+    </div>
+    <div class="card-body">
+      <p class="text-secondary" style="font-size: 13px; margin-bottom: 16px;">
+        Esta agenda inteligente calcula matemáticamente los plazos de vencimiento del período para cada cliente registrado, basándose en la **resolución de último dígito de CUIT impositivo de la ARCA**. Hacé clic sobre el estado para conmutar su presentación.
+      </p>
+
+      <div class="table-responsive">
+        <table class="table table-sm" style="font-size: 12px;">
+          <thead>
+            <tr>
+              <th>Razón Social / Cliente</th>
+              <th>CUIT / Condición</th>
+              <th class="text-center">Vto Libro IVA Digital</th>
+              <th class="text-center">Vto SUSS Cargas F.931</th>
+              <th class="text-center">Vto Monotributo / Autónomos</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${companies.map(co => {
+              const { ivaDate, sussDate, monoDate } = getVencimientoDates(co.cuit, co.condicion_iva);
+              
+              const ivaStatus = getTaxStatus(co.id, 'iva');
+              const sussStatus = getTaxStatus(co.id, 'suss');
+              const monoStatus = getTaxStatus(co.id, 'mono');
+              
+              return `
+                <tr>
+                  <td style="font-weight: 700; color: var(--color-primary);">${co.razon_social}</td>
+                  <td>
+                    <span class="font-mono" style="font-size: 11px; color: var(--text-secondary);">${co.cuit}</span><br>
+                    <span style="font-size: 9.5px; font-weight:600; color: var(--text-muted);">${co.condicion_iva}</span>
+                  </td>
+                  
+                  <!-- IVA Column -->
+                  <td class="text-center">
+                    ${ivaDate !== '—' ? `
+                      <div class="font-mono" style="margin-bottom: 4px; font-weight:600;">${ivaDate}</div>
+                      <span class="badge-status ${getStatusClass(ivaStatus)} btn-toggle-venc" data-co="${co.id}" data-tax="iva" style="font-size: 9.5px; padding: 2px 8px; cursor: pointer; user-select: none;">
+                        ${ivaStatus}
+                      </span>
+                    ` : `
+                      <span class="badge-status" style="font-size: 9.5px; padding: 2px 8px; background: rgba(255,255,255,0.02); border-color: var(--border-color); color: var(--text-muted);">
+                        N/A
+                      </span>
+                    `}
+                  </td>
+
+                  <!-- SUSS Column -->
+                  <td class="text-center">
+                    ${sussDate !== '—' ? `
+                      <div class="font-mono" style="margin-bottom: 4px; font-weight:600;">${sussDate}</div>
+                      <span class="badge-status ${getStatusClass(sussStatus)} btn-toggle-venc" data-co="${co.id}" data-tax="suss" style="font-size: 9.5px; padding: 2px 8px; cursor: pointer; user-select: none;">
+                        ${sussStatus}
+                      </span>
+                    ` : `
+                      <span class="badge-status" style="font-size: 9.5px; padding: 2px 8px; background: rgba(255,255,255,0.02); border-color: var(--border-color); color: var(--text-muted);">
+                        N/A
+                      </span>
+                    `}
+                  </td>
+
+                  <!-- Monotributo / Autónomos Column -->
+                  <td class="text-center">
+                    ${monoDate !== '—' ? `
+                      <div class="font-mono" style="margin-bottom: 4px; font-weight:600;">${monoDate}</div>
+                      <span class="badge-status ${getStatusClass(monoStatus)} btn-toggle-venc" data-co="${co.id}" data-tax="mono" style="font-size: 9.5px; padding: 2px 8px; cursor: pointer; user-select: none;">
+                        ${monoStatus}
+                      </span>
+                    ` : `
+                      <span class="badge-status" style="font-size: 9.5px; padding: 2px 8px; background: rgba(255,255,255,0.02); border-color: var(--border-color); color: var(--text-muted);">
+                        N/A
+                      </span>
+                    `}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   `;
 }
 
@@ -407,4 +546,28 @@ export function initDashboardHome(mainApp) {
     // Fallback si Chart.js no se ha cargado todavía
     console.log("Chart.js no disponible.");
   }
+
+  // -------------------------------------------------------------
+  // INTERACTIVE CHECKLIST FOR MULTI-COMPANY TAX DEADLINES (NEW)
+  // -------------------------------------------------------------
+  document.querySelectorAll('.btn-toggle-venc').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const coId = btn.dataset.co;
+      const taxName = btn.dataset.tax;
+
+      const current = localStorage.getItem(`vmp_venc_status_${coId}_${taxName}`) || 'Pendiente';
+      
+      // Cycle: Pendiente -> Presentado -> Vencido -> Pendiente
+      let next = 'Presentado';
+      if (current === 'Presentado') next = 'Vencido';
+      else if (current === 'Vencido') next = 'Pendiente';
+
+      localStorage.setItem(`vmp_venc_status_${coId}_${taxName}`, next);
+
+      // Re-trigger layout router to update views in real time!
+      mainApp.showToast(`¡Vencimiento: CUIT cliente actualizado a [${next}]!`, 'success');
+      mainApp.router();
+    });
+  });
 }
