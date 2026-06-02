@@ -99,6 +99,15 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="book-open"></i>
           <span>Libro IVA Digital</span>
         </a>
+        <a href="#/studio/retenciones" class="db-nav-item ${activeRoute === 'retenciones' ? 'active' : ''}" data-route="retenciones">
+          <i data-lucide="percent"></i>
+          <span>Retenciones y Percepciones</span>
+          ${!isAdminUnlocked ? '<i data-lucide="lock" style="width: 12px; height: 12px; margin-left: auto; color: #818cf8;" title="Módulo Premium"></i>' : ''}
+        </a>
+        <a href="#/studio/rt54" class="db-nav-item ${activeRoute === 'rt54' ? 'active' : ''}" data-route="rt54">
+          <i data-lucide="calculator"></i>
+          <span>Ajuste por Inflación (RT 54)</span>
+        </a>
 
         <div class="db-nav-label">Soporte</div>
         <a href="#/studio/ayuda" class="db-nav-item ${activeRoute === 'ayuda' ? 'active' : ''}" data-route="ayuda">
