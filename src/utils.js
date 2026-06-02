@@ -125,7 +125,7 @@ export function renderPremiumTeaser(childHTML, title, description) {
     </div>
     <div class="premium-lock-overlay">
       <div class="premium-lock-card">
-        <div class="premium-lock-icon">
+        <div class="premium-lock-icon" onclick="let key = prompt('Ingrese la clave de administrador para desbloquear las funciones premium:'); if (key === 'vmp2026' || key === 'VMP2026') { localStorage.setItem('vmp_premium_unlocked', 'true'); window.location.reload(); } else if (key) { alert('Clave incorrecta'); }" style="cursor: pointer;" title="Acceso de Administración">
           <i data-lucide="lock" style="width: 24px; height: 24px;"></i>
         </div>
         <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin: 0;">${title}</h3>
@@ -137,9 +137,6 @@ export function renderPremiumTeaser(childHTML, title, description) {
         </div>
         <button class="btn btn-primary" onclick="alert('Soluciones Contables\\n\\n📞 WhatsApp: +54 299 673-1487\\n✉️ Email: administracion@vmp-edtech.com')" style="width: 100%; background: #6366f1; border-color: #6366f1; font-weight: 700; margin-top: 4px; padding: 10px; border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <i data-lucide="phone" style="width: 16px; height: 16px;"></i> Contactar para Activar Licencia
-        </button>
-        <button class="btn btn-outline" onclick="localStorage.setItem('vmp_premium_unlocked', 'true'); window.location.reload();" style="width: 100%; margin-top: 8px; border-color: rgba(99, 102, 241, 0.3); color: #6366f1; font-weight: 700; padding: 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent;">
-          <i data-lucide="unlock" style="width: 16px; height: 16px;"></i> Activar Licencia (Demo / Auditoría)
         </button>
       </div>
     </div>

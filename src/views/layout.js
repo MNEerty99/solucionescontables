@@ -6,6 +6,7 @@ import { getCompanies, getActiveCompany, getSyncStatus } from '../db/mockdb.js';
 export function renderDashboardLayout(childHTML, activeRoute) {
   const activeCompany = getActiveCompany();
   const companies = getCompanies();
+  const isAdminUnlocked = localStorage.getItem('vmp_premium_unlocked') === 'true';
 
   // Calcular estado inicial de sincronización
   const syncStatus = getSyncStatus();
@@ -115,7 +116,14 @@ export function renderDashboardLayout(childHTML, activeRoute) {
       <div class="db-sidebar-footer">
         <div class="user-info">
           <span class="user-name">Estudio Contable Comahue</span>
-          <span class="user-role">Administrador</span>
+          <span class="user-role" style="display: flex; align-items: center; gap: 4px;">
+            Administrador
+            ${isAdminUnlocked ? `
+              <span id="vmp-admin-lock-btn" title="Re-bloquear funciones Premium (Volver a Modo Demo)" style="cursor: pointer; color: #f59e0b; display: inline-flex; align-items: center; margin-left: 4px;">
+                <i data-lucide="unlock" style="width: 12px; height: 12px;"></i>
+              </span>
+            ` : ''}
+          </span>
         </div>
         <button class="btn-icon-sm" id="logout-studio-btn" title="Cerrar sesión">
           <i data-lucide="log-out"></i>
@@ -305,6 +313,16 @@ export function initDashboardLayout(mainApp) {
   // Logout studio
   document.getElementById('logout-studio-btn')?.addEventListener('click', () => {
     window.location.hash = '#/';
+  });
+
+  // Re-bloquear funciones Premium
+  document.getElementById('vmp-admin-lock-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    localStorage.removeItem('vmp_premium_unlocked');
+    mainApp.showToast('Funciones premium bloqueadas (Modo Demo)', 'info');
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
   });
 
   // Navigation history back and forward
