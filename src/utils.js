@@ -112,6 +112,12 @@ export function downloadFile(filename, content, mimeType = 'text/plain') {
  * @returns {string} HTML con el overlay y desenfoque aplicados.
  */
 export function renderPremiumTeaser(childHTML, title, description) {
+  // Si el administrador activó la licencia temporalmente para revisión
+  const isUnlocked = localStorage.getItem('vmp_premium_unlocked') === 'true';
+  if (isUnlocked) {
+    return childHTML;
+  }
+
   return `
   <div class="locked-container" style="width: 100%; min-height: 520px; display: flex; flex-direction: column;">
     <div class="locked-blur" style="flex-grow: 1;">
@@ -131,6 +137,9 @@ export function renderPremiumTeaser(childHTML, title, description) {
         </div>
         <button class="btn btn-primary" onclick="alert('Soluciones Contables\\n\\n📞 WhatsApp: +54 299 673-1487\\n✉️ Email: administracion@vmp-edtech.com')" style="width: 100%; background: #6366f1; border-color: #6366f1; font-weight: 700; margin-top: 4px; padding: 10px; border-radius: 6px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <i data-lucide="phone" style="width: 16px; height: 16px;"></i> Contactar para Activar Licencia
+        </button>
+        <button class="btn btn-outline" onclick="localStorage.setItem('vmp_premium_unlocked', 'true'); window.location.reload();" style="width: 100%; margin-top: 8px; border-color: rgba(99, 102, 241, 0.3); color: #6366f1; font-weight: 700; padding: 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent;">
+          <i data-lucide="unlock" style="width: 16px; height: 16px;"></i> Activar Licencia (Demo / Auditoría)
         </button>
       </div>
     </div>
