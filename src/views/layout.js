@@ -85,19 +85,39 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         <div class="db-nav-label">Estudio</div>
         <a href="#/studio" class="db-nav-item ${activeRoute === 'studio' ? 'active' : ''}" data-route="studio">
           <i data-lucide="layout-dashboard"></i>
-          <span>Dashboard</span>
+          <span>Dashboard General</span>
+        </a>
+        <a href="#/studio/empresas" class="db-nav-item ${activeRoute === 'empresas' ? 'active' : ''}" data-route="empresas">
+          <i data-lucide="building-2"></i>
+          <span>Mis Clientes (CUITs)</span>
+        </a>
+        <a href="#/studio/configuracion" class="db-nav-item ${activeRoute === 'configuracion' ? 'active' : ''}" data-route="configuracion">
+          <i data-lucide="cpu"></i>
+          <span>Robots RPA & Scheduler</span>
         </a>
 
         <div class="db-nav-label">Operaciones</div>
         <a href="#/studio/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
           <i data-lucide="file-text"></i>
-          <span>Comprobantes</span>
+          <span>Comprobantes (Ledger)</span>
+        </a>
+        <a href="#/studio/importacion" class="db-nav-item ${activeRoute === 'importacion' ? 'active' : ''}" data-route="importacion">
+          <i data-lucide="refresh-cw"></i>
+          <span>Conciliador "Mis Comprobantes"</span>
+        </a>
+        <a href="#/studio/portal" class="db-nav-item ${activeRoute === 'portal' ? 'active' : ''}" data-route="portal">
+          <i data-lucide="users"></i>
+          <span>Portal del Cliente & Factura</span>
         </a>
 
-        <div class="db-nav-label">Fiscal</div>
+        <div class="db-nav-label">Fiscal & Contable</div>
         <a href="#/studio/iva" class="db-nav-item ${activeRoute === 'iva' ? 'active' : ''}" data-route="iva">
           <i data-lucide="book-open"></i>
           <span>Libro IVA Digital</span>
+        </a>
+        <a href="#/studio/iva-simple" class="db-nav-item ${activeRoute === 'iva-simple' ? 'active' : ''}" data-route="iva-simple">
+          <i data-lucide="file-check"></i>
+          <span>IVA Simple & Monotributo</span>
         </a>
         <a href="#/studio/retenciones" class="db-nav-item ${activeRoute === 'retenciones' ? 'active' : ''}" data-route="retenciones">
           <i data-lucide="percent"></i>
