@@ -126,8 +126,17 @@ export function renderDashboardLayout(childHTML, activeRoute) {
     <!-- Main Section -->
     <div class="db-main">
       <header class="db-topbar">
-        <div class="topbar-left">
-          <div class="db-breadcrumb" id="db-breadcrumb-title">Cargando...</div>
+        <div class="topbar-left" style="display: flex; align-items: center; gap: 12px;">
+          <!-- Botones de Retroceso / Avance de Historial de Navegación -->
+          <div class="history-navigation-buttons" style="display: flex; align-items: center; gap: 6px;">
+            <button class="history-nav-btn" id="nav-history-back-btn" title="Retroceder (Alt + Flecha Izquierda)">
+              <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+            </button>
+            <button class="history-nav-btn" id="nav-history-forward-btn" title="Avanzar (Alt + Flecha Derecha)">
+              <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+            </button>
+          </div>
+          <div class="db-breadcrumb" id="db-breadcrumb-title" style="margin-left: 4px;">Cargando...</div>
         </div>
 
         <div style="display: flex; align-items: center; gap: 16px;">
@@ -297,6 +306,32 @@ export function initDashboardLayout(mainApp) {
   document.getElementById('logout-studio-btn')?.addEventListener('click', () => {
     window.location.hash = '#/';
   });
+
+  // Navigation history back and forward
+  document.getElementById('nav-history-back-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.history.back();
+  });
+
+  document.getElementById('nav-history-forward-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.history.forward();
+  });
+
+  // Global Keyboard Shortcuts for Navigation History: Alt + ArrowLeft / Alt + ArrowRight
+  const handleNavKeyboard = (e) => {
+    if (e.altKey && e.key === 'ArrowLeft') {
+      e.preventDefault();
+      window.history.back();
+    } else if (e.altKey && e.key === 'ArrowRight') {
+      e.preventDefault();
+      window.history.forward();
+    }
+  };
+  
+  window.removeEventListener('keydown', window._vmp_nav_shortcut_fn);
+  window._vmp_nav_shortcut_fn = handleNavKeyboard;
+  window.addEventListener('keydown', handleNavKeyboard);
 
   // -------------------------------------------------------------
   // ACTUALIZACIÓN DINÁMICA DEL PILL DE SINCRONIZACIÓN (SYNC INDICATOR)

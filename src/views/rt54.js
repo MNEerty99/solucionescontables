@@ -595,6 +595,15 @@ export function renderRT54() {
           </div>
         </div>
       </div>
+      
+      <!-- Descargo de responsabilidad CPN para producción -->
+      <div style="margin-top: 20px; background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: var(--radius-sm); padding: 12px; display: flex; gap: 10px; align-items: flex-start;">
+        <i data-lucide="alert-triangle" style="color: #fbbf24; width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;"></i>
+        <div style="font-size: 11.5px; line-height: 1.4; color: var(--text-secondary);">
+          <strong style="color: #fbbf24;">Descargo de Responsabilidad Profesional (CPN):</strong> Los cálculos y reexpresiones patrimoniales arrojados por este simulador de Ajuste por Inflación (RT 54) se presentan con fines exclusivamente orientativos y de soporte técnico pre-auditoría. La validación definitiva, firma y presentación formal del Balance de Situación Patrimonial ante los consejos profesionales correspondientes (FACPCE / Colegios de Graduados en Ciencias Económicas) queda bajo la exclusiva responsabilidad y criterio profesional del contador público matriculado firmante.
+        </div>
+      </div>
+
     </div>
   </div>
 

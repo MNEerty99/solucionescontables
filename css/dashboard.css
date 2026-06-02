@@ -898,3 +898,104 @@
   margin-bottom: 4px;
 }
 
+/* -------------------------------------------------------------
+   🖨️ ESTILOS DE IMPRESIÓN MÓDULO RECONSTRUCTOR DE TICKETS
+   ------------------------------------------------------------- */
+@media print {
+  /* Ocultar toda la estructura del sitio y barra lateral */
+  body > *:not(#reconstruct-modal) {
+    display: none !important;
+  }
+  
+  body, html {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Resetear el contenedor del modal para quitar el fondo oscuro */
+  #reconstruct-modal {
+    position: absolute !important;
+    inset: 0 !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+  }
+  
+  /* Resetear tarjeta contenedora */
+  #reconstruct-modal .card {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 80mm !important; /* Ancho estándar de ticketera térmica de 80mm */
+    margin: 0 auto !important;
+    transform: none !important;
+  }
+  
+  /* Ocultar el encabezado del modal, botones e instructivos */
+  #reconstruct-modal .card-header,
+  #reconstruct-modal .card-body > p,
+  #reconstruct-modal .card-body > div:last-child {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  #reconstruct-modal .card-body {
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  
+  /* Quitar bordes y sombras del papel del ticket térmico */
+  .receipt-print-container {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    width: 100% !important;
+  }
+}
+
+/* -------------------------------------------------------------
+   🧭 BOTONES DE NAVEGACIÓN PREMIUM DEL HISTORIAL (UX)
+   ------------------------------------------------------------- */
+.history-nav-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.history-nav-btn:hover {
+  background: rgba(99, 102, 241, 0.05) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  color: #6366f1 !important;
+  transform: translateY(-1px);
+}
+
+.history-nav-btn:active {
+  transform: scale(0.92) translateY(0);
+}
+
+.history-nav-btn:focus-visible {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+
+
+

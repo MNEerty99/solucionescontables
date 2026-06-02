@@ -257,6 +257,44 @@ export function renderLanding() {
           </div>
 
         </div>
+
+        <!-- Cotizador oficial BNA en Tiempo Real -->
+        <div style="margin-top: 40px; background: rgba(99, 102, 241, 0.02); border: 1.5px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; max-width: 680px; margin-inline: auto; text-align: left; box-shadow: var(--shadow-sm);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; border-bottom: 1px dashed var(--border-color); padding-bottom:16px; margin-bottom:16px;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--color-primary); display:flex; align-items:center; gap:6px; margin:0;">
+                <i data-lucide="refresh-cw" style="color: #6366f1; width: 18px; height: 18px;"></i>
+                Conversor Oficial BNA (Pesos Argentinos)
+              </h4>
+              <p style="font-size: 11.5px; color: var(--text-secondary); margin-top:4px; margin-bottom:0;">
+                Los abonos en USD se facturan en pesos al tipo de cambio oficial vendedor del Banco Nación según el contrato.
+              </p>
+            </div>
+            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.20); padding: 6px 12px; border-radius: 20px; font-size:12px; color: #10b981; font-weight:700; display:flex; align-items:center; gap:6px;">
+              <span style="width:6px; height:6px; background:#10b981; border-radius:50%; display:inline-block;"></span>
+              U.S. Dollar Oficial BNA: <span id="bna-rate-display" style="font-family: monospace; font-weight:800; margin-left: 4px;">Cargando...</span>
+            </div>
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:16px; text-align:center;">
+              <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Licencia Setup (Pago Único)</span>
+              <div style="font-family: var(--font-heading); font-size: 24px; font-weight: 850; color:#10b981; margin-top:8px;" id="ars-license-price">
+                $ ---.---,00
+              </div>
+              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 380 (Promoción)</span>
+            </div>
+            
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:16px; text-align:center;">
+              <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Abono Mantenimiento (Mensual)</span>
+              <div style="font-family: var(--font-heading); font-size: 24px; font-weight: 850; color:#6366f1; margin-top:8px;" id="ars-maint-price">
+                $ ---.---,00
+              </div>
+              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 150 / mes</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -458,6 +496,36 @@ export function initLanding(mainApp) {
       });
     }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
     sections.forEach(section => observer.observe(section));
+  }
+
+  // Fetch real-time BNA official dollar rate and calculate prices
+  const bnaRateDisplay = document.getElementById('bna-rate-display');
+  const arsLicensePrice = document.getElementById('ars-license-price');
+  const arsMaintPrice = document.getElementById('ars-maint-price');
+
+  if (bnaRateDisplay && arsLicensePrice && arsMaintPrice) {
+    const updatePrices = (rate) => {
+      bnaRateDisplay.textContent = `$ ${rate.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
+      const licenseArs = 380 * rate;
+      const maintArs = 150 * rate;
+      arsLicensePrice.textContent = `$ ${Math.round(licenseArs).toLocaleString('es-AR')},00`;
+      arsMaintPrice.textContent = `$ ${Math.round(maintArs).toLocaleString('es-AR')},00`;
+    };
+
+    // Try fetching real-time BNA rate, fallback to a realistic baseline if offline/error
+    fetch('https://dolarapi.com/v1/dolares/oficial')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.venta) {
+          updatePrices(data.venta);
+        } else {
+          updatePrices(960.00); // Realistic fallback
+        }
+      })
+      .catch(err => {
+        console.warn("DolarAPI Fetch Error: Using fallback exchange rate.", err);
+        updatePrices(960.00); // Realistic fallback
+      });
   }
 
   // Fix #9 — Dynamic footer year

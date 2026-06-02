@@ -478,7 +478,7 @@ export function renderPortalCliente() {
         </p>
 
         <!-- Thermal Receipt Box styling -->
-        <div style="background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); padding: 24px; font-family: 'Courier New', Courier, monospace; color: #000; font-size: 11px; line-height: 1.4;">
+        <div class="receipt-print-container" style="background: #fdfdfd; border: 1px solid #e2e8f0; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); padding: 24px; font-family: 'Courier New', Courier, monospace; color: #000; font-size: 11px; line-height: 1.4;">
           <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 12px; margin-bottom: 12px;">
             <div style="font-weight: 900; font-size: 14px; text-transform: uppercase;" id="rec-vendor-name">YPF S.A.</div>
             <div style="font-size: 9px; margin-top:2px;" id="rec-vendor-address">Av. Macacha Güemes 515, CABA</div>

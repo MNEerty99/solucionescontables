@@ -250,6 +250,14 @@ export function renderIVASimple() {
         </div>
       </div>
 
+      <!-- Descargo de responsabilidad CPN para producción -->
+      <div style="margin-top: 24px; background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: var(--radius-sm); padding: 12px; display: flex; gap: 10px; align-items: flex-start;">
+        <i data-lucide="alert-triangle" style="color: #fbbf24; width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;"></i>
+        <div style="font-size: 11.5px; line-height: 1.4; color: var(--text-secondary);">
+          <strong style="color: #fbbf24;">Descargo de Responsabilidad Profesional (CPN):</strong> Los diagnósticos de exclusión rolling y recategorización semestral de Monotributo sugeridos por este panel constituyen una herramienta técnica de simulación y estimación. Las recategorizaciones semestrales definitivas ante ARCA deben ser revisadas, convalidadas y cargadas formalmente en la plataforma fiscal oficial bajo el exclusivo criterio y matrícula del contador público interviniente.
+        </div>
+      </div>
+
     </div>
     `;
   }
