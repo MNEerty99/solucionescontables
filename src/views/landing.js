@@ -163,7 +163,7 @@ export function renderLanding() {
           <p>Olvidate de saltar entre múltiples sistemas lentos y planillas propensas a errores. Reclutá un colaborador virtual de élite en una interfaz moderna y veloz.</p>
         </div>
         
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
+        <div class="features-grid">
           
           <!-- Module 1 -->
           <div class="feature-card" style="padding: 24px; overflow: hidden;">
