@@ -166,69 +166,75 @@ export function renderLanding() {
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
           
           <!-- Module 1 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
-              <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/mis_comprobantes_benefit.png" alt="Conciliador Mis Comprobantes" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="refresh-cw" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Conciliador "Mis Comprobantes"</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Sincronización automatizada. Importá las planillas de ARCA de compras y ventas. El motor cruza datos localmente de forma reactiva, detecta duplicados y alerta inconsistencias fiscales de CUITs APOC.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">Conciliador "Mis Comprobantes"</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Sincronización automatizada. Importá las planillas de ARCA de compras y ventas. El motor cruza datos localmente de forma reactiva, detecta duplicados y alerta inconsistencias fiscales de CUITs APOC.</p>
           </div>
 
           <!-- Module 2 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(99, 102, 241, 0.06); color: #6366f1; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.15);">
-              <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/libro_iva_benefit.png" alt="Libro IVA Digital" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Libro IVA Digital</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Exportación en 1 clic. Generá los archivos oficiales delimitados listos para subir a la web de ARCA. El sistema realiza una pre-auditoría matemática para evitar redondeos incorrectos.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">Libro IVA Digital</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Exportación en 1 clic. Generá los archivos oficiales delimitados listos para subir a la web de ARCA. El sistema realiza una pre-auditoría matemática para evitar redondeos incorrectos.</p>
           </div>
 
           <!-- Module 3 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
-              <i data-lucide="calculator" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/ajuste_inflacion_benefit.png" alt="Ajuste por Inflacion RT 54" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="calculator" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Ajuste por Inflación (RT 54)</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Cumplimiento normativo unificado. Aplica automáticamente los coeficientes de inflación del FACPCE. Realizá los asientos de ajuste del diario y mayor directamente en el panel del cliente.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">Ajuste por Inflación (RT 54)</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Cumplimiento normativo unificado. Aplica automáticamente los coeficientes de inflación del FACPCE. Realizá los asientos de ajuste del diario y mayor directamente en el panel del cliente.</p>
           </div>
 
           <!-- Module 4 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(239, 68, 68, 0.06); color: #ef4444; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(239, 68, 68, 0.15);">
-              <i data-lucide="shield-alert" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/monitoreo_monotributo_benefit.png" alt="Monitoreo de Monotributo" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="shield-alert" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Monitoreo de Monotributo</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Vigilancia anti-exclusión. Control en tiempo real de la facturación acumulada de tus monotributistas. Recibís una alerta automática de WhatsApp si se acercan al límite de exclusión.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">Monitoreo de Monotributo</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Vigilancia anti-exclusión. Control en tiempo real de la facturación acumulada de tus monotributistas. Recibís una alerta automática de WhatsApp si se acercan al límite de exclusión.</p>
           </div>
 
           <!-- Module 5 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(99, 102, 241, 0.06); color: #6366f1; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.15);">
-              <i data-lucide="message-square" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/whatsapp_inbox_benefit.png" alt="WhatsApp Inbox Centralizado" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">WhatsApp Inbox Centralizado</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Comunicación simplificada. Tus clientes te envían fotos de comprobantes o PDFs directamente por WhatsApp. El asistente IA los parsea y clasifica dejándolos en la bandeja de entrada listos para aprobar.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">WhatsApp Inbox Centralizado</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Comunicación simplificada. Tus clientes te envían fotos de comprobantes o PDFs directamente por WhatsApp. El asistente IA los parsea y clasifica dejándolos en la bandeja de entrada listos para aprobar.</p>
           </div>
 
           <!-- Module 6 -->
-          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
-              <i data-lucide="smartphone" style="width: 20px; height: 20px;"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/portal_ocr_benefit.png" alt="Portal de Clientes + IA OCR" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="smartphone" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
-            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Portal de Clientes + IA OCR</h3>
-            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
-              Recolección autónoma de datos. Los clientes entran desde su móvil y sacan fotos a los tickets. La suite lee los datos impositivos con IA y los carga en el Ledger de compras esperando tu aprobación.
-            </p>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); font-family: var(--font-heading);">Portal de Clientes + IA OCR</h3>
+            <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">Recolección autónoma de datos. Los clientes entran desde su móvil y sacan fotos a los tickets. La suite lee los datos impositivos con IA y los carga en el Ledger de compras esperando tu aprobación.</p>
           </div>
           
         </div>
@@ -415,38 +421,53 @@ export function renderLanding() {
     <!-- Partners / Affiliate Program Section -->
     <section id="partners" class="partners-section" style="padding: 80px 0; border-top: 1px solid rgba(226, 232, 240, 0.4); background: transparent;">
       <div class="container">
-        <div class="partners-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(5, 150, 105, 0.03) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 48px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center;">
-          <div class="partners-info">
-            <span class="badge" style="background: rgba(99,102,241,0.08); color: #6366f1; border-color: rgba(99,102,241,0.15); font-weight: 700;">PLAN DE AFILIADOS / SOCIOS COMERCIALES</span>
-            <h2 style="font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 12px;">Ganá <span class="gradient-text">USD 80</span> por cada licencia recomendada</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 14.5px; line-height: 1.6;">
-              ¿Tenés contactos en el sector contable? ¿Sos contador o estudiante y querés generar un ingreso extra? Te invitamos a sumarte a nuestro **Programa de Partners Asociados**. 
-              <br><br>
-              Por cada Licencia de Adquisición de Soluciones Contables que se venda bajo tu recomendación directa (valor de oferta de la licencia: USD 850), **te quedás con USD 80 de comisión en el acto**, sin topes ni demoras operativas.
-            </p>
+        <div class="partners-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(5, 150, 105, 0.03) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 48px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; align-items: stretch;">
+          
+          <!-- Column 1: Organic Partners Image -->
+          <div class="feature-card" style="padding: 0; min-height: 280px; overflow: hidden; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+            <div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
+              <img src="/partners_benefit.png" alt="Socios Comerciales de Soluciones Contables" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease;" class="benefit-img">
+              <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 100%); padding: 24px 20px; color: #ffffff; z-index: 10;">
+                <span class="badge" style="background: rgba(52, 211, 153, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.3); font-weight: 700; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; display: inline-block;">Socio Estratégico</span>
+                <h4 style="font-size: 16px; font-weight: 800; margin: 0; color: #ffffff; font-family: var(--font-heading);">Crecimiento en Red</h4>
+                <p style="font-size: 11px; color: #cbd5e1; margin: 4px 0 0 0; line-height: 1.4;">Unite a nuestra comunidad de contadores y recomendadores en Argentina.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Information & Calculator -->
+          <div class="partners-info" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="badge" style="background: rgba(99,102,241,0.08); color: #6366f1; border-color: rgba(99,102,241,0.15); font-weight: 700;">PLAN DE AFILIADOS / SOCIOS COMERCIALES</span>
+              <h2 style="font-size: 26px; font-weight: 700; margin-top: 10px; margin-bottom: 12px; line-height: 1.25;">Ganá <span class="gradient-text">USD 80</span> por recomendación</h2>
+              <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 13px; line-height: 1.5;">
+                ¿Tenés contactos en el sector contable? ¿Sos contador o estudiante y querés generar un ingreso extra? Te invitamos a sumarte a nuestro **Programa de Partners Asociados**.
+                <br><br>
+                Por cada Licencia vendida bajo tu recomendación directa, **te quedás con USD 80 de comisión en el acto**, sin topes.
+              </p>
+            </div>
             
             <!-- Interactive Earnings Calculator -->
-            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
-              <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="calculator" style="color: #6366f1; width: 18px; height: 18px;"></i>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow-sm);">
+              <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; margin-top: 0;">
+                <i data-lucide="calculator" style="color: #6366f1; width: 16px; height: 16px;"></i>
                 Calculador de Comisiones Proyectadas
               </h4>
               
-              <div style="margin-bottom: 16px;">
+              <div style="margin-bottom: 14px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600;">Licencias vendidas al mes:</span>
-                  <span id="partner-qty-label" style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: var(--color-primary); background: var(--bg-secondary); padding: 2px 10px; border-radius: 12px; border: 1px solid var(--border-color);">5</span>
+                  <span style="font-size: 11.5px; color: var(--text-secondary); font-weight: 600;">Licencias al mes:</span>
+                  <span id="partner-qty-label" style="font-family: var(--font-heading); font-size: 14px; font-weight: 800; color: var(--color-primary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-color);">5</span>
                 </div>
-                <input type="range" id="partner-slider" min="1" max="30" value="5" aria-label="Licencias vendidas por mes" aria-valuemin="1" aria-valuemax="30" aria-valuenow="5" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
+                <input type="range" id="partner-slider" min="1" max="30" value="5" aria-label="Licencias vendidas por mes" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
               </div>
               
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Tu ganancia en comisiones:</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Tu comisión estimada:</span>
                 <div style="text-align: right;">
-                  <span style="font-family: var(--font-heading); font-size: 26px; font-weight: 800; color: #10b981; display: block; line-height: 1;">
+                  <span style="font-family: var(--font-heading); font-size: 22px; font-weight: 800; color: #10b981; display: block; line-height: 1;">
                     USD <span id="partner-commission-val">400</span>
                   </span>
-                  <span style="font-size: 10px; color: var(--text-muted); font-weight: 500;">Comisión inmediata pagada al instante</span>
                 </div>
               </div>
             </div>
