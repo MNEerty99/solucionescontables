@@ -95,6 +95,10 @@ export function renderDashboardLayout(childHTML, activeRoute) {
           <i data-lucide="cpu"></i>
           <span>Robots RPA & Scheduler</span>
         </a>
+        <a href="#/studio/migrador" class="db-nav-item ${activeRoute === 'migrador' ? 'active' : ''}" data-route="migrador">
+          <i data-lucide="upload-cloud"></i>
+          <span>Migrador de Sistemas</span>
+        </a>
 
         <div class="db-nav-label">Operaciones</div>
         <a href="#/studio/ventas" class="db-nav-item ${activeRoute === 'ventas' ? 'active' : ''}" data-route="ventas">
@@ -108,6 +112,10 @@ export function renderDashboardLayout(childHTML, activeRoute) {
         <a href="#/studio/portal" class="db-nav-item ${activeRoute === 'portal' ? 'active' : ''}" data-route="portal">
           <i data-lucide="users"></i>
           <span>Portal del Cliente & Factura</span>
+        </a>
+        <a href="#/studio/whatsapp" class="db-nav-item ${activeRoute === 'whatsapp' ? 'active' : ''}" data-route="whatsapp">
+          <i data-lucide="message-square"></i>
+          <span>Inbox de WhatsApp</span>
         </a>
 
         <div class="db-nav-label">Fiscal & Contable</div>

@@ -17,6 +17,8 @@ import { renderIVASimple, initIVASimple } from './views/iva_simple.js';
 import { renderRetenciones, initRetenciones } from './views/retenciones.js';
 import { renderRT54, initRT54 } from './views/rt54.js';
 import { renderAyuda, initAyuda } from './views/ayuda.js';
+import { renderWhatsApp, initWhatsApp } from './views/whatsapp.js';
+import { renderMigrador, initMigrador } from './views/migrador.js';
 
 class Application {
   constructor() {
@@ -32,6 +34,12 @@ class Application {
 
     // 2. Setup Hash Routing Listener
     window.addEventListener('hashchange', () => this.router());
+
+    // 2b. Setup Database Mutation Listener for Reactivity (Pilar 1 - N5 Vision)
+    window.addEventListener('vmp_db_updated', () => {
+      console.log("DB changed. Reactively redrawing active route...");
+      this.router();
+    });
 
     // 3. Trigger initial routing
     await this.router();
@@ -92,6 +100,12 @@ class Application {
         }
         else if (subRoute === '/rt54') {
           this.safeRoute(renderRT54, initRT54, 'rt54', "RT 54 · Panel Contable");
+        }
+        else if (subRoute === '/whatsapp') {
+          this.safeRoute(renderWhatsApp, initWhatsApp, 'whatsapp', "Omnicanal · WhatsApp Inbox");
+        }
+        else if (subRoute === '/migrador') {
+          this.safeRoute(renderMigrador, initMigrador, 'migrador', "Migrador de Sistemas Legados");
         }
         else if (subRoute === '/ayuda') {
           this.safeRoute(renderAyuda, initAyuda, 'ayuda', "Instructivo & Onboarding");

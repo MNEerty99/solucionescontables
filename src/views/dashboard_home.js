@@ -98,6 +98,63 @@ export function renderDashboardHome() {
   const maxCategoryLimit = 35000000; // Cat H límite legal
   const consumptionPercent = Math.round((accumMonotributoSales / maxCategoryLimit) * 100);
 
+  // Generar alertas del Centro de Control Preventivo (AI Guard) [Pilar 4]
+  let aiGuardHTML = '';
+  if (activeCompany.id === 'co-1') {
+    aiGuardHTML = `
+      <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #92400e; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+          <span><strong>Diferencia SIRCREB (Bancos):</strong> Detectamos 2 percepciones bancarias en el extracto no conciliadas con el Libro Diario.</span>
+        </div>
+        <a href="#/studio/retenciones" class="btn btn-outline btn-sm" style="font-size:10.5px; padding: 3px 10px; border-color: rgba(245,158,11,0.3); color: #d97706; background:#fff; text-decoration:none;">Conciliar</a>
+      </div>
+    `;
+  } else if (activeCompany.id === 'co-2') {
+    aiGuardHTML = `
+      <div style="background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #991b1b; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i data-lucide="alert-octagon" style="width:16px; height:16px; flex-shrink:0;"></i>
+          <span><strong>Límite Monotributo Cat H:</strong> Facturación del período actual consume el 85% de la banda de exclusión legal.</span>
+        </div>
+        <a href="#/studio/iva-simple" class="btn btn-outline btn-sm" style="font-size:10.5px; padding: 3px 10px; border-color: rgba(239,68,68,0.3); color: #dc2626; background:#fff; text-decoration:none;">Planificar Exclusión</a>
+      </div>
+    `;
+  } else if (activeCompany.id === 'co-3') {
+    aiGuardHTML = `
+      <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+        <div style="background: #fef2f2; border: 1px solid #fee2e2; border-left: 4px solid #ef4444; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #991b1b; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="alert-octagon" style="width:16px; height:16px; flex-shrink:0;"></i>
+            <span><strong>Alerta Proveedor Apócrifo:</strong> Se detectaron facturas de compras del proveedor 'Sinergia SRL' listado como apócrifo por ARCA.</span>
+          </div>
+          <a href="#/studio/iva" class="btn btn-outline btn-sm" style="font-size:10.5px; padding: 3px 10px; border-color: rgba(239,68,68,0.3); color: #dc2626; background:#fff; text-decoration:none;">Auditar LID</a>
+        </div>
+        <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #92400e; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+            <span><strong>Inconsistencia Fiscal (F.2051):</strong> Diferencia impositiva de $4.850 entre actividades AFIP y facturación de ventas.</span>
+          </div>
+          <a href="#/studio/iva" class="btn btn-outline btn-sm" style="font-size:10.5px; padding: 3px 10px; border-color: rgba(245,158,11,0.3); color: #d97706; background:#fff; text-decoration:none;">Validar</a>
+        </div>
+      </div>
+    `;
+  } else if (activeCompany.id === 'co-catedral') {
+    aiGuardHTML = `
+      <div style="background: #ecfdf5; border: 1px solid #d1fae5; border-left: 4px solid #10b981; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #065f46; display: flex; align-items: center; gap: 8px; width:100%;">
+        <i data-lucide="shield-check" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span><strong>Cumplimiento Fiscal al 100%:</strong> La auditoría de IA no detectó inconsistencias de CUIT, montos ni facturas apócrifas en Catedral Constructora.</span>
+      </div>
+    `;
+  } else {
+    aiGuardHTML = `
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #64748b; padding: 10px 14px; border-radius: 4px; font-size: 12px; color: #334155; display: flex; align-items: center; gap: 8px; width:100%;">
+        <i data-lucide="info" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span>Sin anomalías impositivas activas para auditar en este cliente.</span>
+      </div>
+    `;
+  }
+
   return `
   <div class="view-header">
     <div>
@@ -110,7 +167,7 @@ export function renderDashboardHome() {
   </div>
 
   <!-- Consola de Enlace ARCA Live -->
-  <div style="background: linear-gradient(135deg, rgba(13, 148, 136, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%); border: 1px solid rgba(13, 148, 136, 0.2); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 28px;">
+  <div style="background: linear-gradient(135deg, rgba(13, 148, 136, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%); border: 1px solid rgba(13, 148, 136, 0.2); border-radius: var(--radius-md); padding: 18px 24px; margin-bottom: 24px;">
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 12px;">
         <div style="background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.2); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-accent); flex-shrink: 0;">
@@ -168,6 +225,17 @@ export function renderDashboardHome() {
         </span>
       </div>
 
+    </div>
+  </div>
+
+  <!-- Centro de Control Preventivo (AI Guard Hub) [NEW PILAR 4] -->
+  <div class="card" style="margin-bottom: 28px; border-color: rgba(129, 140, 248, 0.25); background: linear-gradient(135deg, rgba(99, 102, 241, 0.01) 0%, rgba(13, 148, 136, 0.01) 100%);">
+    <div class="card-header" style="border-bottom-color: rgba(99, 102, 241, 0.1); display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="color:#818cf8; display:flex; align-items:center; gap:8px;"><i data-lucide="shield-alert"></i> Centro de Control Preventivo (AI Guard)</h3>
+      <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.2); font-weight:700;">Auditoría Activa 24/7</span>
+    </div>
+    <div class="card-body" style="display:flex; flex-direction:column; gap:10px; padding: 16px 20px;">
+      ${aiGuardHTML}
     </div>
   </div>
 

@@ -339,6 +339,8 @@ export function saveCompany(company) {
   // Encolar de forma resiliente la tarea en background sync
   enqueueSyncTask('save_company', { company, isNew });
 
+  window.dispatchEvent(new CustomEvent('vmp_db_updated', { detail: { companyId: company.id, type: 'company', item: company } }));
+
   return company;
 }
 
@@ -388,6 +390,7 @@ export function getActiveCompany() {
 
 export function setActiveCompanyId(id) {
   localStorage.setItem("vmp_studio_active_co", id);
+  window.dispatchEvent(new CustomEvent('vmp_db_updated', { detail: { companyId: id, type: 'active_company' } }));
 }
 
 export function getTransactions(companyId) {
@@ -424,6 +427,8 @@ export function addTransaction(companyId, type, item) {
 
   // Registrar encolamiento seguro de sincronización en background
   enqueueSyncTask('insert_transaction', { companyId, type, item });
+
+  window.dispatchEvent(new CustomEvent('vmp_db_updated', { detail: { companyId, type, item } }));
 
   return item;
 }

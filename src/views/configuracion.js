@@ -199,27 +199,65 @@ export function renderConfiguracion() {
       <!-- RPA Robot Console Card [NEW MODULE] -->
       <div class="card" style="border-color: rgba(16, 185, 129, 0.25);">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <h3><i data-lucide="bot" style="color: var(--color-accent);"></i> Consola de Robots RPA & Scheduler</h3>
+          <h3><i data-lucide="bot" style="color: var(--color-accent);"></i> Consola de Robots RPA Cloud</h3>
           <span class="badge" style="margin: 0; background: rgba(16, 185, 129, 0.08); color: var(--color-accent); border-color: rgba(16, 185, 129, 0.25);">Orquestador Activo</span>
         </div>
         <div class="card-body">
-          <p class="text-secondary" style="font-size: 12.5px; margin-bottom: 16px; line-height: 1.4;">
-            Programá robots RPA automáticos que extraen notificaciones del Domicilio Fiscal Electrónico (DFE) y facturas de compras/ventas desde la base centralizada de ARCA.
+          <p class="text-secondary" style="font-size: 12.5px; margin-bottom: 18px; line-height: 1.4;">
+            Monitoreá y configurá los rastreadores automáticos que recopilan información impositiva de ARCA y Rentas provinciales 24/7 sin intervención humana.
           </p>
 
-          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
-            <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
-              <input type="checkbox" id="chk-rpa-dfe" checked style="width:14px; height:14px; accent-color: var(--color-accent);">
-              <span><strong>Robot DFE:</strong> Sincronizar notificaciones cada 12 horas.</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
-              <input type="checkbox" id="chk-rpa-invoices" checked style="width:14px; height:14px; accent-color: var(--color-accent);">
-              <span><strong>Robot Comprobantes:</strong> Auto-descarga Mis Comprobantes cada 24 horas.</span>
-            </label>
+          <!-- Grid of 4 Scraper bots -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="background: rgba(248, 250, 252, 0.6); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 750; color: var(--color-primary);">RPA ARCA Comprobantes</span>
+                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 8.5px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">IDLE</span>
+              </div>
+              <span style="font-size: 9.5px; color: var(--text-secondary);">Sincronizado hace 4 hs · Diario</span>
+            </div>
+            
+            <div style="background: rgba(248, 250, 252, 0.6); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 750; color: var(--color-primary);">RPA Rentas (ARBA/AGIP)</span>
+                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 8.5px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">IDLE</span>
+              </div>
+              <span style="font-size: 9.5px; color: var(--text-secondary);">Sincronizado hace 6 hs · Diario</span>
+            </div>
+            
+            <div style="background: rgba(248, 250, 252, 0.6); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 750; color: var(--color-primary);">RPA SICORE Retenciones</span>
+                <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 8.5px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">IDLE</span>
+              </div>
+              <span style="font-size: 9.5px; color: var(--text-secondary);">Sincronizado hace 6 hs · Cada 12h</span>
+            </div>
+            
+            <div style="background: rgba(248, 250, 252, 0.6); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 6px; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 11.5px; font-weight: 750; color: var(--color-primary);">RPA SIRCREB (Bancos)</span>
+                <span style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; font-size: 8.5px; font-weight: 800; padding: 1px 6px; border-radius: 10px;">PENDING</span>
+              </div>
+              <span style="font-size: 9.5px; color: var(--text-secondary);">Sincronizado hace 12 hs · Cada 12h</span>
+            </div>
+          </div>
+
+          <!-- Scheduler configuration -->
+          <div style="background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.12); padding: 12px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="clock" style="width: 16px; height: 16px; color: #f59e0b;"></i>
+              <span style="font-size: 11.5px; color: var(--text-secondary); font-weight: 600;">Frecuencia de Sincronización:</span>
+            </div>
+            <select id="rpa-sync-frequency" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-color); background: #fff; color: var(--color-primary); outline: none;">
+              <option value="4h">Cada 4 horas</option>
+              <option value="12h" selected>Cada 12 horas</option>
+              <option value="24h">Diario a las 02:00 AM</option>
+              <option value="manual">Manual únicamente</option>
+            </select>
           </div>
 
           <button class="btn btn-primary w-full" id="btn-run-rpa" style="background: linear-gradient(135deg, var(--color-accent) 0%, #10b981 100%); border:none; font-weight:800; font-size:12.5px; height:38px; display:flex; align-items:center; justify-content:center; gap:6px;">
-            <i data-lucide="play" style="width:14px; height:14px;"></i> Ejecutar Robots RPA Ahora
+            <i data-lucide="play" style="width:14px; height:14px;"></i> Sincronizar Robots RPA Ahora
           </button>
 
           <!-- Immersive RPA Scraper Terminal Console -->

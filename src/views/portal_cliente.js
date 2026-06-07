@@ -57,6 +57,17 @@ export function renderPortalCliente() {
   }
   const tickets = JSON.parse(localStorage.getItem(`vmp_tickets_${activeCompany.id}`));
 
+  // Initialize OCR Quota parameters in localStorage if not set
+  if (!localStorage.getItem('vmp_ocr_scans_count')) {
+    localStorage.setItem('vmp_ocr_scans_count', '284');
+  }
+  if (!localStorage.getItem('vmp_ocr_scans_limit')) {
+    localStorage.setItem('vmp_ocr_scans_limit', '300');
+  }
+  const ocrScans = parseInt(localStorage.getItem('vmp_ocr_scans_count'), 10);
+  const ocrLimit = parseInt(localStorage.getItem('vmp_ocr_scans_limit'), 10);
+  const quotaPercent = Math.min(100, (ocrScans / ocrLimit) * 100);
+
   const isMonotributo = activeCompany.condicion_iva.includes('Monotributo');
   const allowedComprobante = isMonotributo 
     ? '<option value="Factura C" selected>Factura C (Monotributo)</option><option value="Factura E">Factura E (Exportación de Servicios)</option>' 
@@ -149,6 +160,25 @@ export function renderPortalCliente() {
               <div class="afip-sample-pill" id="btn-simulate-asset" style="border-color: rgba(99, 102, 241, 0.4); color: #818cf8; font-weight: 600;">
                 <i data-lucide="refresh-cw" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px; color:#818cf8;"></i>
                 Digitalizar Compra de Notebook
+              </div>
+            </div>
+
+            <!-- Quota meter/status -->
+            <div id="ocr-quota-container" style="margin-top: 24px; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; padding: 12px; border-radius: 8px; background: rgba(99, 102, 241, 0.03); border: 1px solid rgba(99, 102, 241, 0.1);">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="sparkles" style="width: 12px; height: 12px; color: #818cf8;"></i> Cupo Gemini OCR mensual:</span>
+                <span id="ocr-quota-text" style="color: var(--color-primary);">${ocrScans} / ${ocrLimit}</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.06); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color); margin-bottom: 6px;">
+                <div id="ocr-quota-bar" style="width: ${quotaPercent}%; height: 100%; background: ${ocrScans >= ocrLimit ? '#ef4444' : 'linear-gradient(90deg, #6366f1 0%, #a855f7 100%)'}; border-radius: 4px; transition: width 0.3s ease;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <span id="ocr-quota-warning" style="font-size: 10px; color: ${ocrScans >= ocrLimit ? '#ef4444' : '#f59e0b'}; font-weight: 700;">
+                  ${ocrScans >= ocrLimit ? '⚠️ Cupo mensual agotado.' : ocrScans >= (ocrLimit * 0.8) ? '⚠️ Cupo próximo al límite.' : '✓ Cupo disponible.'}
+                </span>
+                <button type="button" id="btn-increase-ocr-quota" class="btn btn-outline btn-xs" style="font-size: 9.5px; padding: 2px 8px; height: auto; border-color: rgba(99, 102, 241, 0.3); color: #818cf8; font-weight: 700;">
+                  Aumentar Límite
+                </button>
               </div>
             </div>
           </div>
@@ -540,6 +570,33 @@ export function renderPortalCliente() {
           </button>
           <button class="btn btn-primary w-full" id="btn-download-thermal-txt" style="font-size:12px; height:36px; display:flex; align-items:center; justify-content:center; gap:4px;">
             <i data-lucide="download"></i> Descargar Ticket
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cupo Excedido [NEW] -->
+  <div id="ocr-quota-exceeded-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.25s ease;">
+    <div class="card" style="width: 100%; max-width: 400px; border-color: #ef4444; overflow: hidden; transform: scale(0.95); animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;">
+      <div class="card-header" style="background: rgba(239, 68, 68, 0.03); border-bottom-color: var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="color:#ef4444; display:flex; align-items:center; gap:6px;"><i data-lucide="alert-triangle"></i> Límite de Escaneos Excedido</h3>
+        <button class="btn-icon-sm" id="btn-close-quota-modal" title="Cerrar"><i data-lucide="x"></i></button>
+      </div>
+      <div class="card-body" style="background: var(--bg-secondary); padding: 20px; display:flex; flex-direction:column; gap:16px; text-align: center;">
+        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ef4444; margin: 0 auto;">
+          <i data-lucide="lock" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--color-primary); margin: 0;">Llegaste al límite de 300 escaneos Gemini OCR</h4>
+        <p class="text-secondary" style="font-size: 12.5px; line-height: 1.5; margin:0;">
+          Tu abono mensual actual incluye un límite de 300 digitalizaciones automáticas con IA. Para seguir procesando comprobantes sin interrupción, solicita una extensión de cupo.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top: 8px;">
+          <button class="btn btn-primary w-full" id="btn-upgrade-quota-modal" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); border: none; font-size: 13px; font-weight: 800; height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <i data-lucide="sparkles"></i> Aumentar Cupo a 400 Escaneos
+          </button>
+          <button class="btn btn-outline w-full" id="btn-cancel-quota-modal" style="font-size:12px; height:36px;">
+            Cerrar
           </button>
         </div>
       </div>
@@ -1556,6 +1613,18 @@ ARCA Live Digital Certificate Verification Gate.
 
   // Real AI OCR using Gemini API
   const processRealTicketWithGemini = async (file) => {
+    // Quota check
+    const scansCount = parseInt(localStorage.getItem('vmp_ocr_scans_count') || '284', 10);
+    const scansLimit = parseInt(localStorage.getItem('vmp_ocr_scans_limit') || '300', 10);
+    if (scansCount >= scansLimit) {
+      const quotaModal = document.getElementById('ocr-quota-exceeded-modal');
+      if (quotaModal) {
+        quotaModal.style.display = 'flex';
+        if (window.lucide) window.lucide.createIcons({ root: quotaModal });
+      }
+      return;
+    }
+
     const apiKey = localStorage.getItem('vmp_gemini_api_key');
     
     dropzone.style.display = 'none';
@@ -1656,6 +1725,10 @@ ARCA Live Digital Certificate Verification Gate.
 
       addTransaction(activeCompany.id, 'compras', newPurchase);
 
+      // Increment scans count
+      const updatedScans = scansCount + 1;
+      localStorage.setItem('vmp_ocr_scans_count', updatedScans.toString());
+
       progressContainer.style.display = 'none';
       dropzone.style.display = 'flex';
 
@@ -1671,6 +1744,18 @@ ARCA Live Digital Certificate Verification Gate.
   };
 
   const startUploadSimulation = (isAsset = false) => {
+    // Quota check
+    const scansCount = parseInt(localStorage.getItem('vmp_ocr_scans_count') || '284', 10);
+    const scansLimit = parseInt(localStorage.getItem('vmp_ocr_scans_limit') || '300', 10);
+    if (scansCount >= scansLimit) {
+      const quotaModal = document.getElementById('ocr-quota-exceeded-modal');
+      if (quotaModal) {
+        quotaModal.style.display = 'flex';
+        if (window.lucide) window.lucide.createIcons({ root: quotaModal });
+      }
+      return;
+    }
+
     dropzone.style.display = 'none';
     progressContainer.style.display = 'block';
     progressTxt.textContent = "Subiendo archivo a la nube...";
@@ -1730,6 +1815,10 @@ ARCA Live Digital Certificate Verification Gate.
           categoria: "Combustibles"
         };
         addTransaction(activeCompany.id, 'compras', newPurchase);
+
+        // Increment scans count
+        const updatedScans = scansCount + 1;
+        localStorage.setItem('vmp_ocr_scans_count', updatedScans.toString());
 
         progressContainer.style.display = 'none';
         dropzone.style.display = 'flex';
@@ -1989,5 +2078,42 @@ Sabor digital, VMP Studio.
     URL.revokeObjectURL(url);
 
     mainApp.showToast("¡Ticket térmico vectorial descargado con éxito!", "success");
+  });
+
+  // -------------------------------------------------------------
+  // CONTROLS FOR OCR QUOTA LIMITS & UPGRADE
+  // -------------------------------------------------------------
+  const quotaModal = document.getElementById('ocr-quota-exceeded-modal');
+  const btnCloseQuotaModal = document.getElementById('btn-close-quota-modal');
+  const btnCancelQuotaModal = document.getElementById('btn-cancel-quota-modal');
+  const btnUpgradeQuotaModal = document.getElementById('btn-upgrade-quota-modal');
+  const btnIncreaseQuota = document.getElementById('btn-increase-ocr-quota');
+
+  const increaseOcrQuota = () => {
+    localStorage.setItem('vmp_ocr_scans_limit', '400');
+    mainApp.showToast("¡Cupo mensual de Gemini OCR ampliado a 400 escaneos con éxito!", "success");
+    if (quotaModal) quotaModal.style.display = 'none';
+    // Reactively refresh the view
+    mainApp.router();
+  };
+
+  btnIncreaseQuota?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    increaseOcrQuota();
+  });
+
+  btnUpgradeQuotaModal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    increaseOcrQuota();
+  });
+
+  btnCloseQuotaModal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (quotaModal) quotaModal.style.display = 'none';
+  });
+
+  btnCancelQuotaModal?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (quotaModal) quotaModal.style.display = 'none';
   });
 }
