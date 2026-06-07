@@ -217,12 +217,12 @@ export function renderLanding() {
               <!-- Price displaying original and promo -->
               <div class="price-amount" style="margin: 16px 0 24px;">
                 <div style="font-size: 13px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 6px; font-weight: 500; opacity: 0.75;">
-                  Original: USD 480
+                  Original: USD 1050
                 </div>
                 <span class="currency">USD</span>
-                <span class="val">380</span>
+                <span class="val">850</span>
                 <span style="font-size: 10px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.06); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.15); margin-left: 8px; vertical-align: middle; display: inline-block;">
-                  ¡Ahorrás USD 100!
+                  ¡Ahorrás USD 200!
                 </span>
               </div>
 
@@ -282,7 +282,7 @@ export function renderLanding() {
               <div style="font-family: var(--font-heading); font-size: 24px; font-weight: 850; color:#10b981; margin-top:8px;" id="ars-license-price">
                 $ ---.---,00
               </div>
-              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 380 (Promoción)</span>
+              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 850 (Promoción)</span>
             </div>
             
             <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:16px; text-align:center;">
@@ -308,7 +308,7 @@ export function renderLanding() {
             <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 14.5px; line-height: 1.6;">
               ¿Tenés contactos en el sector contable? ¿Sos contador o estudiante y querés generar un ingreso extra? Te invitamos a sumarte a nuestro **Programa de Partners Asociados**. 
               <br><br>
-              Por cada Licencia de Adquisición de Soluciones Contables que se venda bajo tu recomendación directa (valor de oferta de la licencia: USD 380), **te quedás con USD 80 de comisión en el acto**, sin topes ni demoras operativas.
+              Por cada Licencia de Adquisición de Soluciones Contables que se venda bajo tu recomendación directa (valor de oferta de la licencia: USD 850), **te quedás con USD 80 de comisión en el acto**, sin topes ni demoras operativas.
             </p>
             
             <!-- Interactive Earnings Calculator -->
@@ -506,7 +506,7 @@ export function initLanding(mainApp) {
   if (bnaRateDisplay && arsLicensePrice && arsMaintPrice) {
     const updatePrices = (rate) => {
       bnaRateDisplay.textContent = `$ ${rate.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
-      const licenseArs = 380 * rate;
+      const licenseArs = 850 * rate;
       const maintArs = 150 * rate;
       arsLicensePrice.textContent = `$ ${Math.round(licenseArs).toLocaleString('es-AR')},00`;
       arsMaintPrice.textContent = `$ ${Math.round(maintArs).toLocaleString('es-AR')},00`;
