@@ -1476,45 +1476,99 @@ export function initPortalCliente(mainApp) {
 
   // Download Commercial Invoice Receipt File
   document.getElementById('btn-download-pdf-invoice')?.addEventListener('click', () => {
-    const clientN = inputName.value.trim();
-    const txtContent = `
-==================================================
-VMP STUDIO CONTABLE - COMPROBANTE DE FACTURACIÓN
-==================================================
-EMISOR: ${activeCompany.razon_social}
-CUIT: ${activeCompany.cuit}
-CONDICIÓN: ${activeCompany.condicion_iva}
+    const replicaEl = document.getElementById('live-invoice-pdf-replica');
+    if (!replicaEl) {
+      mainApp.showToast("No se pudo encontrar la factura para imprimir.", "error");
+      return;
+    }
 
-COMPROBANTE: ${lastEmittedType} N° ${lastEmittedCompNum}
-FECHA: ${new Date().toLocaleDateString('es-AR')}
---------------------------------------------------
-CLIENTE: ${clientN}
-CUIT RECEPTOR: ${inputCuit.value}
-CONDICIÓN IVA: ${selectIvaCond.value}
---------------------------------------------------
-DETALLES FACTURADOS:
-${invoiceItems.map(it => `- ${it.desc} (Cant: ${it.qty} x $ ${it.price.toLocaleString('es-AR')})`).join('\n')}
+    const activeTheme = themeSelect.value;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      mainApp.showToast("El navegador bloqueó la ventana emergente. Por favor, permití popups para descargar el PDF.", "error");
+      return;
+    }
 
-NETO GRAVADO: $ ${lastEmittedNeto.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-IVA LIQUIDADO: $ ${lastEmittedIva.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-PERCEPCIÓN IIBB: $ ${lastEmittedIibb.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
-TOTAL GENERAL: $ ${lastEmittedTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
---------------------------------------------------
-CAE: 76239485018374
-Vto. CAE: 10/06/2026
-ARCA Live Digital Certificate Verification Gate.
-==================================================
-`;
-    
-    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `factura-arca-${activeCompany.cuit}-${lastEmittedCompNum}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
-    
-    mainApp.showToast("¡Recibo comercial de Factura descargado con éxito!", "success");
+    const themeColors = {
+      slate: { border: '#0f172a', bg: '#f1f5f9', text: '#0f172a', title: '#000000' },
+      emerald: { border: '#059669', bg: '#ecfdf5', text: '#064e3b', title: '#047857' },
+      navy: { border: '#1d4ed8', bg: '#eff6ff', text: '#1e3a8a', title: '#1d4ed8' }
+    };
+    const colors = themeColors[activeTheme] || themeColors.slate;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>Factura Electrónica ARCA - \${activeCompany.razon_social}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+          }
+          .afip-invoice-wrapper {
+            background: #fff;
+            border: 2px solid \${colors.border} !important;
+            border-radius: 6px;
+            padding: 24px;
+            color: #000;
+            width: 175mm;
+            box-sizing: border-box;
+          }
+          .receipt-theme-bg {
+            background-color: \${colors.bg} !important;
+            border-color: \${colors.border} !important;
+            color: \${colors.text} !important;
+          }
+          .invoice-title-color {
+            color: \${colors.title} !important;
+          }
+          .table-border-custom {
+            border-bottom: 2px solid \${colors.border} !important;
+          }
+          .accent-text-theme {
+            color: \${colors.border} !important;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            font-size: 10px;
+            line-height: 1.4;
+          }
+          .font-mono {
+            font-family: 'Courier New', Courier, monospace;
+          }
+          @media print {
+            body { padding: 0; }
+            .afip-invoice-wrapper { border-width: 2px !important; box-shadow: none !important; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="afip-invoice-wrapper">
+          \${replicaEl.innerHTML}
+        </div>
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              window.close();
+            }, 300);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    mainApp.showToast("Generando PDF de Factura Electrónica...", "success");
   });
 
   // Share link to invoice copy
