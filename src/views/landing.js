@@ -30,7 +30,7 @@ export function renderLanding() {
           <a href="#pricing" class="lp-menu-link">Inversión</a>
           <a href="#partners" class="lp-menu-link">Partners</a>
           <a href="#contact" class="lp-menu-link">Contacto</a>
-          <a href="#/studio" class="btn btn-outline btn-sm">Ingresar al Studio</a>
+          <a href="#contact" class="btn btn-outline btn-sm">Solicitar Demo</a>
         </nav>
       </div>
     </header>
@@ -43,8 +43,8 @@ export function renderLanding() {
           <h1 class="hero-title">El colaborador que tu <span class="gradient-text">estudio merece</span>.</h1>
           <p class="hero-subtitle">No es un software más. Es un integrante virtual de tu equipo que automatiza la carga de comprobantes, liquida el IVA en segundos y vigila el límite de tus monotributistas — de forma autónoma, mientras vos te enfocás en el asesoramiento estratégico.</p>
           <div class="hero-actions">
-            <a href="#/studio" class="btn btn-primary">
-              Acceder al Studio Profesional <i data-lucide="arrow-right"></i>
+            <a href="#contact" class="btn btn-primary">
+              Solicitar Acceso <i data-lucide="arrow-right"></i>
             </a>
             <a href="#contact" class="btn btn-outline">Solicitar Asesoramiento</a>
           </div>
@@ -233,7 +233,7 @@ export function renderLanding() {
                 <li><i data-lucide="check"></i> Capacitación inicial para el equipo</li>
               </ul>
             </div>
-            <a href="#/studio" class="btn btn-primary w-full">Ingresar al Studio</a>
+            <a href="#contact" class="btn btn-primary w-full">Solicitar Setup</a>
           </div>
 
           <!-- Monthly maintenance -->
@@ -428,7 +428,7 @@ export function renderLanding() {
           <a href="#pricing" class="lp-footer-link">Inversión</a>
           <a href="#partners" class="lp-footer-link">Partners</a>
           <a href="#contact" class="lp-footer-link">Contacto</a>
-          <a href="#/studio" class="lp-footer-link" style="color: var(--color-accent); font-weight: 700;">Ingresar al Studio →</a>
+          <a href="#contact" class="lp-footer-link" style="color: var(--color-accent); font-weight: 700;">Solicitar Demo →</a>
         </div>
         <div style="display: flex; gap: 20px; align-items: center;">
           <a href="https://wa.me/5492996731487" target="_blank" rel="noopener" aria-label="WhatsApp" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #25d366; font-weight: 700; text-decoration: none;">
