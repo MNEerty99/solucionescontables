@@ -144,6 +144,86 @@ export function renderLanding() {
       </div>
     </section>
 
+    <!-- Dashboard Suite / Modules Showcase Section -->
+    <section id="dashboard-showcase" class="showcase-section" style="padding: 100px 0; border-top: 1px solid rgba(226, 232, 240, 0.4); background: rgba(248, 250, 252, 0.5); position: relative; overflow: hidden;">
+      <div class="container">
+        <div class="section-header">
+          <h2>Una suite completa diseñada para la gestión diaria</h2>
+          <p>Olvidate de saltar entre múltiples sistemas lentos y planillas propensas a errores. Reclutá un colaborador virtual de élite en una interfaz moderna y veloz.</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px;">
+          
+          <!-- Module 1 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
+              <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Conciliador "Mis Comprobantes"</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Sincronización automatizada. Importá las planillas de ARCA de compras y ventas. El motor cruza datos localmente de forma reactiva, detecta duplicados y alerta inconsistencias fiscales de CUITs APOC.
+            </p>
+          </div>
+
+          <!-- Module 2 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(99, 102, 241, 0.06); color: #6366f1; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.15);">
+              <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Libro IVA Digital</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Exportación en 1 clic. Generá los archivos oficiales delimitados listos para subir a la web de ARCA. El sistema realiza una pre-auditoría matemática para evitar redondeos incorrectos.
+            </p>
+          </div>
+
+          <!-- Module 3 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
+              <i data-lucide="calculator" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Ajuste por Inflación (RT 54)</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Cumplimiento normativo unificado. Aplica automáticamente los coeficientes de inflación del FACPCE. Realizá los asientos de ajuste del diario y mayor directamente en el panel del cliente.
+            </p>
+          </div>
+
+          <!-- Module 4 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(239, 68, 68, 0.06); color: #ef4444; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(239, 68, 68, 0.15);">
+              <i data-lucide="shield-alert" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Monitoreo de Monotributo</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Vigilancia anti-exclusión. Control en tiempo real de la facturación acumulada de tus monotributistas. Recibís una alerta automática de WhatsApp si se acercan al límite de exclusión.
+            </p>
+          </div>
+
+          <!-- Module 5 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(99, 102, 241, 0.06); color: #6366f1; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.15);">
+              <i data-lucide="message-square" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">WhatsApp Inbox Centralizado</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Comunicación simplificada. Tus clientes te envían fotos de comprobantes o PDFs directamente por WhatsApp. El asistente IA los parsea y clasifica dejándolos en la bandeja de entrada listos para aprobar.
+            </p>
+          </div>
+
+          <!-- Module 6 -->
+          <div class="feature-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 24px; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+            <div style="background: rgba(16, 185, 129, 0.06); color: var(--color-accent); width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.15);">
+              <i data-lucide="smartphone" style="width: 20px; height: 20px;"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--color-primary); font-family: var(--font-heading);">Portal de Clientes + IA OCR</h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Recolección autónoma de datos. Los clientes entran desde su móvil y sacan fotos a los tickets. La suite lee los datos impositivos con IA y los carga en el Ledger de compras esperando tu aprobación.
+            </p>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
     <!-- Institutional Prestige Section -->
     <section id="prestige" class="prestige-section" style="padding: 100px 0; border-top: 1px solid rgba(226, 232, 240, 0.4); background: transparent; position: relative; overflow: hidden;">
       <div class="container">
@@ -200,97 +280,120 @@ export function renderLanding() {
     <section id="pricing" class="pricing-section">
       <div class="container">
         <div class="section-header">
-          <h2>Un modelo de licenciamiento transparente y profesional</h2>
-          <p>Sin sorpresas mensuales ni cuotas variables por colaboradores del estudio.</p>
+          <h2>Un modelo de adquisición transparente y a medida</h2>
+          <p>Sin sorpresas por usuario ni cargos ocultos por cantidad de comprobantes procesados.</p>
         </div>
         <div class="pricing-grid">
           
           <!-- Upfront license -->
           <div class="price-card featured" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div class="featured-badge">Promoción Especial</div>
+              <div class="featured-badge">Promoción Setup</div>
               <div class="price-header" style="margin-top: 12px;">
                 <h3>Licencia de Adquisición</h3>
-                <p>Instalación, configuración y alta de tu estudio.</p>
+                <p>Instalación del entorno en la nube, onboarding y alta de tu estudio.</p>
               </div>
 
-              <!-- Price displaying original and promo -->
-              <div class="price-amount" style="margin: 16px 0 24px;">
-                <div style="font-size: 13px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 6px; font-weight: 500; opacity: 0.75;">
-                  Original: USD 1050
-                </div>
-                <span class="currency">USD</span>
-                <span class="val">850</span>
-                <span style="font-size: 10px; font-weight: 800; color: #14b8a6; background: rgba(20,184,166,0.06); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(20,184,166,0.15); margin-left: 8px; vertical-align: middle; display: inline-block;">
-                  ¡Ahorrás USD 200!
-                </span>
+              <!-- Price displaying custom quotation -->
+              <div class="price-amount" style="margin: 24px 0 28px; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <span style="font-size: 11px; font-weight: 750; color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.05em; background: rgba(5,150,105,0.06); padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(5,150,105,0.12); margin-bottom: 8px;">Pago Único</span>
+                <span style="font-size: 22px; font-weight: 850; color: var(--color-primary); font-family: var(--font-heading);">Cotización Personalizada</span>
+                <span style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;">Adaptado al tamaño de tu cartera</span>
               </div>
 
               <ul class="price-features" style="text-align: left; margin-bottom: 24px;">
-                <li><i data-lucide="check"></i> Entorno exclusivo en la nube</li>
-                <li><i data-lucide="check"></i> Carga y configuración de hasta 100 empresas</li>
+                <li><i data-lucide="check"></i> Servidor y base de datos dedicados en AWS/Railway</li>
+                <li><i data-lucide="check"></i> Soporte y alta de hasta 100 CUITs de clientes</li>
                 <li><i data-lucide="check"></i> Colaboradores del estudio ilimitados</li>
-                <li><i data-lucide="check"></i> Capacitación inicial para el equipo</li>
+                <li><i data-lucide="check"></i> Onboarding inicial y capacitación al equipo</li>
               </ul>
             </div>
-            <a href="#contact" class="btn btn-primary w-full">Solicitar Setup</a>
+            <a href="#contact" class="btn btn-primary w-full">Solicitar Presupuesto</a>
           </div>
 
           <!-- Monthly maintenance -->
-          <div class="price-card" style="text-align: center; border-color: var(--border-color);">
-            <div class="price-header" style="margin-top: 12px;">
-              <h3>Mantenimiento y Soporte</h3>
-              <p>Hosting, backups y actualizaciones continuas.</p>
+          <div class="price-card" style="text-align: center; border-color: var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="price-header" style="margin-top: 12px;">
+                <h3>Soporte y Mantenimiento</h3>
+                <p>Hospedaje, copias de seguridad y actualización legal.</p>
+              </div>
+              
+              <!-- Price displaying custom subscription -->
+              <div class="price-amount" style="margin: 24px 0 28px; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <span style="font-size: 11px; font-weight: 750; color: #6366f1; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(99,102,241,0.06); padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(99,102,241,0.12); margin-bottom: 8px;">Abono Mensual</span>
+                <span style="font-size: 22px; font-weight: 850; color: var(--color-primary); font-family: var(--font-heading);">Suscripción Operativa</span>
+                <span style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;">Hosting, Backups periódicos e IA OCR</span>
+              </div>
+
+              <ul class="price-features" style="text-align: left; margin-bottom: 24px;">
+                <li><i data-lucide="check"></i> Soporte prioritario directo vía WhatsApp</li>
+                <li><i data-lucide="check"></i> Backups de datos automáticos diarios en la nube</li>
+                <li><i data-lucide="check"></i> Portal de Clientes móvil con IA ilimitado</li>
+                <li><i data-lucide="check"></i> Actualizaciones normativas ARCA bonificadas</li>
+              </ul>
             </div>
-            <div class="price-amount" style="margin: 16px 0 24px;">
-              <span class="currency">USD</span>
-              <span class="val">150</span>
-              <span class="period">/ mes</span>
-            </div>
-            <ul class="price-features" style="text-align: left; margin-bottom: 24px;">
-              <li><i data-lucide="check"></i> Soporte prioritario vía WhatsApp</li>
-              <li><i data-lucide="check"></i> Copias de seguridad automáticas diarias</li>
-              <li><i data-lucide="check"></i> Portal de Clientes móvil ilimitado</li>
-              <li><i data-lucide="check"></i> Actualización legal ARCA bonificada</li>
-            </ul>
-            <a href="#contact" class="btn btn-outline w-full">Comenzar Implementación</a>
+            <a href="#contact" class="btn btn-outline w-full">Consultar Abono</a>
           </div>
 
         </div>
 
-        <!-- Cotizador oficial BNA en Tiempo Real -->
-        <div style="margin-top: 40px; background: rgba(99, 102, 241, 0.02); border: 1.5px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; max-width: 680px; margin-inline: auto; text-align: left; box-shadow: var(--shadow-sm);">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; border-bottom: 1px dashed var(--border-color); padding-bottom:16px; margin-bottom:16px;">
-            <div>
-              <h4 style="font-size: 15px; font-weight: 700; color: var(--color-primary); display:flex; align-items:center; gap:6px; margin:0;">
-                <i data-lucide="refresh-cw" style="color: #6366f1; width: 18px; height: 18px;"></i>
-                Conversor Oficial BNA (Pesos Argentinos)
-              </h4>
-              <p style="font-size: 11.5px; color: var(--text-secondary); margin-top:4px; margin-bottom:0;">
-                Los abonos en USD se facturan en pesos al tipo de cambio oficial vendedor del Banco Nación según el contrato.
-              </p>
-            </div>
-            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.20); padding: 6px 12px; border-radius: 20px; font-size:12px; color: #10b981; font-weight:700; display:flex; align-items:center; gap:6px;">
-              <span style="width:6px; height:6px; background:#10b981; border-radius:50%; display:inline-block;"></span>
-              U.S. Dollar Oficial BNA: <span id="bna-rate-display" style="font-family: monospace; font-weight:800; margin-left: 4px;">Cargando...</span>
-            </div>
+        <!-- Interactive ROI Calculator (Replaces BNA Converter) -->
+        <div style="margin-top: 50px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.02) 0%, rgba(5, 150, 105, 0.02) 100%); border: 1.5px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px; max-width: 760px; margin-inline: auto; text-align: left; box-shadow: var(--shadow-sm);">
+          <div style="border-bottom: 1px dashed var(--border-color); padding-bottom:18px; margin-bottom:20px;">
+            <h4 style="font-size: 17px; font-weight: 800; color: var(--color-primary); display:flex; align-items:center; gap:8px; margin:0; font-family: var(--font-heading);">
+              <i data-lucide="trending-up" style="color: #059669; width: 20px; height: 20px;"></i>
+              Simulador de Ahorro Operativo y ROI
+            </h4>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-top:6px; margin-bottom:0; line-height: 1.5;">
+              Descubrí cuántas horas mensuales de trabajo manual y administrativo podés recuperar en tu estudio automatizando las tareas repetitivas.
+            </p>
           </div>
           
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:16px; text-align:center;">
-              <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Licencia Setup (Pago Único)</span>
-              <div style="font-family: var(--font-heading); font-size: 24px; font-weight: 850; color:#10b981; margin-top:8px;" id="ars-license-price">
-                $ ---.---,00
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center;">
+            <!-- Left inputs -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 13px; color: var(--text-secondary); font-weight: 700;">Empresas Clientes (CUITs):</span>
+                  <span id="roi-cuit-label" style="font-family: var(--font-heading); font-size: 14.5px; font-weight: 800; color: var(--color-accent); background: rgba(5,150,105,0.06); padding: 2px 10px; border-radius: 12px; border: 1px solid rgba(5,150,105,0.15);">30</span>
+                </div>
+                <input type="range" id="roi-cuit-slider" min="5" max="100" value="30" aria-label="Cantidad de empresas clientes" style="width: 100%; accent-color: var(--color-accent); cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
               </div>
-              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 850 (Promoción)</span>
+              
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 13px; color: var(--text-secondary); font-weight: 700;">Horas de carga manual al mes por CUIT:</span>
+                  <span id="roi-hours-label" style="font-family: var(--font-heading); font-size: 14.5px; font-weight: 800; color: #6366f1; background: rgba(99,102,241,0.06); padding: 2px 10px; border-radius: 12px; border: 1px solid rgba(99,102,241,0.15);">8 hs</span>
+                </div>
+                <input type="range" id="roi-hours-slider" min="2" max="24" value="8" aria-label="Horas mensuales de carga manual por empresa" style="width: 100%; accent-color: #6366f1; cursor: pointer; height: 6px; border-radius: 3px; background: var(--border-color); -webkit-appearance: none; outline: none;">
+              </div>
             </div>
             
-            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:16px; text-align:center;">
-              <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Abono Mantenimiento (Mensual)</span>
-              <div style="font-family: var(--font-heading); font-size: 24px; font-weight: 850; color:#6366f1; margin-top:8px;" id="ars-maint-price">
-                $ ---.---,00
+            <!-- Right output stats -->
+            <div style="background:#ffffff; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:24px; box-shadow: var(--shadow-sm); display:flex; flex-direction:column; gap:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12.5px; color:var(--text-secondary); font-weight:600;">Carga Manual sin el sistema:</span>
+                <span id="roi-total-manual" style="font-family: var(--font-mono); font-size:14px; font-weight:700; color:#ef4444;">240 hs / mes</span>
               </div>
-              <span style="font-size:9.5px; color:var(--text-secondary); display:block; margin-top:4px;">Calculado sobre USD 150 / mes</span>
+              
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed var(--border-color); padding-bottom:12px;">
+                <span style="font-size:12.5px; color:var(--text-secondary); font-weight:600;">Tiempo con Soluciones Contables:</span>
+                <span id="roi-total-virtual" style="font-family: var(--font-mono); font-size:14px; font-weight:700; color:#10b981;">36 hs / mes</span>
+              </div>
+              
+              <div style="text-align:center; padding-top:4px;">
+                <span style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block;">TIEMPO LIBERADO MENSUAL</span>
+                <div style="font-family: var(--font-heading); font-size: 30px; font-weight: 850; color:#10b981; margin-top:4px; display:flex; align-items:center; justify-content:center; gap:8px;" id="roi-saved-hours">
+                  204 horas
+                  <span style="font-size: 11px; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.08); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.15); margin-left: 8px;">
+                    ¡85% de ahorro!
+                  </span>
+                </div>
+                <span style="font-size:11px; color:var(--text-secondary); display:block; margin-top:6px; line-height: 1.4;">
+                  Equivale a recuperar <strong>25 jornadas laborales completas</strong> al mes para enfocar a tu equipo en consultoría estratégica y captación de clientes.
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -498,34 +601,51 @@ export function initLanding(mainApp) {
     sections.forEach(section => observer.observe(section));
   }
 
-  // Fetch real-time BNA official dollar rate and calculate prices
-  const bnaRateDisplay = document.getElementById('bna-rate-display');
-  const arsLicensePrice = document.getElementById('ars-license-price');
-  const arsMaintPrice = document.getElementById('ars-maint-price');
+  // ROI Calculator Logic
+  const cuitSlider = document.getElementById('roi-cuit-slider');
+  const hoursSlider = document.getElementById('roi-hours-slider');
+  const cuitLabel = document.getElementById('roi-cuit-label');
+  const hoursLabel = document.getElementById('roi-hours-label');
+  const totalManualLabel = document.getElementById('roi-total-manual');
+  const totalVirtualLabel = document.getElementById('roi-total-virtual');
+  const savedHoursLabel = document.getElementById('roi-saved-hours');
 
-  if (bnaRateDisplay && arsLicensePrice && arsMaintPrice) {
-    const updatePrices = (rate) => {
-      bnaRateDisplay.textContent = `$ ${rate.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
-      const licenseArs = 850 * rate;
-      const maintArs = 150 * rate;
-      arsLicensePrice.textContent = `$ ${Math.round(licenseArs).toLocaleString('es-AR')},00`;
-      arsMaintPrice.textContent = `$ ${Math.round(maintArs).toLocaleString('es-AR')},00`;
+  if (cuitSlider && hoursSlider && cuitLabel && hoursLabel && totalManualLabel && totalVirtualLabel && savedHoursLabel) {
+    const updateROI = () => {
+      const cuits = parseInt(cuitSlider.value, 10);
+      const hoursPerCuit = parseInt(hoursSlider.value, 10);
+      
+      cuitLabel.textContent = cuits;
+      hoursLabel.textContent = `${hoursPerCuit} hs`;
+      
+      // Calculate manual hours
+      const manualHours = cuits * hoursPerCuit;
+      // Calculate virtual hours (saves 85%)
+      const virtualHours = Math.round(manualHours * 0.15);
+      const savedHours = manualHours - virtualHours;
+      const workdaysSaved = Math.round(savedHours / 8);
+      
+      totalManualLabel.textContent = `${manualHours} hs / mes`;
+      totalVirtualLabel.textContent = `${virtualHours} hs / mes`;
+      savedHoursLabel.innerHTML = `
+        ${savedHours} horas
+        <span style="font-size: 11px; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.08); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.15); margin-left: 8px;">
+          ¡85% de ahorro!
+        </span>
+      `;
+      
+      // Update equivalency text
+      const detailsEl = savedHoursLabel.nextElementSibling;
+      if (detailsEl) {
+        detailsEl.innerHTML = `Equivale a recuperar <strong>${workdaysSaved} jornadas laborales completas</strong> al mes para enfocar a tu equipo en consultoría estratégica y captación de clientes.`;
+      }
     };
 
-    // Try fetching real-time BNA rate, fallback to a realistic baseline if offline/error
-    fetch('https://dolarapi.com/v1/dolares/oficial')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.venta) {
-          updatePrices(data.venta);
-        } else {
-          updatePrices(960.00); // Realistic fallback
-        }
-      })
-      .catch(err => {
-        console.warn("DolarAPI Fetch Error: Using fallback exchange rate.", err);
-        updatePrices(960.00); // Realistic fallback
-      });
+    cuitSlider.addEventListener('input', updateROI);
+    hoursSlider.addEventListener('input', updateROI);
+    
+    // Initial run
+    updateROI();
   }
 
   // Fix #9 — Dynamic footer year
