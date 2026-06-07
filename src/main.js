@@ -68,8 +68,25 @@ class Application {
     } 
     // Studio Professional Routes
     else if (hash.startsWith('#/studio')) {
+      // Global admin gate for temporary hiding
+      let isUnlocked = localStorage.getItem('vmp_premium_unlocked') === 'true';
+      if (!isUnlocked) {
+        if (hash.includes('key=vmp2026') || hash.includes('key=VMP2026')) {
+          localStorage.setItem('vmp_premium_unlocked', 'true');
+          isUnlocked = true;
+          // Strip the query key from the hash to keep it clean
+          const cleanHash = hash.split('?')[0];
+          window.location.hash = cleanHash;
+          return;
+        } else {
+          // Silently redirect to landing page
+          window.location.hash = '#/';
+          return;
+        }
+      }
+
       try {
-        const subRoute = hash.substring(8); // View route after '#/studio'
+        const subRoute = hash.substring(8).split('?')[0]; // View route after '#/studio'
 
         if (subRoute === '' || subRoute === '/') {
           this.safeRoute(renderDashboardHome, initDashboardHome, 'studio', "Dashboard General");

@@ -3,3 +3,4 @@ node_modules/
 dist/
 temp_reportlab.pdf
 *.log
+.vercel

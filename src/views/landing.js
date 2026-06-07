@@ -579,7 +579,12 @@ export function initLanding(mainApp) {
     const studio = document.getElementById('lead-studio').value;
     const email = document.getElementById('lead-email').value;
 
-    mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Suite...`, 'success');
+    const isUnlocked = localStorage.getItem('vmp_premium_unlocked') === 'true';
+    if (isUnlocked) {
+      mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Entrando a la Suite...`, 'success');
+    } else {
+      mainApp.showToast(`¡Gracias ${name}! Tu solicitud fue registrada. Nos pondremos en contacto pronto.`, 'success');
+    }
 
     // Register lead in Supabase asynchronously in background
     if (isSupabaseConfigured && supabase) {
@@ -595,9 +600,11 @@ export function initLanding(mainApp) {
       });
     }
     
-    // Redirigir al studio después de 1.5s
-    setTimeout(() => {
-      window.location.hash = '#/studio';
-    }, 1500);
+    // Redirigir al studio después de 1.5s solo si está desbloqueado
+    if (isUnlocked) {
+      setTimeout(() => {
+        window.location.hash = '#/studio';
+      }, 1500);
+    }
   });
 }
