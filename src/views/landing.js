@@ -119,26 +119,37 @@ export function renderLanding() {
           <p>Optimizá la relación operativa y de recolección de datos con todas tus empresas clientes en un solo canal.</p>
         </div>
         <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i data-lucide="smartphone"></i>
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/client_portal_benefit.png" alt="Portal de Clientes Simplificado" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="smartphone" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
             <h3>Portal de Clientes Simplificado</h3>
-            <p>Tus clientes ingresan desde su celular y cargan fotos de tickets o arrastran PDFs de facturas. El portal realiza la pre-lectura y clasifica la información de compras al instante para tu revisión.</p>
+            <p style="margin-top: 8px;">Tus clientes ingresan desde su celular y cargan fotos de tickets o arrastran PDFs de facturas. El portal realiza la pre-lectura y clasifica la información de compras al instante para tu revisión.</p>
           </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i data-lucide="upload-cloud"></i>
+          
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/arca_sync_benefit.png" alt="Sincronización y Parser ARCA" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="upload-cloud" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
             <h3>Sincronización y Parser ARCA</h3>
-            <p>Cargá archivos Excel/TXT de ARCA (Mis Comprobantes). Nuestro motor interpreta alícuotas, neto y percepciones de cientos de facturas en menos de 10 segundos, eliminando errores de tipeo.</p>
+            <p style="margin-top: 8px;">Cargá archivos Excel/TXT de ARCA (Mis Comprobantes). Nuestro motor interpreta alícuotas, neto y percepciones de cientos de facturas en menos de 10 segundos, eliminando errores de tipeo.</p>
           </div>
-          <div class="feature-card">
-            <div class="feature-icon">
-              <i data-lucide="file-spreadsheet"></i>
+          
+          <div class="feature-card" style="padding: 24px; overflow: hidden;">
+            <div class="feature-image-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(15, 23, 42, 0.06); position: relative;">
+              <img src="/iva_digital_benefit.png" alt="Consolidación de Libro IVA Digital" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block;" loading="lazy" class="benefit-img">
+              <div class="feature-icon" style="position: absolute; bottom: 12px; left: 12px; margin-bottom: 0; background: #ffffff; box-shadow: var(--shadow-sm); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(15, 23, 42, 0.08);">
+                <i data-lucide="file-spreadsheet" style="width: 18px; height: 18px;"></i>
+              </div>
             </div>
             <h3>Consolidación de Libro IVA Digital</h3>
-            <p>Visualizá tus libros mensuales de compras y ventas consolidados. Generá los archivos de texto delimitados oficiales listos para importar directamente en el portal de ARCA de forma regulada.</p>
+            <p style="margin-top: 8px;">Visualizá tus libros mensuales de compras y ventas consolidados. Generá los archivos de texto delimitados oficiales listos para importar directamente en el portal de ARCA de forma regulada.</p>
           </div>
         </div>
       </div>
