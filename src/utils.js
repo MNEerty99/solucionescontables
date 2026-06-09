@@ -144,3 +144,66 @@ export function renderPremiumTeaser(childHTML, title, description) {
   `;
 }
 
+/**
+ * Descarga el IPC mensual desde la API de ArgentinaDatos y compila la serie de índices históricos
+ * acumulados en localStorage.
+ * @returns {Promise<Object>} Diccionario { "YYYY-MM": valorIndex }
+ */
+export async function fetchAndCompileIPC() {
+  const url = "https://api.argentinadatos.com/v1/finanzas/indices/inflacion";
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Error HTTP: ${response.status}`);
+  }
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error("Datos inválidos devueltos por la API");
+  }
+
+  // Ordenar cronológicamente (ascendente)
+  const sorted = [...data].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+  const indices = {};
+  
+  // Buscar el índice correspondiente a Diciembre 2025 para usar como ancla de 1500.0
+  const dec2025Index = sorted.findIndex(item => item.fecha.startsWith("2025-12"));
+  
+  if (dec2025Index !== -1) {
+    const baseVal = 1500.0;
+    const baseKey = sorted[dec2025Index].fecha.substring(0, 7);
+    indices[baseKey] = baseVal;
+    
+    // Compilar hacia adelante (forward compounding)
+    for (let i = dec2025Index + 1; i < sorted.length; i++) {
+      const prevKey = sorted[i - 1].fecha.substring(0, 7);
+      const currKey = sorted[i].fecha.substring(0, 7);
+      const rate = sorted[i].valor;
+      indices[currKey] = indices[prevKey] * (1 + rate / 100);
+    }
+    
+    // Compilar hacia atrás (backward compounding)
+    for (let i = dec2025Index - 1; i >= 0; i--) {
+      const nextKey = sorted[i + 1].fecha.substring(0, 7);
+      const currKey = sorted[i].fecha.substring(0, 7);
+      const rateNext = sorted[i + 1].valor;
+      indices[currKey] = indices[nextKey] / (1 + rateNext / 100);
+    }
+  } else {
+    // Si no encuentra Diciembre 2025, empieza desde el primero con base 100.0
+    let currentVal = 100.0;
+    if (sorted.length > 0) {
+      const firstKey = sorted[0].fecha.substring(0, 7);
+      indices[firstKey] = currentVal;
+      for (let i = 1; i < sorted.length; i++) {
+        const prevKey = sorted[i - 1].fecha.substring(0, 7);
+        const currKey = sorted[i].fecha.substring(0, 7);
+        const rate = sorted[i].valor;
+        indices[currKey] = indices[prevKey] * (1 + rate / 100);
+      }
+    }
+  }
+  
+  localStorage.setItem("vmp_ipc_indices", JSON.stringify(indices));
+  return indices;
+}
+

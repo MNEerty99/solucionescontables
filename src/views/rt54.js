@@ -3,7 +3,7 @@
    Categorización de entidades y valuación bajo RT 54 FACPCE
    ------------------------------------------------------------- */
 import { getActiveCompany, getTransactions, addTransaction } from '../db/mockdb.js';
-import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE } from '../utils.js';
+import { fmt, categorizarRT54, RT54_COEF, RT54_BASE_MEDIANA, RT54_BASE_RESTANTE, fetchAndCompileIPC } from '../utils.js';
 
 const EI_FACTOR = 1.2; // EI = stockFinal * EI_FACTOR
 
@@ -99,13 +99,38 @@ export function renderRT54() {
   // -------------------------------------------------------------
   // CALCULATOR PARAMETERS FOR INFLATION ADJUSTMENT (AxI - RT 54)
   // -------------------------------------------------------------
-  const IPC_INDICES = {
+  const FALLBACK_INDICES = {
     '2025-12': 1500.0,
-    '2026-01': 1620.0,
-    '2026-02': 1733.4,
-    '2026-03': 1837.4,
-    '2026-04': 1929.3,
-    '2026-05': 2006.5
+    '2026-01': 1543.5,
+    '2026-02': 1588.26,
+    '2026-03': 1642.26,
+    '2026-04': 1684.96
+  };
+
+  let IPC_INDICES = FALLBACK_INDICES;
+  try {
+    const cached = localStorage.getItem('vmp_ipc_indices');
+    if (cached) {
+      IPC_INDICES = JSON.parse(cached);
+    }
+  } catch (e) {
+    console.error("Error reading IPC_INDICES from localStorage:", e);
+  }
+
+  // Get sorted periods and latest period/value
+  const periods = Object.keys(IPC_INDICES).sort();
+  const latestPeriod = periods[periods.length - 1] || '2026-04';
+  const latestValue = IPC_INDICES[latestPeriod] || 1684.96;
+
+  // Helper function to format periods
+  const formatPeriodName = (periodStr) => {
+    if (!periodStr || !periodStr.includes('-')) return periodStr;
+    const [year, month] = periodStr.split('-');
+    const monthNames = {
+      '01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
+      '07': 'Jul', '08': 'Ago', '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dic'
+    };
+    return `${monthNames[month] || month} ${year}`;
   };
 
   if (!localStorage.getItem(`vmp_axi_items_${company.id}`)) {
@@ -126,7 +151,7 @@ export function renderRT54() {
 
   const axiRowsHtml = axiItems.map(item => {
     const ipcOrig = IPC_INDICES[item.origen] || 1500.0;
-    const coef = 2006.5 / ipcOrig;
+    const coef = latestValue / ipcOrig;
     const adjusted = item.valor * coef;
     const adjustment = adjusted - item.valor;
 
@@ -158,6 +183,13 @@ export function renderRT54() {
   // Calculate balancing RECPAM
   const recpam = totalAdjustedAssets - totalAdjustedEquity; // Assets = Liabilities + Equity + RECPAM => RECPAM = Assets - Equity
   const totalAdjustedLiabEquity = totalAdjustedEquity + recpam;
+
+  // Dynamic options based on last 60 periods (5 years of history)
+  const dropdownPeriods = [...periods].reverse().slice(0, 60);
+  const optionsHtml = dropdownPeriods.map(p => {
+    const val = IPC_INDICES[p];
+    return `<option value="${p}">${formatPeriodName(p)} (${val.toFixed(1)})</option>`;
+  }).join('');
 
   return `
   <div class="view-header">
@@ -436,9 +468,23 @@ export function renderRT54() {
 
   <!-- ── SIMULADOR DE AJUSTE POR INFLACIÓN CONTABLE (AxI - RT 54) [NEW MODULE] ── -->
   <div class="card" style="margin-bottom: 24px; border-color: rgba(99, 102, 241, 0.25);">
-    <div class="card-header" style="border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+    <style>
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .spin-icon {
+        animation: spin 1.2s linear infinite;
+      }
+    </style>
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
       <h3><i data-lucide="trending-up" style="color: #6366f1;"></i> Simulador de Ajuste por Inflación Contable (AxI — RT 54)</h3>
-      <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Índice IPC Cierre: 2006.5</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="btn-sync-ipc" class="btn btn-outline btn-sm" style="font-size:11px; padding: 5px 10px; display:flex; align-items:center; gap:6px; margin:0; height:auto; border-color:rgba(99, 102, 241, 0.3); color:#818cf8; font-weight:600;">
+          <i data-lucide="refresh-cw" style="width:12px; height:12px;" id="icon-sync-ipc"></i> Sincronizar Índices IPC
+        </button>
+        <span class="badge" style="margin: 0; background: rgba(99, 102, 241, 0.08); color: #818cf8; border-color: rgba(99, 102, 241, 0.25);">Índice IPC Cierre: ${latestValue.toFixed(2)} (${latestPeriod})</span>
+      </div>
     </div>
     <div class="card-body">
       <p class="text-secondary" style="font-size: 13px; margin-bottom: 16px;">
@@ -458,12 +504,7 @@ export function renderRT54() {
           <div>
             <label style="font-size: 10px; color: var(--text-secondary); display:block; margin-bottom:4px;">Mes Origen</label>
             <select id="axi-origen" class="form-input" style="padding: 6px 10px; font-size:12px; width:100%; background:#fff;">
-              <option value="2025-12">Dic 2025 (1500.0)</option>
-              <option value="2026-01">Ene 2026 (1620.0)</option>
-              <option value="2026-02">Feb 2026 (1733.4)</option>
-              <option value="2026-03">Mar 2026 (1837.4)</option>
-              <option value="2026-04">Abr 2026 (1929.3)</option>
-              <option value="2026-05">May 2026 (2006.5)</option>
+              ${optionsHtml}
             </select>
           </div>
           <div>
@@ -486,7 +527,7 @@ export function renderRT54() {
       </div>
 
       <!-- Table of Reexpressed items -->
-      <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 10px;">Partidas Reexpresadas a Mayo 2026</h4>
+      <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 10px;">Partidas Reexpresadas a ${formatPeriodName(latestPeriod)}</h4>
       <div class="table-responsive" style="margin-bottom: 24px;">
         <table class="table table-sm" style="font-size: 11.5px;">
           <thead>
@@ -548,7 +589,7 @@ export function renderRT54() {
 
         <!-- Adjusted (Homogeneous) Balance Sheet -->
         <div style="background: rgba(99, 102, 241, 0.02); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: var(--radius-sm); padding: 14px;">
-          <h5 style="font-size:11.5px; font-weight:700; color:#818cf8; text-transform:uppercase; border-bottom:1px solid rgba(99,102,241,0.15); padding-bottom:6px; margin-bottom:8px;">Balance Reexpresado (RT 54)</h5>
+          <h5 style="font-size:11.5px; font-weight:700; color:#818cf8; text-transform:uppercase; border-bottom:1px solid rgba(99,102,241,0.15); padding-bottom:6px; margin-bottom:8px;">Balance Reexpresado (RT 54) a ${formatPeriodName(latestPeriod)}</h5>
           <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px;">
             <div style="display:flex; justify-content:space-between;">
               <span class="text-secondary">Caja y Bancos (Monetario):</span>
@@ -556,7 +597,7 @@ export function renderRT54() {
             </div>
             ${axiItems.filter(i => i.tipo === 'activo').map(i => {
               const ipcOrig = IPC_INDICES[i.origen] || 1500.0;
-              const coef = 2006.5 / ipcOrig;
+              const coef = latestValue / ipcOrig;
               const adjVal = i.valor * coef;
               return `
               <div style="display:flex; justify-content:space-between;">
@@ -572,7 +613,7 @@ export function renderRT54() {
             <div style="margin-top:8px; border-top: 1px dashed rgba(99,102,241,0.15); padding-top:8px;"></div>
             ${axiItems.filter(i => i.tipo === 'patrimonio').map(i => {
               const ipcOrig = IPC_INDICES[i.origen] || 1500.0;
-              const coef = 2006.5 / ipcOrig;
+              const coef = latestValue / ipcOrig;
               const adjVal = i.valor * coef;
               return `
               <div style="display:flex; justify-content:space-between;">
@@ -923,5 +964,30 @@ export function initRT54(mainApp) {
       mainApp.showToast('Partida eliminada de la reexpresión contable.', 'info');
       mainApp.router();
     });
+  });
+
+  // Sincronizar Índices IPC desde API INDEC (ArgentinaDatos)
+  document.getElementById('btn-sync-ipc')?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const btn = document.getElementById('btn-sync-ipc');
+    const icon = document.getElementById('icon-sync-ipc');
+    if (!btn || btn.disabled) return;
+
+    btn.disabled = true;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = `<i data-lucide="refresh-cw" class="spin-icon" style="width:12px; height:12px; margin-right:4px;"></i> Sincronizando...`;
+    if (window.lucide) window.lucide.createIcons();
+
+    try {
+      await fetchAndCompileIPC();
+      mainApp.showToast('¡Índices IPC actualizados correctamente desde la API!', 'success');
+      mainApp.router();
+    } catch (err) {
+      console.error(err);
+      mainApp.showToast('Error al conectar con la API de ArgentinaDatos. Usando índices de contingencia.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+      if (window.lucide) window.lucide.createIcons();
+    }
   });
 }
