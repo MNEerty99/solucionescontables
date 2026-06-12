@@ -36,14 +36,18 @@ export function renderImportacion() {
   </div>
 
   <!-- Solapas de la vista de importación -->
-  <div style="display: flex; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px; gap: 4px; margin-bottom: 24px;">
-    <button class="btn btn-sm import-tab-btn active" data-tab="import" style="flex: 1; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
+  <div style="display: flex; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 4px; gap: 4px; margin-bottom: 24px; flex-wrap: wrap;">
+    <button class="btn btn-sm import-tab-btn active" data-tab="import" style="flex: 1; min-width: 150px; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
       <i data-lucide="upload-cloud" style="width: 15px; height: 15px;"></i>
-      Sincronización Masiva
+      Sincronización Masiva ARCA
     </button>
-    <button class="btn btn-sm import-tab-btn" data-tab="reconcile" style="flex: 1; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
+    <button class="btn btn-sm import-tab-btn" data-tab="reconcile" style="flex: 1; min-width: 150px; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
       <i data-lucide="scale" style="width: 15px; height: 15px; color: var(--color-accent);"></i>
-      Consola de Reconciliación ARCA Live
+      Conciliación ARCA Live
+    </button>
+    <button class="btn btn-sm import-tab-btn" data-tab="bank" style="flex: 1; min-width: 150px; border: none; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border-radius: 4px;">
+      <i data-lucide="landmark" style="width: 15px; height: 15px; color: #fbbf24;"></i>
+      Conciliación Bancaria (Excel)
     </button>
   </div>
 
@@ -256,7 +260,169 @@ export function renderImportacion() {
       </div>
     </div>
   </div>
+
+  <!-- PANEL 3: CONCILIACIÓN BANCARIA INTELIGENTE -->
+  <div id="import-panel-bank" style="display: none; flex-direction: column; gap: 20px;">
+    <div class="card" style="border-color: rgba(245, 158, 11, 0.25);">
+      <div class="card-header" style="border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h3><i data-lucide="landmark" style="color: #fbbf24;"></i> Conciliación Bancaria con Inteligencia Artificial (AI Matching)</h3>
+        <span class="badge" style="margin: 0; background: rgba(245, 158, 11, 0.08); color: #fbbf24; border-color: rgba(245, 158, 11, 0.25);">Estado: Pendiente Conciliar</span>
+      </div>
+      <div class="card-body">
+        <p class="text-secondary" style="font-size: 13.5px; margin-bottom: 16px;">
+          Subí el extracto de cuenta bancaria de tu cliente (Banco Galicia, Santander, Macro, Nación o cuenta digital Mercado Pago). El motor de **AI-Matching** cruzará de manera automática las transferencias, comisiones de tarjetas y acreditaciones contra tus facturas de ventas y compras cargadas en el Ledger.
+        </p>
+
+        <!-- Configuration parameters and upload -->
+        <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 20px; display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 16px; align-items: center;">
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display:block; margin-bottom:6px;">1. Seleccionar Entidad Bancaria</label>
+            <select id="bank-entity-select" class="form-input" style="padding: 8px 12px; font-size:13px; width:100%; background:#fff; border-color: var(--border-color);">
+              <option value="galicia">Banco Galicia (Oficial)</option>
+              <option value="santander">Banco Santander Río</option>
+              <option value="nacion">Banco de la Nación Argentina</option>
+              <option value="mercadopago">Mercado Pago (CVU)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display:block; margin-bottom:6px;">2. Cargar Extracto Bancario (Excel o CSV)</label>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn btn-outline" id="btn-simulate-bank-extract" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; height:38px; border-color: rgba(245, 158, 11, 0.3); color:#f59e0b; font-weight:700; cursor:pointer;">
+                <i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Cargar Extracto Demo
+              </button>
+              <label class="btn btn-outline" style="cursor: pointer; font-size:12px; height:38px; display:flex; align-items:center; justify-content:center; gap:6px; margin:0;">
+                <i data-lucide="upload" style="width:14px; height:14px;"></i> Examinar...
+                <input type="file" id="bank-file-input" style="display: none;" accept=".csv,.xlsx,.xls">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Loader progress -->
+        <div id="bank-progress-container" style="display: none; padding: 24px; border-top: 1px solid var(--border-color); text-align: center;">
+          <div class="spinner" style="margin: 0 auto 16px; border-top-color: #fbbf24;"></div>
+          <h4 id="bank-progress-title">Procesando extracto e identificando movimientos...</h4>
+          <div style="width: 100%; max-width: 400px; height: 6px; background: rgba(255,255,255,0.05); border-radius: var(--radius-full); margin: 12px auto; overflow: hidden; position: relative;">
+            <div id="bank-progress-bar" style="width: 0%; height: 100%; background: #fbbf24; transition: width 0.08s linear;"></div>
+          </div>
+          <span id="bank-progress-percent" style="font-family: var(--font-mono); font-size: 13px; font-weight: 600;">0%</span>
+        </div>
+
+        <!-- Bank Reconciliation results layout -->
+        <div id="bank-results-container" style="display: none; flex-direction: column; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+          
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 8px;">
+            <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="font-size: 10px; font-weight: 800; color: #10b981; text-transform: uppercase;">Movimientos</div>
+              <div class="font-mono" style="font-size: 20px; font-weight: 800; margin-top: 2px;">5</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="font-size: 10px; font-weight: 800; color: #10b981; text-transform: uppercase;">Cruces Directos</div>
+              <div class="font-mono" style="font-size: 20px; font-weight: 800; margin-top: 2px; color: #10b981;">3</div>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="font-size: 10px; font-weight: 800; color: #f59e0b; text-transform: uppercase;">Descuadre / Retenciones</div>
+              <div class="font-mono" style="font-size: 20px; font-weight: 800; margin-top: 2px; color: #f59e0b;">1</div>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="font-size: 10px; font-weight: 800; color: #ef4444; text-transform: uppercase;">Sin Factura</div>
+              <div class="font-mono" style="font-size: 20px; font-weight: 800; margin-top: 2px; color: #ef4444;">1</div>
+            </div>
+          </div>
+
+          <h4 style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="list" style="width:16px; height:16px; color:#fbbf24;"></i> Resultados de la Conciliación Automática (AI Matcher)
+          </h4>
+
+          <div class="table-responsive">
+            <table class="table table-sm" style="font-size: 11.5px;">
+              <thead>
+                <tr>
+                  <th>Fecha Banco</th>
+                  <th>Detalle / Concepto Extracto</th>
+                  <th class="text-right">Importe Banco</th>
+                  <th>Comprobante Sugerido en Libros</th>
+                  <th class="text-center" style="width:120px;">Diferencia</th>
+                  <th class="text-center">Cruce AI</th>
+                  <th class="text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-mono">24/05/2026</td>
+                  <td style="font-weight:600;">TRANSF RECIBIDA - Mayorista Patagonia</td>
+                  <td class="font-mono text-right text-emerald" style="font-weight:700;">$ 181.500,00</td>
+                  <td style="color:#6366f1; font-weight:600;">Factura A N° 0003-00000850</td>
+                  <td class="text-center font-mono text-muted">$ 0,00</td>
+                  <td class="text-center"><span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 6px; border-radius:4px;">100% COINCIDENTE</span></td>
+                  <td class="text-center">
+                    <span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 8px; border-radius:4px; display:inline-block;">
+                      Conciliado
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono">22/05/2026</td>
+                  <td style="font-weight:600;">PAGO BANCO GALICIA - Combustibles YPF</td>
+                  <td class="font-mono text-right" style="font-weight:700; color:#ef4444;">-$ 217.800,00</td>
+                  <td style="color:#6366f1; font-weight:600;">Factura A N° 4820-00239481</td>
+                  <td class="text-center font-mono text-muted">$ 0,00</td>
+                  <td class="text-center"><span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 6px; border-radius:4px;">100% COINCIDENTE</span></td>
+                  <td class="text-center">
+                    <span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 8px; border-radius:4px; display:inline-block;">
+                      Conciliado
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono">20/05/2026</td>
+                  <td style="font-weight:600;">TRANSF RECIBIDA - Cervecería Austral</td>
+                  <td class="font-mono text-right text-emerald" style="font-weight:700;">$ 302.500,00</td>
+                  <td style="color:#6366f1; font-weight:600;">Factura A N° 0003-00000845</td>
+                  <td class="text-center font-mono text-muted">$ 0,00</td>
+                  <td class="text-center"><span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 6px; border-radius:4px;">100% COINCIDENTE</span></td>
+                  <td class="text-center">
+                    <span style="font-size: 9.5px; font-weight:700; color:#10b981; background:rgba(16, 185, 129, 0.08); padding:2px 8px; border-radius:4px; display:inline-block;">
+                      Conciliado
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono">18/05/2026</td>
+                  <td style="font-weight:600;">TRANSF RECIBIDA - Estudio Centenario</td>
+                  <td class="font-mono text-right text-emerald" style="font-weight:700;">$ 120.000,00</td>
+                  <td style="color:#6366f1; font-weight:600;">Factura A N° 0103-00048192 ($ 145.200,00)</td>
+                  <td class="text-center font-mono text-amber" style="font-weight:700;">-$ 25.200,00</td>
+                  <td class="text-center"><span style="font-size: 9.5px; font-weight:700; color:#f59e0b; background:rgba(245, 158, 11, 0.08); padding:2px 6px; border-radius:4px;" title="Retención impositiva de Ingresos Brutos (IIBB)">RETENCIÓN IIBB</span></td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-primary" onclick="alert('¡Asiento de retención registrado! Se asientan $ 25.200,00 como Crédito Fiscal de Ingresos Brutos contra la cuenta bancaria en libros contables.')" style="font-size:9px; padding:3px 8px; background:#f59e0b; border-color:#f59e0b; font-weight:700; cursor:pointer;">
+                      ⚡ Ajustar
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="font-mono">15/05/2026</td>
+                  <td style="font-weight:600;">RET DE IMPUESTOS - Débito SIRCREB</td>
+                  <td class="font-mono text-right" style="font-weight:700; color:#ef4444;">-$ 1.500,00</td>
+                  <td class="text-muted">No se encontraron facturas coincidentes</td>
+                  <td class="text-center font-mono text-muted">-</td>
+                  <td class="text-center"><span style="font-size: 9.5px; font-weight:700; color:#ef4444; background:rgba(239, 68, 68, 0.08); padding:2px 6px; border-radius:4px;">HUÉRFANO</span></td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-outline" onclick="alert('¡Gasto registrado! Se asientan $ 1.500,00 en la cuenta 5.2.03.01 (Gastos Bancarios Directos).')" style="font-size:9px; padding:3px 8px; border-color:#ef4444; color:#ef4444; font-weight:700; cursor:pointer;">
+                      📝 Gasto
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
   `;
+
 }
 
 export function initImportacion(mainApp) {
@@ -268,6 +434,7 @@ export function initImportacion(mainApp) {
   const tabBtns = document.querySelectorAll('.import-tab-btn');
   const panelMasiva = document.getElementById('import-panel-masiva');
   const panelReconcile = document.getElementById('import-panel-reconcile');
+  const panelBank = document.getElementById('import-panel-bank');
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -279,9 +446,15 @@ export function initImportacion(mainApp) {
       if (tabKey === 'import') {
         panelMasiva.style.display = 'block';
         panelReconcile.style.display = 'none';
-      } else {
+        panelBank.style.display = 'none';
+      } else if (tabKey === 'reconcile') {
         panelMasiva.style.display = 'none';
         panelReconcile.style.display = 'flex';
+        panelBank.style.display = 'none';
+      } else {
+        panelMasiva.style.display = 'none';
+        panelReconcile.style.display = 'none';
+        panelBank.style.display = 'flex';
       }
     });
   });
@@ -803,5 +976,46 @@ export function initImportacion(mainApp) {
   btnSimRecibidas?.addEventListener('click', (e) => {
     e.stopPropagation();
     startSimulation(ARCA_MOCK_RECIBIDAS, 'compras');
+  });
+
+  // Bank reconciliation simulation
+  const btnSimBank = document.getElementById('btn-simulate-bank-extract');
+  const bankProgContainer = document.getElementById('bank-progress-container');
+  const bankProgBar = document.getElementById('bank-progress-bar');
+  const bankProgPercent = document.getElementById('bank-progress-percent');
+  const bankProgTitle = document.getElementById('bank-progress-title');
+  const bankResults = document.getElementById('bank-results-container');
+
+  btnSimBank?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (bankResults) bankResults.style.display = 'none';
+    if (bankProgContainer) bankProgContainer.style.display = 'block';
+    
+    let percent = 0;
+    if (bankProgBar) bankProgBar.style.width = '0%';
+    if (bankProgPercent) bankProgPercent.textContent = '0%';
+    if (bankProgTitle) bankProgTitle.textContent = 'Analizando transacciones bancarias del extracto...';
+
+    const interval = setInterval(() => {
+      percent += 10;
+      if (percent > 100) percent = 100;
+      
+      if (bankProgBar) bankProgBar.style.width = percent + '%';
+      if (bankProgPercent) bankProgPercent.textContent = percent + '%';
+
+      if (percent === 30) {
+        if (bankProgTitle) bankProgTitle.textContent = 'Identificando CUITs de proveedores y clientes en movimientos...';
+      } else if (percent === 60) {
+        if (bankProgTitle) bankProgTitle.textContent = 'Cruzando montos contra facturas activas del Ledger...';
+      } else if (percent === 90) {
+        if (bankProgTitle) bankProgTitle.textContent = 'Corrigiendo diferencias por retenciones impositivas...';
+      } else if (percent === 100) {
+        clearInterval(interval);
+        if (bankProgContainer) bankProgContainer.style.display = 'none';
+        if (bankResults) bankResults.style.display = 'flex';
+        mainApp.showToast("¡Conciliación bancaria completada! Encontramos 3 coincidencias exactas, 1 retención y 1 movimiento huérfano.", "success");
+        if (window.lucide) window.lucide.createIcons({ root: bankResults });
+      }
+    }, 70);
   });
 }
